@@ -1,0 +1,127 @@
+<?php
+
+$front = Zend_Controller_Front::getInstance();
+$c = $this->ah('control')->config;
+
+if ($front->getRequest()->getPost('nd')) {
+	$rows = array();
+	if ($c->data && $c->field) {
+    	foreach ($c->data as $el) {
+    		$cc = array();
+    		foreach ($el as $k => $el_1) {
+    			if (!$c->field->$k->active || $k == '_level' || $k == '_count') continue;
+    			$cc[]= $el_1;
+    		}
+    		if ($c->tree) {
+    			$cc[] = $el->_level;
+    			$cc[] = $el->{$c->tree_field};
+    			$cc[] = $el->_count ? false : true;
+    			$cc[] = false;
+    		}
+    		$rows[] = array('id' => $el->id, 'cell' => $cc);
+    	}
+    }
+    $data = array(
+    	'page' => $c->pager_page
+    		? $c->pager_page
+    		: 1,
+    	'total' => $c->pager_perpage
+    		? ceil($c->data_cnt / $c->pager_perpage)
+    		: 1,
+    	'records' => $c->data_cnt,
+    	'rows' => $rows
+    );
+	$this->placeholder('content')->set(Zend_Json::encode($data));
+    $c->response_type = 'json';
+}
+else {
+	$this->placeholder('text')->captureStart();
+?>
+<div class="c_table">
+	<table id="list" class="scroll" cellpadding="0" cellspacing="0"></table>
+	<div id="list_pager"></div>
+</div>
+<?php
+	// Схема таблицы для списка и дерева
+	$field_title = $field_model = array();
+
+	if ($c->field) foreach ($c->field as $el) {
+	    if (!$el->active) continue;
+	    $field_title[] = $el->title;
+	    $dt = array(
+	    	'name' => $el->name
+	    );
+	    if ($el->align) $dt['align'] = $el->align;
+	    if ($el->width) $dt['width'] = $el->width;
+	    if ($el->hidden) $dt['hidden'] = true;
+	    if ($el->stype) $dt['stype'] = $el->stype;
+	    if ($el->editoptions) $dt['editoptions'] = $el->editoptions;
+	    if ($el->formatter) {
+			if ($el->formatter == 'function') {
+				$dt['formatter'] = 'fmt_'.$el->name;
+				$formatter_function[] = '$.fn.fmatter.'.$dt['formatter'].' = function(value, options, row, action) { var data = c.formatter(row, $("#list").getGridParam("colModel")); '.$el->formatoptions.' };';
+			}
+			else {
+				$dt['formatter'] = $el->formatter;
+				if ($el->formatoptions) $dt['formatoptions'] = $el->formatoptions;
+			}
+		}
+		if (!$el->sortable) $dt['sortable'] = $el->sortable;
+	    $field_model[] = $dt;
+	}
+
+	$this->placeholder('text')->captureEnd();
+
+	$this->placeholder('content')->set($this->render('control/inner.phtml'));
+
+	$this->ah('js')->addEval(
+'$.include("/lib/ctl/jqgrid/css/ui.jqgrid.css|link");
+$.include([
+	"/lib/ctl/jqgrid/i18n/grid.locale-ru.js",
+	"/lib/ctl/jqgrid/grid.base.js",
+	"/lib/ctl/jqgrid/grid.treegrid.js",
+	"/lib/ctl/jqgrid/grid.custom.js",
+	"/lib/js/jquery/ui/ui.core.js",
+	"/lib/js/jquery/jquery.fmatter.js"
+], function() {
+	'.($formatter_function ? implode('', $formatter_function) : '').'
+	$("#list").jqGrid({
+		'.($c->tree
+?		'treeGrid: true,
+		treeGridModel: "adjacency",
+		ExpandColumn: "'.$field_model[0]['name'].'",'
+:		''
+).'
+	   	url: "/control/router/",
+	   	mtype: "post",
+		datatype: "json",
+	   	colNames: '.Zend_Json::encode($field_title).',
+	   	colModel: '.Zend_Json::encode($field_model).',
+	   	rowNum: '.$c->pager_perpage.',
+	   	pager: "#list_pager",
+	   	sortname: "'.$c->orderby.'",
+	    viewrecords: true,
+	    sortorder: "'.$c->orderdir.'",
+	    width: c.table_width(),
+	    height: c.table_height(),
+	    rownumbers: true,
+	    rownumWidth: 40,
+	    multiselect: true,
+	    multiboxonly: true,
+	    loadui: "block",
+	    forceFit: true,
+	    shrinkToFit: true,
+	    altRows: true,
+	    serializeGridData: function(d) {
+	    	d._controller = "'.$front->getRequest()->getControllerName().'";
+	    	d._action = "'.$front->getRequest()->getActionName().'";
+	    	return d;
+		},
+		scroll: 1,
+		prmNames: {page: "_page", rows: "rows", sort: "_orderby", order: "_orderdir", search:"_search", nd: "nd"}
+	});
+
+});');
+
+	$c->response_type = 'jqphp';
+}

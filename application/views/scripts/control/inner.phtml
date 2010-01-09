@@ -1,0 +1,47 @@
+<?php
+
+if (count($this->ah('control')->config->button_top)) {
+	$this->placeholder('button_top')->captureStart();
+
+?>
+<div class="c_button">
+<?php
+
+	foreach ($this->ah('control')->config->button_top as $el) {
+?>
+<input default="<?php echo (int)$el->default; ?>" type="button" value="<?php echo $el->title; ?>" onclick="c.do_action({controller:'<?php echo $el->controller; ?>',action:'<?php echo $el->action; ?>',param:'<?php echo $el->param ?>',confirm:'<?php echo (int)$el->confirm; ?>'}, this)" />
+<?php
+
+	}
+
+?>
+</div>
+<?php
+
+	$this->placeholder('button_top')->captureEnd();
+}
+if (count($this->ah('control')->config->button_bottom)) {
+	$this->placeholder('button_bottom')->captureStart();
+
+?>
+<div class="c_button">
+<?php
+
+	foreach ($this->ah('control')->config->button_bottom as $el) {
+
+?>
+<input default="<?php echo (int)$el->default; ?>" type="button" value="<?php echo $el->title; ?>" onclick="c.do_action({controller:'<?php echo $el->controller; ?>',action:'<?php echo $el->action; ?>',param:'<?php echo $el->param ?>',confirm:'<?php echo (int)$el->confirm; ?>'}, this)" />
+<?php
+
+	}
+
+?>
+</div>
+<?php
+
+	$this->placeholder('button_bottom')->captureEnd();
+}
+echo	(count($this->ah('control')->config->button_top) ? $this->placeholder('button_top')->getValue() : '').
+		($this->ah('control')->config->text ? '<div class="c_text">'.$this->ah('control')->config->text.'</div>' : '').
+		$this->placeholder('text')->getValue().
+		(count($this->ah('control')->config->button_bottom) ? $this->placeholder('button_bottom')->getValue() : '');
