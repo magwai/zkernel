@@ -24,10 +24,10 @@ class Magwai_Controller_Minify extends Zend_Controller_Action {
 
 			$expires = gmdate('D, d M Y H:i:s', time() + 2592000).' GMT';
 
-			if (@$_SERVER['HTTP_IF_MODIFIED_SINCE'] === $modified) $response->setHttpResponseCode(304);
+			if (0/*@$_SERVER['HTTP_IF_MODIFIED_SINCE'] === $modified*/) $response->setHttpResponseCode(304);
 			else {
 				$res = file_get_contents($path);
-				if ($res) {
+				/*if ($res) {
 					$md5 = md5($path.$modified);
 
 					$cache = Zend_Cache::factory('Core', 'Memcached');
@@ -55,14 +55,14 @@ class Magwai_Controller_Minify extends Zend_Controller_Action {
 								fwrite($pipes[0], $res);
 								fclose($pipes[0]);
 								$res_1 = stream_get_contents($pipes[1]);
-								fclose($pipes[1]);
-								if ($res_1) $res = "/* yuicompressor */\n".$res_1;
-								proc_close($process);
+								fclose($pipes[1]);*/
+								//if ($res_1) $res = "/* yuicompressor */\n".$res_1;
+								/*proc_close($process);
 							}
 						}
 						$cache->save($res, $md5);
 					}
-				}
+				}*/
 				echo $res;
 			}
 		}

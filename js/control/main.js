@@ -57,7 +57,7 @@ c.init = function(bd) {
 							});
 							$(window).unbind("resize").resize(function() {
 								var l = $("#list");
-								if (l.length) l.setGridHeight(c.table_height()).setGridWidth(c.table_width());
+								if (l.length && l.setGridHeight) l.setGridHeight(c.table_height()).setGridWidth(c.table_width());
 							});
 							c.loading_start(true);
 							c.load_auth(function() {
