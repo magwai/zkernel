@@ -74,5 +74,21 @@ class Helper_Util extends Zend_Controller_Action_Helper_Abstract  {
 		return $res;
 	}
 
+	function getOuterIds($param = array()) {
+		$param['where'] = @$param['where'];
+		$param['field'] = @$param['field'] ? $param['field'] : 'parentid';
+		$param['model'] = @$param['model'];
+		$param['id'] = @$param['id'];
+		$ret = array();
+		$id = $param['model']->fetchOne($param['field'], '`id` = "'.$param['id'].'"'.($param['where'] ? ' AND ('.$param['where'].')' : ''));
+		if ($id) {
+			$ret[] = $id;
+			$param['id'] = $id;
+			$ret_1 = $this->getOuterIds($param);
+			$ret = array_merge($ret, $ret_1);
+		}
+		return $ret;
+	}
+
 
 }

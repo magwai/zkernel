@@ -70,7 +70,7 @@ $.jgrid.extend({
 				$t.grid.headers[1].el.style.width = $t.grid.headers[1].width + 'px';
 			}
 
-			$("td:eq("+expCol+")",row).wrapInner("<span></span>").prepend(twrap)/*.width(ident*18 + 22)*/;
+			$("td:eq("+expCol+")",row).wrapInner("<span></span>").prepend(twrap);
 			$(".treeclick",row).bind("click",function(e){
 				var target = e.target || e.srcElement;
 				var ind =$(target,$t.rows).parents("tr.jqgrow")[0].rowIndex;

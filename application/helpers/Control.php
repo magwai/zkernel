@@ -23,6 +23,7 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
 			'model' 				=> $model,
 			'tree'					=> false,
 			'tree_field'			=> 'parentid',
+			'tree_opened'			=> array(),
 			'cotroller' 			=> $controller,
 			'action' 				=> $action,
 			'stop_frame' 			=> false,
@@ -174,6 +175,14 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
     	if ($request->getParam('orderby')) $this->config->orderby = $request->getParam('orderby');
     	if ($request->getParam('orderdir')) $this->config->orderdir = $request->getParam('orderdir');
     	if ($request->getParam('page')) $this->config->pager_page = $request->getParam('page');
+    	if ($this->config->tree && $request->getParam('oid')) {
+    		$util = Zend_Controller_Action_HelperBroker::getStaticHelper('util');
+    		$this->config->tree_opened = $util->getOuterIds(array(
+    			'model' => $this->config->model,
+    			'id' => $request->getParam('oid')
+    		));
+    		$this->config->tree_opened[] = $request->getParam('oid');
+    	}
     	return $this;
 	}
 
@@ -234,6 +243,10 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
 			}
 			if ($this->config->tree) {
 				$parentid = (int)$request->getPost('nodeid');
+				if ($parentid) {
+					$s = new Zend_Session_Namespace();
+					$s->control['history'][$request->getControllerName()]['oid'] = $parentid;
+				}
 				$level = $request->getPost('n_level');
 				$level = strlen($level) > 0 ? $level + 1 : 0;
 				$where['`'.$this->config->tree_field.'` = ?'] = $parentid;
@@ -274,7 +287,11 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
     	$request = $this->getRequest();
     	$view = $this->getActionController()->view;
     	$id = $id_old = (int)$request->getParam('id');
-		if ($this->config->type == 'edit' && !$id) {
+		if ($this->config->tree && $id) {
+			$s = new Zend_Session_Namespace();
+			$s->control['history'][$request->getControllerName()]['oid'] = $id;
+		}
+    	if ($this->config->type == 'edit' && !$id) {
 			$this->config->info[] = 'Элемент не выбран';
 			$this->config->stop_frame = true;
 		}
@@ -468,6 +485,13 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
     		$id = (int)$request->getParam('id');
     		$ids = $id ? array($id) : array();
     	}
+    	if ($this->config->tree && @$ids[0]) {
+    		$pid = (int)$this->config->model->fetchOne($this->config->tree_field, array('`id` = ?' => $ids[0]));
+			if ($pid) {
+    			$s = new Zend_Session_Namespace();
+				$s->control['history'][$request->getControllerName()]['oid'] = $pid;
+			}
+		}
     	$cnt = 0;
     	if ($ids) {
 	    	foreach ($ids as $el) {

@@ -57,7 +57,7 @@ jQuery.extend({
 			}
 		};
 		script.onreadystatechange = function () {
-			if (this.readyState == 'loaded' || this.readyState == 'complete') {
+			if (script.readyState == 'loaded' || script.readyState == 'complete') {
 				jQuery.includedScripts[url] = script;
 
 				if (typeof onload == 'function') {

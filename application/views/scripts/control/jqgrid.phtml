@@ -121,6 +121,15 @@ $.include([
 	    	d._action = "'.$front->getRequest()->getActionName().'";
 	    	return d;
 		},
+		gridComplete: function() {'.($c->tree && count($c->tree_opened) ?
+			'$("#list").find("tr[id='.implode('],tr[id=', $c->tree_opened->toArray()).']").each(function() {
+				var o = $(this).find(".treeclick.tree-plus");
+				if (o.length) {
+				 	$("#list")[0].grid.hDiv.loading = false;
+					o.click();
+				}
+			});' : '').'
+		},
 		scroll: 1,
 		prmNames: {page: "_page", rows: "rows", sort: "_orderby", order: "_orderdir", search:"_search", nd: "nd"}
 	});
