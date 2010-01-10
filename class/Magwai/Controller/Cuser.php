@@ -16,6 +16,7 @@ class Magwai_Controller_Cuser extends Magwai_Controller_Action {
     	);
 
 		$this->_helper->control()->config->set(array(
+			'field_title' => 'login',
 			'post_field_unset' => array('password'),
 			'post_field_extend' => $ex,
 			'field' => array(

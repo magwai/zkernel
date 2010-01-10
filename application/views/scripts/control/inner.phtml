@@ -9,7 +9,7 @@ if (count($this->ah('control')->config->button_top)) {
 
 	foreach ($this->ah('control')->config->button_top as $el) {
 ?>
-<input default="<?php echo (int)$el->default; ?>" type="button" value="<?php echo $el->title; ?>" onclick="c.do_action({controller:'<?php echo $el->controller; ?>',action:'<?php echo $el->action; ?>',param:'<?php echo $el->param ?>',confirm:'<?php echo (int)$el->confirm; ?>'}, this)" />
+<input default="<?php echo (int)$el->default; ?>" type="button" value="<?php echo $el->title; ?>" onclick="c.do_action({controller:'<?php echo $el->controller; ?>',action:'<?php echo $el->action; ?>',param:'<?php echo $el->param ?>',confirm:'<?php echo (int)$el->confirm; ?>'<?php echo $el->field ? ',field:\''.$el->field.'\'' : ''; ?>}, this)" />
 <?php
 
 	}

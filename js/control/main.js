@@ -146,11 +146,6 @@ c.go = function(controller, action, param) {
 		c.info('e:' + c.lang['no_response'] + ': ' + controller + (action ? '/' + action : ''));
 	};
 	php.complete = function (request, status) {
-		$('#c_navpane a').each(function() {
-			$(this).click(function() {
-				return c.go($(this).attr('rel'));
-			});
-		});
 		c.loading_finish();
 		if (typeof callback != 'undefined') callback();
 		$('.c_form input:first').focus();
@@ -271,17 +266,21 @@ c.do_action = function(obj, parent) {
 	var controller = obj.controller;
 	var action = obj.action;
 	var param = obj.param;
-	var field = obj.field;
+	var field = obj.field ? obj.field : 'id';
 	var conf = Number(obj.confirm);
 	if (conf && !confirm(parent.value + '?')) return;
 	var l = $('#list');
+
 	if (l.length) {
 		var id = l.getGridParam('selrow');
+		if (c.controller != controller && l.find('tr[id=' + id + '] .treeclick').length != 0) {
+			return false;
+		}
 		var ids = l.getGridParam('selarrrow');
-		param += (param.length ? '&' : '') + '_id=' + (id ? id : 0);
+		param += (param.length ? '&' : '') + '_' + field + '=' + (id ? id : 0);
 		var p = '';
 		if (ids) for (var i = 0; i < ids.length; i++) p += (p.length ? ',' : '') + ids[i];
-		param += (param.length ? '&' : '') + '_ids=' + (p.length ? p : 0);
+		param += (param.length ? '&' : '') + '_' + field + 's=' + (p.length ? p : 0);
 	}
 	c.go(
 		controller,
@@ -483,7 +482,19 @@ c.formatter = function(row, cm) {
 	return d;
 }
 
-
+c.build_navpane = function(d) {
+	var r = '';
+	for (k in d) r +=
+		(r.length ? ' - ' : '') +
+		(d[k].c
+			? '<a href="#" c="' + d[k].c + '" a="' + d[k].a + '" p="' + d[k].p + '">' + d[k].t + '</a>'
+			: d[k].t
+		);
+	$('#c_navpane').html(r).find('a').click(function() {
+		c.go($(this).attr('c'), $(this).attr('a'), $(this).attr('p'));
+		return false;
+	});
+}
 
 
 

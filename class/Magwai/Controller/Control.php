@@ -161,7 +161,7 @@ class Magwai_Controller_Control extends Magwai_Controller_Action {
 		$db = new Magwai_Model_Cmenu();
 		$row = $db->fetchRow(array('id = ?' => $parentid));
 
-		$result = $db->fetchAll(array('parentid = ?' => $parentid), 'orderid');
+		$result = $db->fetchAll(array('parentid = ?' => $parentid, '`show_it` = 1'), 'orderid');
 		if ($result) {
 			foreach ($result as $num => $el) {
 				if (!@$el['title']) continue;

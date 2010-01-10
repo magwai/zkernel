@@ -149,7 +149,8 @@ $.include([
 		},
 		stop: function(event, ui) {
 			var id = ui.item.attr("id");
-			var prev = ui.item.prev("tr").attr("id");
+			var r = ui.item.prev("tr").get(0);
+			var prev = r ? (r.parent_id == ui.item.get(0).parent_id ? r.id : 0) : 0;;
 			if (prev == this._was) return;
 			prev = typeof prev == "undefined" ? 0 : prev;
 			c.go(c.controller, "ctldrag", "_id=" + id + "&_prev=" + prev);

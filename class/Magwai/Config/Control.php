@@ -57,26 +57,29 @@ class Magwai_Config_Control implements Countable, Iterator, ArrayAccess {
 		}
 		else if (($this->_key === 'button_top' || $this->_key === 'button_bottom')) {
 			if (is_string($v)) {
-				$action = $v;
+				$action = 'ctl'.$v;
 				$default = 0;
 				$confirm = 0;
 				$param = '';
+				$field = '';
 			}
 			else {
 				$action = $v->action;
 				$default = (int)$v->default;
 				$confirm = (int)$v->confirm;
 				$param = $v->param;
+				$controller = $v->controller;
+				$field = $v->field;
 			}
-
+			if (!$controller) $controller = Zend_Controller_Front::getInstance()->getRequest()->getControllerName();
 			switch ($action) {
-				case 'add':
+				case 'ctladd':
 					$title = 'Добавить';
 					break;
-				case 'edit':
+				case 'ctledit':
 					$title = 'Изменить';
 					break;
-				case 'delete':
+				case 'ctldelete':
 					$title = 'Удалить';
 					break;
 				default:
@@ -85,11 +88,12 @@ class Magwai_Config_Control implements Countable, Iterator, ArrayAccess {
 			}
 			$v = new Magwai_Config_Control(array(
 				'title' => $title,
-				'controller' => Zend_Controller_Front::getInstance()->getRequest()->getControllerName(),
-				'action' => 'ctl'.$action,
+				'controller' => $controller,
+				'action' => $action,
 				'param' => $param,
 				'default' => $default,
-				'confirm' => $confirm
+				'confirm' => $confirm,
+				'field' => $field
 			));
 		}
 	}

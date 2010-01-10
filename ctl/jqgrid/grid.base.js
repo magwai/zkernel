@@ -1646,10 +1646,13 @@ $.jgrid.extend({
 			}
 			if(!$t.p.multiselect) {
 				if($(pt).attr("class") !== "subgrid") {
-				if( $t.p.selrow ) {$("tr#"+$.jgrid.jqID($t.p.selrow),$t.grid.bDiv).removeClass("ui-state-highlight").attr("aria-selected","false") ;}
-				$t.p.selrow = pt.id;
-				$(pt).addClass("ui-state-highlight").attr("aria-selected","true");
-				if( $t.p.onSelectRow && onsr) { $t.p.onSelectRow($t.p.selrow, true); }
+					if( $t.p.selrow ) {$("tr#"+$.jgrid.jqID($t.p.selrow),$t.grid.bDiv).removeClass("ui-state-highlight").attr("aria-selected","false") ;}
+					if ($t.p.selrow != pt.id) {
+						$t.p.selrow = pt.id;
+						$(pt).addClass("ui-state-highlight").attr("aria-selected","true");
+						if( $t.p.onSelectRow && onsr) { $t.p.onSelectRow($t.p.selrow, true); }
+					}
+					else $t.p.selrow = 0;
 				}
 			} else {
 				$t.p.selrow = pt.id;

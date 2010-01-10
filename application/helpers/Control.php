@@ -24,6 +24,10 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
 			'tree'					=> false,
 			'tree_field'			=> 'parentid',
 			'tree_opened'			=> array(),
+			'field_orderid'			=> 'orderid',
+			'field_title'			=> 'title',
+			'field_link'			=> 'parentid',
+			'param_link'			=> 'cid',
 			'cotroller' 			=> $controller,
 			'action' 				=> $action,
 			'stop_frame' 			=> false,
@@ -35,6 +39,7 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
 			'button_bottom' 		=> array(),
 			'scroll_top' 			=> true,
 			'use_db' 				=> true,
+			'action'				=> 'Просмотр',
 			'request_ok' 			=> array(
 	    		'controller' 			=> $controller,
 	    		'action' 				=> '',
@@ -56,18 +61,28 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
 	    	'pager_perpage' 		=> 0,
 		   	'pager_page' 			=> 1,
 	    	'pre_view'				=> null,
-	    	'func_success'			=> null
+	    	'func_success'			=> null,
+	    	'navpane'				=> array(
+	    		'start' => array(),
+	    		'middle' => true,
+	    		'finish' => array()
+	    	),
 		));
 		return $this;
 	}
 
 	function configFromType() {
+		if ($this->config->tree) $this->config->drag = 1;
 		if (!$this->config->view) {
 			switch ($this->config->type) {
 				case 'add':
 					$this->config->oac_apply = false;
+					$this->config->action = 'Добавление';
+					$view = 'form';
+					break;
 				case 'edit':
 					$view = 'form';
+					$this->config->action = 'Изменение';
 					break;
 				case 'list':
 					$view = 'jqgrid';
@@ -149,7 +164,7 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
 
 		$this->config->set($conf);
 
-		if ($this->config->field && ($this->config->drag || $this->config->type == 'drag') && !$this->config->orderby) $this->config->orderby = 'orderid';
+		if ($this->config->field && ($this->config->drag || $this->config->type == 'drag') && !$this->config->orderby) $this->config->orderby = $this->config->field_orderid;
 		if ($this->config->field && !$this->config->orderby) foreach ($this->config->field as $k => $el) {
 			if ($el->active && !$el->hidden) {
 				$this->config->orderby = $k;
@@ -183,6 +198,21 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
     		));
     		$this->config->tree_opened[] = $request->getParam('oid');
     	}
+
+    	if ($this->config->drag && $this->config->type == 'add' && $this->config->field && isset($this->config->field->{$this->config->field_orderid})) {
+    		$nid = $this->config->model->fetchOne('MAX(`'.$this->config->field_orderid.'`)');
+    		$this->config->post_field_extend->set(array(
+    			$this->config->field_orderid => $nid + 1
+    		));
+    	}
+		if ($this->config->tree && $this->config->type == 'add' && $this->config->field && isset($this->config->field->{$this->config->tree_field}) && $request->getParam('id')) $this->config->post_field_extend->set(array(
+    		$this->config->tree_field => $request->getParam('id')
+    	));
+    	if ($request->getParam('cid')) {
+    		$this->config->post_field_extend->set(array(
+    			$this->config->field_link => $request->getParam('cid')
+    		));
+    	}
     	return $this;
 	}
 
@@ -208,8 +238,18 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
 			case 'jqphp':
 				if (count($this->config->info)) $jquery->direct()->addMessage(($this->config->info_type == 'i' ? '' : 'e:').implode('<br />', $this->config->info->toArray()));
 				if (!$this->config->stop_frame) {
-					$jquery->direct('#c_navpane')->html($view->placeholder('navpane')->getValue());
-	    			$jquery->direct('#c_content')->html($view->placeholder('content')->getValue());
+					$navpane = array();
+					if (count($this->config->navpane->start)) $navpane = array_merge($navpane, $this->config->navpane->start->toArray());
+					if ($this->config->navpane->middle === true) {
+						$middle = $this->buildNavpane();
+						if ($middle) $navpane = array_merge($navpane, $middle);
+					}
+					else if ($this->config->navpane->middle !== false) $navpane = array_merge($navpane, $this->config->navpane->middle->toArray());
+					if (count($this->config->navpane->finish)) $navpane = array_merge($navpane, $this->config->navpane->finish->toArray());
+
+					$navpane[] = array('t' => $this->config->action);
+					$js->addEval('c.build_navpane('.Zend_Json::encode($navpane).');');
+					$jquery->direct('#c_content')->html($view->placeholder('content')->getValue());
 				}
 	    		$jquery->direct()->evalScript($js->renderEval());
 
@@ -227,13 +267,35 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
 		}
     }
 
+    function buildNavpane($id = null) {
+    	$ret = array();
+    	$model = new Site_Model_Cmenu();
+    	if ($id === null) {
+    		$id = $model->fetchOne('id', array('`controller` = ?' => $this->getRequest()->getControllerName()));
+    	}
+    	$item = $model->fetchRow(array('`id` = ?' => $id));
+    	if ($item) {
+    		array_unshift($ret, array(
+    			't' => $item->title,
+    			'c' => $item->controller,
+    			'a' => $item->action,
+    			'p' => $item->param
+    		));
+    		$inner = $this->buildNavpane((int)$item->parentid);
+    		if ($inner) $ret = array_merge($inner, $ret);
+    	}
+    	return $ret;
+    }
+
 	public function routeShow()
     {
+    	$js = Zend_Controller_Action_HelperBroker::getStaticHelper('js');
+    	$menu_model = new Site_Model_Cmenu();
+		$menu = $menu_model->fetchRow(array('`controller` = ?' => $this->getRequest()->getControllerName()));
     	$request = $this->getRequest();
     	$view = $this->getActionController()->view;
 
 		if ($request->getPost('nd')) {
-
 			$rows = array();
 			$where = array();
 			if ($request->getParam('search')) {
@@ -252,6 +314,7 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
 				$where['`'.$this->config->tree_field.'` = ?'] = $parentid;
 				$parentid = $parentid == 0 ? null : $parentid;
 			}
+			if ($request->getParam('cid')) $where['`'.$this->config->field_link.'` = ?'] = $request->getParam('cid');
 			$rd = $this->config->model->fetchAll(
 		    	$where,
 		    	$this->config->orderby.' '.$this->config->orderdir,
@@ -272,8 +335,32 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
 		    		));
 		    	}
 		    }
-
 		    $this->config->data = $data;
+		}
+		else {
+			$menus = $menu_model->fetchAll(array('`parentid` = ?' => $menu->id, '`show_it` = 0'));
+			if ($menus) {
+				foreach ($menus as $el) {
+					$this->config->button_top[] = array(
+						'controller' => $el->controller,
+						'action' => $el->action ? $el->action : 'ctlshow',
+						'field' => 'cid',
+						'title' => $el->title
+					);
+				}
+			}
+			$menu = $menu_model->fetchRow(array('`id` = ?' => $menu->parentid));
+			if ($menu) {
+				if (strlen($request->getParam('cid')) && !$request->getParam('cid')) {
+					$this->config->stop_frame = 1;
+					$js->addEval('c.go("'.$menu->controller.'", "'.$menu->action.'", "");');
+					$this->config->info[] = 'Элемент не выбран';
+				}
+				else {
+					$s = new Zend_Session_Namespace();
+					$s->control['history'][$menu->controller]['oid'] = $request->getParam('cid');
+				}
+			}
 
 		}
 		$this->config->pre_view;
@@ -287,10 +374,7 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
     	$request = $this->getRequest();
     	$view = $this->getActionController()->view;
     	$id = $id_old = (int)$request->getParam('id');
-		if ($this->config->tree && $id) {
-			$s = new Zend_Session_Namespace();
-			$s->control['history'][$request->getControllerName()]['oid'] = $id;
-		}
+
     	if ($this->config->type == 'edit' && !$id) {
 			$this->config->info[] = 'Элемент не выбран';
 			$this->config->stop_frame = true;
@@ -393,10 +477,7 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
 						foreach ($data as $k => $v) {
 							if (!array_key_exists($k, $this->config->model->info('metadata'))) unset($data[$k]);
 						}
-						if ($this->config->type == 'add') {
-							if ($this->config->tree) $data[$this->config->tree_field] = $id_old;
-							$ok = $this->config->model->insert($data);
-						}
+						if ($this->config->type == 'add') $ok = $this->config->model->insert($data);
 						if ($this->config->type == 'edit') $ok = $this->config->model->update($data, array('`id` = ?' => $id));
 					}
 					if ($ok || $m2m_changed) {
@@ -420,6 +501,16 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
 			else {
 				if ($this->config->type == 'edit') {
 					$data = $this->config->model->fetchRow(array('`id` = ?' => $id));
+
+					if ($this->config->field && isset($this->config->field->{$this->config->field_title})) {
+						$this->config->navpane->finish[] = array(
+		    				't' => $data->{$this->config->field_title},
+							'c' => $this->getRequest()->getControllerName(),
+							'a' => $this->getRequest()->getActionName(),
+							'p' => ''
+		    			);
+		    		}
+
 					$data = $data ? $data->toArray() : array();
 					$els = $this->config->form->getElements();
 					if ($els) {
@@ -437,6 +528,10 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
 					}
 					$this->config->form->setDefaults($data);
 				}
+			}
+    		if ($this->config->tree && $id) {
+				$s = new Zend_Session_Namespace();
+				$s->control['history'][$request->getControllerName()]['oid'] = $id;
 			}
 		}
 		$view->render($this->config->view);
@@ -456,6 +551,7 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
 	    	$ok = $cur->save();
 	    	if ($ok) {
 	    		$w = array('`id` != ?' => $cur->id);
+	    		if ($this->config->tree) $w['`'.$this->config->tree_field.'` = ?'] = $cur->{$this->config->tree_field};
 		    	if ($prev) $w['`'.$this->config->orderby.'` > ?'] = $prev->{$this->config->orderby};
 	    		$next = $this->config->model->fetchCol('id', $w);
 	    		if ($next) $ok = $this->config->model->update(array($this->config->orderby => new Zend_Db_Expr('`'.$this->config->orderby.'` + 1')), '`id` IN ('.implode(',', $next).')');
@@ -487,10 +583,8 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
     	}
     	if ($this->config->tree && @$ids[0]) {
     		$pid = (int)$this->config->model->fetchOne($this->config->tree_field, array('`id` = ?' => $ids[0]));
-			if ($pid) {
-    			$s = new Zend_Session_Namespace();
-				$s->control['history'][$request->getControllerName()]['oid'] = $pid;
-			}
+    		$s = new Zend_Session_Namespace();
+			$s->control['history'][$request->getControllerName()]['oid'] = $pid;
 		}
     	$cnt = 0;
     	if ($ids) {
