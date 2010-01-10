@@ -45,7 +45,13 @@ $.widget("ui.sortable", $.extend({}, $.ui.mouse, {
 	},
 
 	_mouseCapture: function(event, overrideHandle) {
-
+		t = this;
+		if (t.jc) return false;
+		t.jc = true;
+		window.setTimeout(function() {
+			t.jc = false;
+		}, 500);
+		
 		if (this.reverting) {
 			return false;
 		}

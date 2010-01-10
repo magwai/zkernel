@@ -164,23 +164,14 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
 
 		$this->config->set($conf);
 
-		if ($this->config->field && ($this->config->drag || $this->config->type == 'drag') && !$this->config->orderby) $this->config->orderby = $this->config->field_orderid;
+		if ($this->config->field && ($this->config->drag || $this->config->type == 'drag') && !$this->config->orderby && isset($this->config->field->{$this->config->field_orderid})) $this->config->orderby = $this->config->field_orderid;
+
 		if ($this->config->field && !$this->config->orderby) foreach ($this->config->field as $k => $el) {
 			if ($el->active && !$el->hidden) {
 				$this->config->orderby = $k;
 				break;
 			}
 		}
-
-		//print_r($this->config);
-		//echo 'ggg';
-    	//exit();
-		//$c = new Magwai_Config_Control($conf);
-
-
-
-		//print_r($this->config);
-    	//exit();
 
     	return $this;
 	}
@@ -338,7 +329,7 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
 		    $this->config->data = $data;
 		}
 		else {
-			$menus = $menu_model->fetchAll(array('`parentid` = ?' => $menu->id, '`show_it` = 0'));
+			$menus = $menu_model->fetchAll(array('`parentid` = ?' => @(int)$menu->id, '`show_it` = 0'));
 			if ($menus) {
 				foreach ($menus as $el) {
 					$this->config->button_top[] = array(
@@ -349,7 +340,7 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
 					);
 				}
 			}
-			$menu = $menu_model->fetchRow(array('`id` = ?' => $menu->parentid));
+			$menu = $menu_model->fetchRow(array('`id` = ?' => @(int)$menu->parentid));
 			if ($menu) {
 				if (strlen($request->getParam('cid')) && !$request->getParam('cid')) {
 					$this->config->stop_frame = 1;

@@ -59,7 +59,7 @@ class Magwai_Config_Control implements Countable, Iterator, ArrayAccess {
 			if (is_string($v)) {
 				$action = 'ctl'.$v;
 				$default = 0;
-				$confirm = 0;
+				$confirm = (int)($v == 'delete');
 				$param = '';
 				$field = '';
 			}

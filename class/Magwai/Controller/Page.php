@@ -61,7 +61,10 @@ class Magwai_Controller_Page extends Magwai_Controller_Action {
 			'field' => array(
 				'stitle' => array(
 					'active' => false
-				)
+				)/*,
+				'cedit' => array(
+					'active' => $this->_helper->user()->acl->isAllowed($this->_helper->user()->role, )
+				)*/
 			)
 		));
 

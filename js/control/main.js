@@ -487,7 +487,7 @@ c.build_navpane = function(d) {
 	for (k in d) r +=
 		(r.length ? ' - ' : '') +
 		(d[k].c
-			? '<a href="#" c="' + d[k].c + '" a="' + d[k].a + '" p="' + d[k].p + '">' + d[k].t + '</a>'
+			? '<a href="#" c="' + d[k].c + '" a="' + (d[k].a ? d[k].a : '') + '" p="' + (d[k].p ? d[k].p : '') + '">' + d[k].t + '</a>'
 			: d[k].t
 		);
 	$('#c_navpane').html(r).find('a').click(function() {

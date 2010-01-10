@@ -310,7 +310,7 @@ class Magwai_Controller_Cconf extends Magwai_Controller_Action {
 		    	$dir = @$dir['default'];
 		    	$handle = @opendir($dir);@readdir($handle);@readdir($handle);
 				while ($path = @readdir($handle)) {
-					if (!is_dir($bpath.$path)) {
+					if (!is_dir($dir.$path)) {
 						$n = strtolower(str_ireplace('Controller.php', '', $path));
 						$tt[$n] = $n;
 					}
