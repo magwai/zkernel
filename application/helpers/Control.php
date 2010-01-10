@@ -64,6 +64,7 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
 		if (!$this->config->view) {
 			switch ($this->config->type) {
 				case 'add':
+					$this->config->oac_apply = false;
 				case 'edit':
 					$view = 'form';
 					break;
@@ -76,6 +77,9 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
 					break;
 				case 'delete':
 					$view = 'delete';
+					break;
+				case 'drag':
+					$view = 'drag';
 					break;
 				default:
 					$view = 'error';
@@ -142,6 +146,9 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
 			}
 		}
 
+		$this->config->set($conf);
+
+		if ($this->config->field && ($this->config->drag || $this->config->type == 'drag') && !$this->config->orderby) $this->config->orderby = 'orderid';
 		if ($this->config->field && !$this->config->orderby) foreach ($this->config->field as $k => $el) {
 			if ($el->active && !$el->hidden) {
 				$this->config->orderby = $k;
@@ -154,7 +161,7 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
     	//exit();
 		//$c = new Magwai_Config_Control($conf);
 
-		$this->config->set($conf);
+
 
 		//print_r($this->config);
     	//exit();
@@ -176,13 +183,15 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
     	Zend_Controller_Action_HelperBroker::getStaticHelper('layout')->disableLayout();
     	Zend_Controller_Action_HelperBroker::getStaticHelper('viewRenderer')->setNoRender(true);
 
-    	$request = $this->getRequest();
-    	$s = new Zend_Session_Namespace();
-    	$s->control['last'] = array(
-			'controller' => $request->getControllerName(),
-			'action' => $request->getActionName(),
-			'param' => $request->getParams()
-		);
+    	if (!$this->config->stop_frame) {
+    		$request = $this->getRequest();
+	    	$s = new Zend_Session_Namespace();
+	    	$s->control['last'] = array(
+				'controller' => $request->getControllerName(),
+				'action' => $request->getActionName(),
+				'param' => $request->getParams()
+			);
+    	}
 
 		$view = $this->getActionController()->view;
 
@@ -230,7 +239,7 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
 				$where['`'.$this->config->tree_field.'` = ?'] = $parentid;
 				$parentid = $parentid == 0 ? null : $parentid;
 			}
-		    $rd = $this->config->model->fetchAll(
+			$rd = $this->config->model->fetchAll(
 		    	$where,
 		    	$this->config->orderby.' '.$this->config->orderdir,
 		    	$this->config->pager_perpage
@@ -368,7 +377,7 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
 							if (!array_key_exists($k, $this->config->model->info('metadata'))) unset($data[$k]);
 						}
 						if ($this->config->type == 'add') {
-							if ($this->config->tree) $data[$this->tree_field] = $id_old;
+							if ($this->config->tree) $data[$this->config->tree_field] = $id_old;
 							$ok = $this->config->model->insert($data);
 						}
 						if ($this->config->type == 'edit') $ok = $this->config->model->update($data, array('`id` = ?' => $id));
@@ -414,6 +423,35 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
 			}
 		}
 		$view->render($this->config->view);
+		return $this;
+    }
+
+    public function routeDrag()
+    {
+    	$view = $this->getActionController()->view;
+    	$request = $this->getRequest();
+
+    	$cur = $this->config->model->fetchRow(array('`id` = ?' => $request->getParam('id')));
+    	$prev = $this->config->model->fetchRow(array('`id` = ?' => $request->getParam('prev')));
+    	$ok = false;
+    	if ($cur) {
+	    	$cur->orderid = @(int)$prev->orderid + 1;
+	    	$ok = $cur->save();
+	    	if ($ok) {
+	    		$w = array('`id` != ?' => $cur->id);
+		    	if ($prev) $w['`'.$this->config->orderby.'` > ?'] = $prev->{$this->config->orderby};
+	    		$next = $this->config->model->fetchCol('id', $w);
+	    		if ($next) $ok = $this->config->model->update(array($this->config->orderby => new Zend_Db_Expr('`'.$this->config->orderby.'` + 1')), '`id` IN ('.implode(',', $next).')');
+	    	}
+    	}
+
+    	if ($ok) {
+    		$this->config->info[] = 'Элемент перемещен';
+    		$this->config->func_success;
+    	}
+    	else $this->config->info[] = 'Элемент не был перемещен';
+    	$this->config->stop_frame = true;
+    	$view->render($this->config->view);
 		return $this;
     }
 

@@ -280,7 +280,7 @@ c.do_action = function(obj, parent) {
 		var ids = l.getGridParam('selarrrow');
 		param += (param.length ? '&' : '') + '_id=' + (id ? id : 0);
 		var p = '';
-		for (var i = 0; i < ids.length; i++) p += (p.length ? ',' : '') + ids[i];
+		if (ids) for (var i = 0; i < ids.length; i++) p += (p.length ? ',' : '') + ids[i];
 		param += (param.length ? '&' : '') + '_ids=' + (p.length ? p : 0);
 	}
 	c.go(

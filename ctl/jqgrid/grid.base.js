@@ -1,5 +1,10 @@
 ;(function ($) {
 /*
+ * 
+ * 
+ * BUG IN 644 LINE - commented
+ * 
+ * 
  * jqGrid  3.6.2 - jQuery Grid
  * Copyright (c) 2008, Tony Tomov, tony@trirand.com
  * Dual licensed under the MIT and GPL licenses
@@ -380,9 +385,9 @@ $.fn.jqGrid = function( pin ) {
 			var ral = ts.p.colModel[pos].align, result="style=\"", clas = ts.p.colModel[pos].classes;
 			if(ral) result += "text-align:"+ral+";";
 			if(ts.p.colModel[pos].hidden===true) result += "display:none;";
-			if(rowInd===0) {
+			//if(rowInd===0) {
 				result += "width: "+grid.headers[pos].width+"px;"
-			}
+			//}
 			return result+"\"" + (clas !== undefined ? (" class=\""+clas+"\"") :"");
 		},
 		addCell = function(rowId,cell,pos,irow, srvr) {
@@ -641,7 +646,7 @@ $.fn.jqGrid = function( pin ) {
 						fpos = ts.p.treeANode >= -1 ? ts.p.treeANode: 0;
 						row = $(rowData.join(''))[0];
 						try {$(ts).jqGrid("setTreeNode",rd,row);} catch (e) {}
-						rl ===  0 ? $("tbody:first",t).append(row) : $(ts.rows[i+fpos+rcnt]).after(row);
+						rl ===  0 ? $("tbody:first",t).append(row) : $(ts.rows[i+fpos/*+rcnt*/]).after(row);
 					} else {
 						$("tbody:first",t).append(rowData.join(''));
 					}
@@ -1587,6 +1592,7 @@ $.fn.jqGrid = function( pin ) {
 		this.grid = grid;
 		ts.addXmlData = function(d) {addXmlData(d,ts.grid.bDiv);};
 		ts.addJSONData = function(d) {addJSONData(d,ts.grid.bDiv);};
+		ts.setColWidth = function(d) {setColWidth();};
 		populate();ts.p.hiddengrid=false;
 		$(window).unload(function () {
 			$(this).empty();

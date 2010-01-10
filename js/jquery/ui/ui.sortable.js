@@ -138,7 +138,7 @@ $.widget("ui.sortable", $.extend({}, $.ui.mouse, {
 
 		//If the helper is not the original, hide the original so it's not playing any role during the drag, won't cause anything bad this way
 		if(this.helper[0] != this.currentItem[0]) {
-			this.currentItem.hide();
+			//this.currentItem.hide();
 		}
 
 		//Create the placeholder
@@ -697,6 +697,7 @@ $.widget("ui.sortable", $.extend({}, $.ui.mouse, {
 		if(helper[0].style.width == '' || o.forceHelperSize) helper.width(this.currentItem.width());
 		if(helper[0].style.height == '' || o.forceHelperSize) helper.height(this.currentItem.height());
 
+		helper[0].style.border = 'none';
 		return helper;
 
 	},
@@ -948,11 +949,14 @@ $.widget("ui.sortable", $.extend({}, $.ui.mouse, {
 		if(!noPropagation) this._trigger("beforeStop", event, this._uiHash());
 
 		//$(this.placeholder[0]).remove(); would have been the jQuery way - unfortunately, it unbinds ALL events from the original node!
-		this.placeholder[0].parentNode.removeChild(this.placeholder[0]);
+		
+		var _cancelled = this.helper ? 0 : 1;
+			
+		if (!_cancelled) this.placeholder[0].parentNode.removeChild(this.placeholder[0]);
 
-		if(this.helper[0] != this.currentItem[0]) this.helper.remove(); this.helper = null;
+		if(!_cancelled && this.helper[0] != this.currentItem[0]) this.helper.remove(); this.helper = null;
 
-		if(!noPropagation) {
+		if(!_cancelled && !noPropagation) {
 			for (var i=0; i < delayedTriggers.length; i++) { delayedTriggers[i].call(this, event); }; //Trigger all delayed events
 			this._trigger("stop", event, this._uiHash());
 		}

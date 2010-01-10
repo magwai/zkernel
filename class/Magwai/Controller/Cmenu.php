@@ -55,4 +55,13 @@ class Magwai_Controller_Cmenu extends Magwai_Controller_Action {
 
     	$this->_helper->control()->routeDefault();
     }
+
+	public function ctldragAction()
+    {
+    	$this->_helper->control()->config->set(array(
+    		'func_success' => 'php_function:Zend_Controller_Action_HelperBroker::getStaticHelper("js")->addEval("c.load_menu();");'
+		));
+
+    	$this->_helper->control()->routeDefault();
+    }
 }

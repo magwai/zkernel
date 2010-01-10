@@ -59,7 +59,18 @@ $.jgrid.extend({
 					$(row).css("display","none");
 				}
 			}
-			$("td:eq("+expCol+")",row).wrapInner("<span></span>").prepend(twrap);
+
+			var nw = ident*18 + 22;
+			if (nw > $t.grid.headers[0].width) {
+				var d = nw - $t.grid.headers[0].width;
+				$t.grid.headers[0].width = nw;
+				$t.grid.headers[1].width -= d;
+				$t.updateColumns();
+				$t.grid.headers[0].el.style.width = $t.grid.headers[0].width + 'px';
+				$t.grid.headers[1].el.style.width = $t.grid.headers[1].width + 'px';
+			}
+
+			$("td:eq("+expCol+")",row).wrapInner("<span></span>").prepend(twrap)/*.width(ident*18 + 22)*/;
 			$(".treeclick",row).bind("click",function(e){
 				var target = e.target || e.srcElement;
 				var ind =$(target,$t.rows).parents("tr.jqgrow")[0].rowIndex;

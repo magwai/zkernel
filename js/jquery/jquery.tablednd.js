@@ -155,7 +155,7 @@ jQuery.tableDnD = {
 	                        }
 	                        return false;
 	                    }
-	                }).css("cursor", "move"); // Store the tableDnD object
+	                })/*.css("cursor", "move")*/; // Store the tableDnD object
 				}
 			});
 		}

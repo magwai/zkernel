@@ -44,6 +44,7 @@ else {
 <?php
 	// Схема таблицы для списка и дерева
 	$field_title = $field_model = array();
+	$is_fmatter = false;
 
 	if ($c->field) foreach ($c->field as $el) {
 	    if (!$el->active) continue;
@@ -65,8 +66,10 @@ else {
 				$dt['formatter'] = $el->formatter;
 				if ($el->formatoptions) $dt['formatoptions'] = $el->formatoptions;
 			}
+			if ($dt['formatter']) $is_fmatter = true;
 		}
-		if (!$el->sortable) $dt['sortable'] = $el->sortable;
+		if ($c->drag) $dt['sortable'] = false;
+		elseif (!$el->sortable) $dt['sortable'] = $el->sortable;
 	    $field_model[] = $dt;
 	}
 
@@ -79,10 +82,11 @@ else {
 $.include([
 	"/lib/ctl/jqgrid/i18n/grid.locale-ru.js",
 	"/lib/ctl/jqgrid/grid.base.js",
-	"/lib/ctl/jqgrid/grid.treegrid.js",
-	"/lib/ctl/jqgrid/grid.custom.js",
+	'.($c->tree ? '"/lib/ctl/jqgrid/grid.treegrid.js",' : '').'
+	'.($is_fmatter ? '"/lib/js/jquery/jquery.fmatter.js",' : '').'
 	"/lib/js/jquery/ui/ui.core.js",
-	"/lib/js/jquery/jquery.fmatter.js"
+	'.($c->drag ? '"/lib/ctl/jqgrid/grid.jqueryui.js","/lib/js/jquery/ui/ui.sortable.js",' : '').'
+	"/lib/ctl/jqgrid/grid.zkernel.js"
 ], function() {
 	'.($formatter_function ? implode('', $formatter_function) : '').'
 	$("#list").jqGrid({
@@ -99,9 +103,9 @@ $.include([
 	   	colModel: '.Zend_Json::encode($field_model).',
 	   	rowNum: '.$c->pager_perpage.',
 	   	pager: "#list_pager",
-	   	sortname: "'.$c->orderby.'",
+	   	'.($c->drag ? '' : 'sortname: "'.$c->orderby.'",').'
+	   	'.($c->drag ? '' : 'sortorder: "'.$c->orderdir.'",').'
 	    viewrecords: true,
-	    sortorder: "'.$c->orderdir.'",
 	    width: c.table_width(),
 	    height: c.table_height(),
 	    rownumbers: true,
@@ -120,7 +124,29 @@ $.include([
 		scroll: 1,
 		prmNames: {page: "_page", rows: "rows", sort: "_orderby", order: "_orderdir", search:"_search", nd: "nd"}
 	});
-
+	'.($c->drag ? '$("#list").jqGrid("sortableRows", {
+		helper: "clone",
+		distance: 4,
+		forceHelperSize: true,
+		start: function(event, ui) {
+			$("#list").resetSelection();
+			this._was = ui.item.prev("tr").attr("id");
+		},
+		beforeStop: function(event, ui) {
+			var p = ui.item.get(0);
+			var r = ui.item.prev("tr").get(0);
+			if ((r && p.parent_id == r.parent_id) || (r && p.parent_id == r.id) || (p.parent_id == 0 && !r)) return true;
+			return false;
+		},
+		stop: function(event, ui) {
+			var id = ui.item.attr("id");
+			var prev = ui.item.prev("tr").attr("id");
+			if (prev == this._was) return;
+			prev = typeof prev == "undefined" ? 0 : prev;
+			c.go(c.controller, "ctldrag", "_id=" + id + "&_prev=" + prev);
+			'.($c->tree ? '$("#list").updateNodeChildren(ui.item.get(0));' : '$("#list").updateRowNum();').'
+		}
+	});' : '').'
 });');
 
 	$c->response_type = 'jqphp';

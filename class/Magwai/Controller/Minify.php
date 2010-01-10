@@ -6,13 +6,13 @@ class Magwai_Controller_Minify extends Zend_Controller_Action {
     	$this->_helper->viewRenderer->setNoRender(true);
 		$request = $this->getRequest();
 		$response = $this->getResponse();
-		
+
 	   	$ext = $request->getParam('ext');
 	    $path = SITE_PATH.'/'.$request->getParam('path').'.'.$ext;
 		$file = basename($path);
-		
+
 		$content_type = '';
-		
+
 		if ($path && $file) {
 			$res = '';
 
@@ -24,7 +24,7 @@ class Magwai_Controller_Minify extends Zend_Controller_Action {
 
 			$expires = gmdate('D, d M Y H:i:s', time() + 2592000).' GMT';
 
-			if (0/*@$_SERVER['HTTP_IF_MODIFIED_SINCE'] == $modified*/) $response->setHttpResponseCode(304);
+			if (@$_SERVER['HTTP_IF_MODIFIED_SINCE'] === $modified) $response->setHttpResponseCode(304);
 			else {
 				$res = file_get_contents($path);
 				if ($res) {
@@ -38,7 +38,7 @@ class Magwai_Controller_Minify extends Zend_Controller_Action {
 
 					if ($res_1) $res = $res_1;
 					else {
-						$process = popen('java -client -Xmx64m', 'r');	
+						$process = popen('java -client -Xmx64m', 'r');
 						$ret = false;
 						if (is_resource($process)) {
 							$read = fread($process, 1024);
@@ -77,7 +77,7 @@ class Magwai_Controller_Minify extends Zend_Controller_Action {
 					->setHeader('Expires', $expires);
 		if ($content_type) $response
 					->setHeader('Content-type', $content_type);
-		
+
     }
 }
 

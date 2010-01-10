@@ -101,10 +101,11 @@ class Magwai_Config_Control implements Countable, Iterator, ArrayAccess {
 				$f = create_function('$control', substr($ret, 13));
 				$control = Zend_Controller_Action_HelperBroker::getStaticHelper('control');
 				$ret = $f($control);
-
-				$this->set($k, $ret);
-				$this->_data[$k]->set($ret);
-				$ret = $this->_data[$k];
+				if ($ret) {
+					$this->set($k, $ret);
+					$this->_data[$k]->set($ret);
+					$ret = $this->_data[$k];
+				}
 			}
 		}
 		else $ret = null;
