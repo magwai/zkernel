@@ -90,5 +90,54 @@ class Helper_Util extends Zend_Controller_Action_Helper_Abstract  {
 		return $ret;
 	}
 
+	function getById($param = array()) {
+		$param['field'] = @$param['field'];
+		$param['model'] = @$param['model'];
+		$param['key'] = @$param['key'] ? $param['key'] : 'id';
+		$param['id'] = @$param['id'];
+		return $param['model']->fetchOne($param['field'], array('`'.$param['key'].'` = ?' => $param['id']));
+	}
+
+	function translit($str) {
+		$tr = array(
+			"Ґ"=>"G","Ё"=>"YO","Є"=>"E","Ї"=>"YI","І"=>"I",
+			"і"=>"i","ґ"=>"g","ё"=>"yo","№"=>"#","є"=>"e",
+			"ї"=>"yi","А"=>"A","Б"=>"B","В"=>"V","Г"=>"G",
+			"Д"=>"D","Е"=>"E","Ж"=>"ZH","З"=>"Z","И"=>"I",
+			"Й"=>"Y","К"=>"K","Л"=>"L","М"=>"M","Н"=>"N",
+			"О"=>"O","П"=>"P","Р"=>"R","С"=>"S","Т"=>"T",
+			"У"=>"U","Ф"=>"F","Х"=>"H","Ц"=>"TS","Ч"=>"CH",
+			"Ш"=>"SH","Щ"=>"SCH","Ъ"=>"'","Ы"=>"YI","Ь"=>"",
+			"Э"=>"E","Ю"=>"YU","Я"=>"YA","а"=>"a","б"=>"b",
+			"в"=>"v","г"=>"g","д"=>"d","е"=>"e","ж"=>"zh",
+			"з"=>"z","и"=>"i","й"=>"y","к"=>"k","л"=>"l",
+			"м"=>"m","н"=>"n","о"=>"o","п"=>"p","р"=>"r",
+			"с"=>"s","т"=>"t","у"=>"u","ф"=>"f","х"=>"h",
+			"ц"=>"ts","ч"=>"ch","ш"=>"sh","щ"=>"sch","ъ"=>"'",
+			"ы"=>"yi","ь"=>"","э"=>"e","ю"=>"yu","я"=>"ya"
+		);
+		return strtr($str, $tr);
+	}
+
+	function stitle($str, $length = 56000) {
+		$str = strtolower($this->translit($str));
+		$str = @preg_replace('/[^\w]/', '_', $str);
+		while (strpos($str, '__') !== false) $str = str_replace('__', '_', $str);
+		$str = trim($str, '_');
+		if (strlen($str) > $length) {
+			$p = explode('_', $str);
+			$c = array();
+			foreach ($p as $el) $c[] = strlen($el);
+			while (strlen($str) > $length) {
+				$i = array_search(max($c), $c);
+				if ($i === false) break;
+				unset($c[$i]);
+				unset($p[$i]);
+				$str = implode('_', $p);
+			}
+		}
+		return $str;
+	}
+
 
 }

@@ -96,6 +96,16 @@ class Magwai_Config_Control implements Countable, Iterator, ArrayAccess {
 				'field' => $field
 			));
 		}
+		else if ($k === 'static_field' && $v) {
+			$t = $v;
+			$v = new Magwai_Config_Control(array(
+				'field_src' => 'title',
+				'field_dst' => 'stitle',
+				'unique' => true,
+				'length' => 20
+			));
+			if ($t instanceof Magwai_Config_Control) $v->set($t);
+		}
 	}
 
 	function get($k) {
@@ -107,7 +117,7 @@ class Magwai_Config_Control implements Countable, Iterator, ArrayAccess {
 				$ret = $f($control);
 				if ($ret) {
 					$this->set($k, $ret);
-					$this->_data[$k]->set($ret);
+					if ($this->_data[$k] instanceof Magwai_Config_Control) $this->_data[$k]->set($ret);
 					$ret = $this->_data[$k];
 				}
 			}

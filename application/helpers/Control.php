@@ -66,6 +66,7 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
 	    		'middle' => true,
 	    		'finish' => array()
 	    	),
+	    	'static_field' => false
 		));
 		return $this;
 	}
@@ -382,7 +383,7 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
 					'label' => $el->title,
 					'description' => $el->description,
 		    		'required' => $el->required ? true : false,
-					'validators' => array()
+					'validators' => $el->validators ? $el->validators : array()
 				));
 				if ($el->unique) {
 					$p->validators[] = array(
@@ -421,6 +422,26 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
 					if ($this->config->type == 'add') $id = $this->config->model->fetchNextId();
 
 					$data = $this->config->form->getValues();
+
+					if (count($this->config->static_field)) {
+						$util = Zend_Controller_Action_HelperBroker::getStaticHelper('util');
+						$stitle = $util->stitle($data[$this->config->static_field->field_src], $this->config->static_field->length);
+    					$stitle = $stitle ? $stitle : '_';
+    					$stitle_n = $stitle;
+						if ($this->config->static_field->unique && $this->config->use_db) {
+							$stitle_p = -1;
+							do {
+								$stitle_p++;
+								$stitle_n = $stitle.($stitle_p == 0 ? '' : $stitle_p);
+								$w = array('`'.$this->config->static_field->field_dst.'` = ?' => $stitle_n);
+								if ($this->config->type == 'edit') $w['`id` != ?'] = $id;
+								$stitle_c = (int)$this->config->model->fetchCount($w);
+							}
+							while ($stitle_c > 0);
+						}
+						$data[$this->config->static_field->field_dst] = $stitle_n;
+					}
+
 					if (count($this->config->post_field_unset)) {
 						foreach ($this->config->post_field_unset as $k) unset($data[$k]);
 					}

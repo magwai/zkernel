@@ -7,12 +7,18 @@ class Magwai_Controller_Txt extends Magwai_Controller_Action {
 				'title' => array(
 					'title' => 'Заголовок',
 					'required' => true,
-					'sortable' => true
+					'sortable' => true,
+					'unique' => true
 				),
 				'key' => array(
 					'title' => 'Ключ',
 					'required' => true,
-					'sortable' => true
+					'sortable' => true,
+					'unique' => true,
+					'validators' => array(array(
+						'validator' => 'Regex',
+						'options' => array('/^[a-z0-9\_\-]*$/i')
+					))
 				),
 				'value' => array(
 					'title' => 'Значение',

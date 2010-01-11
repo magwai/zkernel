@@ -11,6 +11,7 @@ class Magwai_Controller_Page extends Magwai_Controller_Action {
 
 	function ctlinit() {
 		$this->_helper->control()->config->set(array(
+			'static_field' => true,
 			'field' => array(
 				'title' => array(
 					'title' => 'Заголовок',
@@ -22,7 +23,11 @@ class Magwai_Controller_Page extends Magwai_Controller_Action {
 					'required' => true,
 					'formatter' => 'function',
 					'formatoptions' => 'return Number(data.cedit) ? "/page/<strong>" + data.stitle + "</strong>/" : "";',
-					'sortable' => true
+					'sortable' => true,
+					'validators' => array(array(
+						'validator' => 'Regex',
+						'options' => array('/^[a-z0-9\_\-]*$/i')
+					))
 				),
 				'message' => array(
 					'title' => 'Текст',
@@ -61,10 +66,42 @@ class Magwai_Controller_Page extends Magwai_Controller_Action {
 			'field' => array(
 				'stitle' => array(
 					'active' => false
-				)/*,
+				),
 				'cedit' => array(
-					'active' => $this->_helper->user()->acl->isAllowed($this->_helper->user()->role, )
-				)*/
+					'active' => $this->_helper->user()->acl->isAllowed(
+						$this->_helper->user()->role,
+						$this->_helper->util()->getById(array(
+							'model' => new Site_Model_Cresource(),
+							'field' => 'id',
+							'key' => 'key',
+							'id' => 'admin'
+						))
+					)
+				)
+			)
+		));
+
+		$this->_helper->control()->routeDefault();
+	}
+
+	function ctleditAction() {
+		$this->_helper->control()->config->set(array(
+			'static_field' => false,
+			'field' => array(
+				'stitle' => array(
+					'unique' => true
+				),
+				'cedit' => array(
+					'active' => $this->_helper->user()->acl->isAllowed(
+						$this->_helper->user()->role,
+						$this->_helper->util()->getById(array(
+							'model' => new Site_Model_Cresource(),
+							'field' => 'id',
+							'key' => 'key',
+							'id' => 'admin'
+						))
+					)
+				)
 			)
 		));
 
