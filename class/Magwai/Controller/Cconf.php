@@ -3,7 +3,6 @@
 class Magwai_Controller_Cconf extends Magwai_Controller_Action {
 	function ctlinit() {
 		$this->_helper->control()->config->set(array(
-			'actions' => array('add', 'edit', 'delete', 'wizard'),
 			'field' => array(
 				'controller' => array(
 					'title' => 'Контроллер',
@@ -425,7 +424,7 @@ class Magwai_Controller_Cconf extends Magwai_Controller_Action {
 				array(
 					'title' => 'Мастер',
 					'controller' => 'cconf',
-					'action' => 'wizard',
+					'action' => 'ctlwizard',
 					'param' => '_step=default'
 				)
 			),

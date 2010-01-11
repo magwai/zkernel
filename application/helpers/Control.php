@@ -39,7 +39,7 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
 			'button_bottom' 		=> array(),
 			'scroll_top' 			=> true,
 			'use_db' 				=> true,
-			'action'				=> 'Просмотр',
+			'place'					=> 'Просмотр',
 			'request_ok' 			=> array(
 	    		'controller' 			=> $controller,
 	    		'action' 				=> '',
@@ -53,7 +53,6 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
 	    	'oac_apply' 			=> true,
 	    	'post_field_extend'		=> array(),
 	    	'post_field_uset'		=> array(),
-	    	'button_top' 			=> array(),
 	    	'orderby' 				=> '',
 	    	'orderdir' 				=> 'asc',
 	    	'field' 				=> array(),
@@ -73,16 +72,17 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
 
 	function configFromType() {
 		if ($this->config->tree) $this->config->drag = 1;
+
 		if (!$this->config->view) {
 			switch ($this->config->type) {
 				case 'add':
 					$this->config->oac_apply = false;
-					$this->config->action = 'Добавление';
+					$this->config->place = 'Добавление';
 					$view = 'form';
 					break;
 				case 'edit':
 					$view = 'form';
-					$this->config->action = 'Изменение';
+					$this->config->place = 'Изменение';
 					break;
 				case 'list':
 					$view = 'jqgrid';
@@ -121,7 +121,7 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
     	$conf_s = $mc->fetchPairs(null, $this->config->action, $this->config->controller);
     	if ($conf_s) $conf = array_merge($conf, $conf_s);
 
-    	//print_r($conf);
+    	//print_r($this->config->action);
     	//exit();
 
     	//$this->config->set($conf_s);
@@ -238,7 +238,7 @@ class Helper_Control extends Zend_Controller_Action_Helper_Abstract  {
 					else if ($this->config->navpane->middle !== false) $navpane = array_merge($navpane, $this->config->navpane->middle->toArray());
 					if (count($this->config->navpane->finish)) $navpane = array_merge($navpane, $this->config->navpane->finish->toArray());
 
-					$navpane[] = array('t' => $this->config->action);
+					$navpane[] = array('t' => $this->config->place);
 					$js->addEval('c.build_navpane('.Zend_Json::encode($navpane).');');
 					$jquery->direct('#c_content')->html($view->placeholder('content')->getValue());
 				}
