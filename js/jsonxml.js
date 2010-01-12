@@ -1,7 +1,4 @@
-/*
-Testing GIT changed on linux
-and added line
-*/
+
 
 /*
 	The below work is licensed under Creative Commons GNU LGPL License.
