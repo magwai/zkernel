@@ -1,0 +1,25 @@
+<?php
+
+class Zkernel_Form_Element_Color extends Zend_Form_Element_Text
+{
+	public function render(Zend_View_Interface $view = null)
+    {
+    	$js =
+'$.include("/zkernel/ctl/colorpicker/css/colorpicker.css|link");
+$.include("/zkernel/ctl/colorpicker/colorpicker.js", function() {
+	$("input[name='.$this->getName().']").ColorPicker({
+    	color: "'.$this->getValue().'",
+    	onBeforeShow: function () {
+			$(this).ColorPickerSetColor(this.value);
+		},
+    	onSubmit: function(hsb, hex, rgb, el) {
+    		$(el).val("#" + hex);
+    		$(el).ColorPickerHide();
+    	}
+    });
+});
+';
+    	Zend_Controller_Action_HelperBroker::getStaticHelper('js')->addEval($js);
+		return parent::render($view);
+	}
+}
