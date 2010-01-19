@@ -1,6 +1,7 @@
 c = {
 	sel_block: false,
-	drag: []
+	drag: [],
+	timer_l: null
 }; 
 
 c.init = function(bd) {
@@ -59,7 +60,11 @@ c.init = function(bd) {
 								var l = $("#list");
 								if (l.length && l.setGridHeight) l.setGridHeight(c.table_height()).setGridWidth(c.table_width());
 							});
-							c.loading_start(true);
+							$(window).bind('include_start', function(e, d) {
+								c.loading_start(true, 400);
+							}).bind('include_finish', function(e, d) {
+								c.loading_finish();
+							});
 							c.load_auth(function() {
 								c.load_menu(function() {
 									c.go(c.cfg['controller'], c.cfg['action'], c.cfg['param']);
@@ -73,15 +78,23 @@ c.init = function(bd) {
 		}
 	});
 }
-c.loading_start = function(lock) {
+c.loading_start = function(lock, delay) {
+	if (c.loading) return;
+	window.clearTimeout(c.timer_l);
+	if (delay) {
+		c.timer_l = window.setTimeout('c.loading_start(' + Number(lock) + ')', delay);
+		return;
+	}
 	$('#c_loader').show();
 	if (typeof lock != 'undefined' && lock) c.overlay_show();
 	c.loading = true;
 }
 c.loading_finish = function() {
+	window.clearTimeout(c.timer_l);
+	c.loading = false;
 	$('#c_loader').hide();
 	c.overlay_hide();
-	c.loading = false;
+	
 }
 c.load_menu = function(success) {
 	$.ajax({
@@ -134,7 +147,7 @@ c.go = function(controller, action, param) {
 	param = typeof param == 'undefined' ? '' : param;
 	action = typeof action == 'undefined' ? '' : action;
 	noempty = typeof noempty == 'undefined' ? false : noempty;
-	c.loading_start();
+	c.loading_start(true, 1000);
 	/*if (!noempty) {
 		$('#c_content').empty();
 		$('#c_navpane').empty();
@@ -179,7 +192,7 @@ c.load_auth = function(success) {
 	});
 }
 c.login = function(data, controller, action, param) {
-	c.loading_start();
+	c.loading_start(false, 400);
 	$('#c_login').fadeOut('fast');
 	$.ajax({
 		url: '/control/auth/?' + c.rnd(),
@@ -206,7 +219,7 @@ c.login = function(data, controller, action, param) {
 	return false;
 }
 c.logout = function() {
-	c.loading_start();
+	c.loading_start(false, 400);
 	$('#c_login').fadeOut('fast');
 	$.ajax({
 		url: '/control/auth/?' + c.rnd(),

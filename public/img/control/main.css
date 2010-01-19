@@ -1,4 +1,4 @@
-body.c_body{overflow:scroll;background:#ffffff;color:#000000;font:12px Arial;padding:0;margin:0;cursor:default;min-width:996px;}
+body.c_body{overflow-y:scroll;background:#ffffff;color:#000000;font:12px Arial;padding:0;margin:0;cursor:default;min-width:996px;}
 .c_body form{padding:0;margin:0;}
 .c_body p{padding:0;margin:0;}
 .c_body a,a:link,a:visited{color:#000000;}

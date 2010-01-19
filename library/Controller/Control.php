@@ -165,8 +165,11 @@ class Zkernel_Controller_Control extends Zkernel_Controller_Action {
 		);
 
 		if ($error) {
-			$this->_helper->control()->response_type = 'jqphp';
-			$this->_helper->control()->info = array($error);
+			$js = Zend_Controller_Action_HelperBroker::getStaticHelper('js');
+			$this->_helper->control()->config->response_type = 'jqphp';
+			$this->_helper->control()->config->stop_frame = true;
+			$this->_helper->control()->config->info = array($error);
+			$js->addEval('c.load_menu();c.load_auth();c.go(c.cfg["def_controller"], c.cfg["def_action"], c.cfg["def_param"]);');
 			$this->_helper->control()->viewControl();
 		}
     }

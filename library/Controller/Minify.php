@@ -63,7 +63,9 @@ class Zkernel_Controller_Minify extends Zend_Controller_Action {
 								fclose($pipes[0]);
 								$res_1 = stream_get_contents($pipes[1]);
 								fclose($pipes[1]);
-								if ($res_1) $res = "/* yuicompressor */\n".$res_1;
+								if ($res_1) {
+									$res = "/* yuicompressor */\n".$res_1;
+								}
 								proc_close($process);
 							}
 						}

@@ -1,6 +1,6 @@
 <?php
 
-class Magwai_View_Helper_FormRubr extends Zend_View_Helper_FormMultiCheckbox
+class Zkernel_View_Helper_FormRubr extends Zend_View_Helper_FormMultiCheckbox
 {
     public function formRubr($name, $value = null, $attribs = null, $options = null)
     {

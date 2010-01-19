@@ -33,17 +33,18 @@ class Zkernel_Db_Table extends Zend_Db_Table_Abstract
     	return $this->getAdapter()->fetchPairs($select);
     }
 
-	public function fetchCol($col = 'id', $where = null, $order = null) {
+	public function fetchCol($col = 'id', $where = null, $order = null, $count = null, $offset = null) {
 		if ($col instanceof Zend_Db_Select) $select = $col;
 		else {
 			$select = $this->select()->from($this, $col);
     		if ($where) $this->_where($select, $where);
+    		if ($count && $offset) $this->limit($count, $offset);
     		if ($order) $select->order($order);
 		}
     	return $this->getAdapter()->fetchCol($select);
     }
 
-	public function fetchOne($col = 'id', $where = null) {
+	public function fetchOne($col = 'id', $where = null, $order = null) {
     	$select = $this->select()->from($this, $col);
     	if ($where) $this->_where($select, $where);
     	if ($order) $select->order($order);

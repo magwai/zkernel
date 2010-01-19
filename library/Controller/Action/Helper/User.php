@@ -106,7 +106,7 @@ class Zkernel_Controller_Action_Helper_User extends Zend_Controller_Action_Helpe
 				if ($remember) setcookie(
 					$key,
 					sha1($this->data->login.$this->data->password),
-					time() + 86400,
+					time() + 86400 * 30,
 					'/'
 				);
 				return true;

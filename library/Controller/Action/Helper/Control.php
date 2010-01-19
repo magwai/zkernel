@@ -87,7 +87,7 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 					break;
 				case 'list':
 					$view = 'jqgrid';
-					$this->config->button_top = array('add', 'edit', 'delete');
+					if (!count($this->config->button_top)) $this->config->button_top = array('add', 'edit', 'delete');
 					break;
 				case 'text':
 					$view = 'text';
@@ -291,7 +291,6 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 		$menu = $menu_model->fetchRow(array('`controller` = ?' => $this->getRequest()->getControllerName()));
     	$request = $this->getRequest();
     	$view = $this->getActionController()->view;
-
 		if ($request->getPost('nd')) {
 			$rows = array();
 			$where = array();
@@ -312,6 +311,7 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 				$parentid = $parentid == 0 ? null : $parentid;
 			}
 			if ($request->getParam('cid')) $where['`'.$this->config->field_link.'` = ?'] = $request->getParam('cid');
+
 			$rd = $this->config->model->fetchAll(
 		    	$where,
 		    	$this->config->orderby.' '.$this->config->orderdir,

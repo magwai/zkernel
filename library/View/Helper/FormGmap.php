@@ -1,6 +1,6 @@
 <?php
 
-class Magwai_View_Helper_FormGmap extends Zend_View_Helper_FormHidden
+class Zkernel_View_Helper_FormGmap extends Zend_View_Helper_FormHidden
 {
     public function formGmap($name, $value = null, $attribs = null)
     {

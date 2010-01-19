@@ -8,7 +8,6 @@ jQuery.extend({
 	 * included scripts
 	 */
 	includedScripts: {},
-
 	/*
 	 * include timer
 	 */
@@ -55,6 +54,16 @@ jQuery.extend({
 			if (typeof onload == 'function') {
 				onload.apply(jQuery(script), arguments);
 			}
+			var isReady = true;
+			for (var script in jQuery.includedScripts) {
+				if (jQuery.includedScripts[script] == false) {
+					isReady = false;
+					break;
+				}
+			}
+			if (isReady) $(window).trigger('include_finish', {
+				url: url
+			});
 		};
 		script.onreadystatechange = function () {
 			if (script.readyState == 'loaded' || script.readyState == 'complete') {
@@ -63,6 +72,16 @@ jQuery.extend({
 				if (typeof onload == 'function') {
 					onload.apply(jQuery(script), arguments);
 				}
+				var isReady = true;
+				for (var script in jQuery.includedScripts) {
+					if (jQuery.includedScripts[script] == false) {
+						isReady = false;
+						break;
+					}
+				}
+				if (isReady) $(window).trigger('include_finish', {
+					url: url
+				});
 			}
 		};
 		if (type == 'script') script.src = url;
@@ -71,8 +90,14 @@ jQuery.extend({
 			script.href = url;
 		}
 
-		jQuery.includedScripts[url] = false;
+		if (type == 'script') {
+			jQuery.includedScripts[url] = false;
+			$(window).trigger('include_start', {
+				url: url
+			});
+		}
 		document.getElementsByTagName('head')[0].appendChild(script);
+		
 
 		if (!jQuery.includeTimer) {
 			jQuery.includeTimer = window.setInterval(function () {
