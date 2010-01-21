@@ -28,7 +28,7 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 			'field_title'			=> 'title',
 			'field_link'			=> 'parentid',
 			'param_link'			=> 'cid',
-			'cotroller' 			=> $controller,
+			'controller' 			=> $controller,
 			'action' 				=> $action,
 			'stop_frame' 			=> false,
 			'info' 					=> array(),
@@ -365,6 +365,59 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 		return $this;
     }
 
+    public function buildForm()
+    {
+    	$id = (int)$this->getRequest()->getParam('id');
+    	$form = new Zkernel_Form(array(
+	    	'accept-charset' => 'utf-8',
+    		'onsubmit' => 'return c.submit()',
+    		'id' => 'c_form'
+    	));
+    	if ($this->config->field) foreach ($this->config->field as $el) {
+		    if (!$el->active) continue;
+			$p = new Zkernel_Config_Control($el->param, array(
+				'label' => $el->title,
+				'description' => $el->description,
+	    		'required' => $el->required ? true : false,
+				'validators' => $el->validators ? $el->validators : array()
+			));
+			if ($el->unique) {
+				$p->validators[] = array(
+					'validator' => 'Db_NoRecordExists',
+					'options' => array(
+						$this->config->model->info('name'),
+						$el->name,
+						array('field' => 'id', 'value' => $id)
+					)
+				);
+			}
+			if ($el->type == 'textarea') $p->rows = 10;
+			if ($el->type == 'editarea') $p->rows = 15;
+			if ($el->type == 'uploadify') {
+				if (!isset($p->path)) $p->path = PUBLIC_PATH.'/upload/'.$this->config->controller.'_'.$el->name;
+				if (!isset($p->fn)) $p->fn = $this->config->model->fetchOne($el->name, array('`id` = ?' => $id));
+			}
+		   $form->addElement($el->type, $el->name, $p->toArray());
+		}
+
+		$form->addElement('submit', 'oac_ok', array(
+		    'label' => 'ОК',
+    		'class' => 'c_button'
+		));
+		$form->addElement('submit', 'oac_cancel', array(
+		    'label' => 'Отмена',
+			'onclick' => 'return c.go("'.$this->config->request_cancel->controller.'", "'.$this->config->request_cancel->action.'", "'.$this->config->request_cancel->param.'")',
+    		'class' => 'c_button'
+		));
+		if ($this->config->oac_apply) $form->addElement('submit', 'oac_apply', array(
+		    'label' => 'Применить',
+    		'onclick' => 'return c.submit(1)',
+    		'class' => 'c_button'
+		));
+    	$form->addDisplayGroup(array('oac_ok', 'oac_cancel', 'oac_apply'), 'oac');
+    	return $form;
+    }
+
 	public function routeForm()
     {
     	$js = Zend_Controller_Action_HelperBroker::getStaticHelper('js');
@@ -377,50 +430,7 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 			$this->config->stop_frame = true;
 		}
     	else {
-		    $this->config->form = new Zkernel_Form(array(
-		    	'accept-charset' => 'utf-8',
-	    		'onsubmit' => 'return c.submit()',
-	    		'id' => 'c_form'
-	    	));
-	    	if ($this->config->field) foreach ($this->config->field as $el) {
-			    if (!$el->active) continue;
-				$p = new Zkernel_Config_Control($el->param, array(
-					'label' => $el->title,
-					'description' => $el->description,
-		    		'required' => $el->required ? true : false,
-					'validators' => $el->validators ? $el->validators : array()
-				));
-				if ($el->unique) {
-					$p->validators[] = array(
-						'validator' => 'Db_NoRecordExists',
-						'options' => array(
-							$this->config->model->info('name'),
-							$el->name,
-							array('field' => 'id', 'value' => $id)
-						)
-					);
-				}
-				if ($el->type == 'textarea') $p->rows = 10;
-				if ($el->type == 'editarea') $p->rows = 15;
-
-			    $this->config->form->addElement($el->type, $el->name, $p->toArray());
-			}
-
-			$this->config->form->addElement('submit', 'oac_ok', array(
-			    'label' => 'ОК',
-	    		'class' => 'c_button'
-			));
-			$this->config->form->addElement('submit', 'oac_cancel', array(
-			    'label' => 'Отмена',
-				'onclick' => 'return c.go("'.$this->config->request_cancel->controller.'", "'.$this->config->request_cancel->action.'", "'.$this->config->request_cancel->param.'")',
-	    		'class' => 'c_button'
-			));
-			if ($this->config->oac_apply) $this->config->form->addElement('submit', 'oac_apply', array(
-			    'label' => 'Применить',
-	    		'onclick' => 'return c.submit(1)',
-	    		'class' => 'c_button'
-			));
-	    	$this->config->form->addDisplayGroup(array('oac_ok', 'oac_cancel', 'oac_apply'), 'oac');
+		    $this->config->form = $this->buildForm();
 
 			if (@(int)$_POST['cposted']) {
 				if ($this->config->form->isValid($_POST)) {
@@ -606,8 +616,21 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
     	$cnt = 0;
     	if ($ids) {
 	    	foreach ($ids as $el) {
+	    		$item = $this->config->model->fetchRow(array('`id` = ?' => $el));
 	    		$ok = $this->config->model->delete(array('`id` = ?' => $el));
-	    		if ($ok) $cnt++;
+	    		if ($ok) {
+	    			$form = $this->buildForm();
+	    			$els = $form->getElements();
+	    			if ($els) {
+	    				foreach ($els as $k => $v) {
+							if ($v->getType() == 'Zkernel_Form_Element_Uploadify') {
+								$path = $v->getAttrib('path');
+								if (isset($item->$k)) @unlink($path.'/'.$item->$k);
+							}
+	    				}
+	    			}
+	    			$cnt++;
+	    		}
 	    	}
 	    	$this->config->info[] = $cnt
 				? 'Удалено элементов: '.$cnt

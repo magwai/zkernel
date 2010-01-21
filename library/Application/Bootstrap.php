@@ -39,5 +39,17 @@ class Zkernel_Application_Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$config->merge(new Zend_Config($this->getOptions()));
 		$this->setOptions($config->toArray());
 	}
+
+	public function _initFu() {
+       	$router = Zend_Controller_Front::getInstance()->getRouter();
+		$route = new Zend_Controller_Router_Route_Regex(
+			'/fu',
+			array(
+				'controller' => 'fu',
+				'action'     => 'index'
+			)
+		);
+		$router->addRoute('fu', $route);
+    }
 }
 

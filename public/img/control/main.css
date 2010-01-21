@@ -122,5 +122,8 @@ input.c_button,#c_form input.c_button{width:auto;padding:2px 10px 2px 10px;font:
 #c_form .description{font-size:11px;line-height:13px;}
 #c_form label input{width:auto;}
 
-
+#c_form .c_uploadify input{width:auto;border:0;}
+.c_uploadify_em{font-style:normal;}
+.c_uploadify_em span{display:block;float:left;margin:2px 20px 0 0;font-size:20px;line-height:20px;}
+.c_uploadify_em img{display:block;float:left;margin:7px 20px 0 0;}
 

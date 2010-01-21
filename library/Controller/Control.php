@@ -47,7 +47,8 @@ class Zkernel_Controller_Control extends Zkernel_Controller_Action {
 			'no_login_err' => 'Логин / пароль неверны',
 			'no_sel' => 'Элемент не выбран',
 			'no_response' => 'Ошибка загрузки модуля',
-			'no_filter' => 'Укажите запрос'
+			'no_filter' => 'Укажите запрос',
+    		'file_error' => 'Ошибка загрузки файла'
 		);
 		if ($data) {
 			$xml = new SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><d></d>');
