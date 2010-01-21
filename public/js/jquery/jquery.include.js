@@ -32,7 +32,7 @@ jQuery.extend({
 			url = url.slice(0, i);
 		}
 
-		if (jQuery.includedScripts[url] != undefined) {
+		if (typeof jQuery.includedScripts[url] != 'undefined') {
 			if (typeof onload == 'function') {
 				onload.apply(jQuery(jQuery.includedScripts[url]), arguments);
 			}
@@ -55,8 +55,8 @@ jQuery.extend({
 				onload.apply(jQuery(script), arguments);
 			}
 			var isReady = true;
-			for (var script in jQuery.includedScripts) {
-				if (jQuery.includedScripts[script] == false) {
+			for (var s in jQuery.includedScripts) {
+				if (jQuery.includedScripts[s] == false) {
 					isReady = false;
 					break;
 				}
@@ -73,8 +73,8 @@ jQuery.extend({
 					onload.apply(jQuery(script), arguments);
 				}
 				var isReady = true;
-				for (var script in jQuery.includedScripts) {
-					if (jQuery.includedScripts[script] == false) {
+				for (var s in jQuery.includedScripts) {
+					if (jQuery.includedScripts[s] == false) {
 						isReady = false;
 						break;
 					}
@@ -122,8 +122,8 @@ jQuery.extend({
 	ready: function () {
 		isReady = true;
 
-		for (var script in jQuery.includedScripts) {
-			if (jQuery.includedScripts[script] == false) {
+		for (var s in jQuery.includedScripts) {
+			if (jQuery.includedScripts[s] == false) {
 				isReady = false;
 				break;
 			}

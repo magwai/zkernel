@@ -1,4 +1,4 @@
-body.c_body{overflow-y:scroll;background:#ffffff;color:#000000;font:12px Arial;padding:0;margin:0;cursor:default;min-width:996px;}
+body.c_body{background:#ffffff;color:#000000;font:12px Arial;padding:0;margin:0;cursor:default;min-width:996px;}
 .c_body form{padding:0;margin:0;}
 .c_body p{padding:0;margin:0;}
 .c_body a,a:link,a:visited{color:#000000;}
@@ -14,7 +14,7 @@ body.c_body{overflow-y:scroll;background:#ffffff;color:#000000;font:12px Arial;p
 .c_tline #c_tl{display:none;font-size:14px;line-height:16px;padding:10px 0 0 0;font-weight:bold;text-align:center;}
 .c_tline .mf{display:none;}
 
-a#c_mlink{outline:none;color:#ffffff;font-size:30px;line-height:30px;font-weight:bold;text-decoration:none;text-transform:lowercase;padding:2px 10px 7px 20px;display:block;float:left;}
+a#c_mlink{width:110px;outline:none;color:#ffffff;font-size:30px;line-height:30px;font-weight:bold;text-decoration:none;text-transform:lowercase;padding:2px 10px 7px 20px;display:block;float:left;}
 a#c_mlink .ui-icon{float:right;margin:11px 0 0 5px;}
 
 #c_navpane{padding:11px 0 0 20px;height:17px;overflow:hidden;}
@@ -121,6 +121,7 @@ input.c_button,#c_form input.c_button{width:auto;padding:2px 10px 2px 10px;font:
 #c_form fieldset dd{display:inline;}
 #c_form .description{font-size:11px;line-height:13px;}
 #c_form label input{width:auto;}
+#c_form #oac-element dd{margin:0 10px 0 0;}
 
 #c_form .c_uploadify input{width:auto;border:0;}
 .c_uploadify_em{font-style:normal;}

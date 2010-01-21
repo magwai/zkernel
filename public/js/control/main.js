@@ -60,7 +60,7 @@ c.init = function(bd) {
 							});
 							$(window).unbind("resize").resize(function() {
 								var l = $("#list");
-								if (l.length && l.setGridHeight) l.setGridHeight(c.table_height()).setGridWidth(c.table_width());
+								if (l.length && l.setGridHeight && l.setGridWidth) l.setGridHeight(c.table_height()).setGridWidth(c.table_width());
 							});
 							$(window).bind('include_start', function(e, d) {
 								c.loading_start(true, 400);
@@ -481,7 +481,7 @@ c.rnd = function() {
 	return dt.getTime();
 }
 c.table_width = function() {
-	return $(window).width() - 40;
+	return $(window).width() - 43;
 }
 c.table_height = function() {
 	var th = 0;

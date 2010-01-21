@@ -1992,83 +1992,85 @@ $.jgrid.extend({
 	},
 	setGridWidth : function(nwidth, shrink) {
 		return this.each(function(){
-			var $t = this, cw,
-			initwidth = 0, brd=$t.p.cellLayout, lvc, vc=0, hs=false, scw=$t.p.scrollOffset, aw, gw=0, tw=0,
-			cl = 0,cr;
-			if (!$t.grid ) {return;}
-			if(typeof shrink != 'boolean') {
-				shrink=$t.p.shrinkToFit;
-			}
-			if(isNaN(nwidth)) {return;}
-			else { nwidth = parseInt(nwidth); $t.grid.width = $t.p.width = nwidth;}
-			$("#gbox_"+$t.p.id).css("width",nwidth+"px");
-			$("#gview_"+$t.p.id).css("width",nwidth+"px");
-			$($t.grid.bDiv).css("width",nwidth+"px");
-			$($t.grid.hDiv).css("width",nwidth+"px");
-			if($t.p.pager ) {$($t.p.pager).css("width",nwidth+"px");}
-			if($t.p.toolbar[0] === true){
-				$($t.grid.uDiv).css("width",nwidth+"px");
-				if($t.p.toolbar[1]=="both") {$($t.grid.ubDiv).css("width",nwidth+"px");}
-			}
-			if($t.p.footerrow) $($t.grid.sDiv).css("width",nwidth+"px");
-			if(shrink ===false && $t.p.forceFit == true) {$t.p.forceFit=false;}			
-			if(shrink===true) {
-				if ($.browser.safari) { brd=0;}
-				$.each($t.p.colModel, function(i) {
-					if(this.hidden===false){
-						initwidth += parseInt(this.width,10);
-						if(this.fixed) {
-							tw += this.width;
-							gw += this.width+brd;
-						} else {
-							vc++;
+			var $t = this;
+			if (typeof $t.p != 'undefined') {
+				var cw, initwidth = 0, brd=$t.p.cellLayout, lvc, vc=0, hs=false, scw=$t.p.scrollOffset, aw, gw=0, tw=0,
+				cl = 0,cr;
+				if (!$t.grid ) {return;}
+				if(typeof shrink != 'boolean') {
+					shrink=$t.p.shrinkToFit;
+				}
+				if(isNaN(nwidth)) {return;}
+				else { nwidth = parseInt(nwidth); $t.grid.width = $t.p.width = nwidth;}
+				$("#gbox_"+$t.p.id).css("width",nwidth+"px");
+				$("#gview_"+$t.p.id).css("width",nwidth+"px");
+				$($t.grid.bDiv).css("width",nwidth+"px");
+				$($t.grid.hDiv).css("width",nwidth+"px");
+				if($t.p.pager ) {$($t.p.pager).css("width",nwidth+"px");}
+				if($t.p.toolbar[0] === true){
+					$($t.grid.uDiv).css("width",nwidth+"px");
+					if($t.p.toolbar[1]=="both") {$($t.grid.ubDiv).css("width",nwidth+"px");}
+				}
+				if($t.p.footerrow) $($t.grid.sDiv).css("width",nwidth+"px");
+				if(shrink ===false && $t.p.forceFit == true) {$t.p.forceFit=false;}			
+				if(shrink===true) {
+					if ($.browser.safari) { brd=0;}
+					$.each($t.p.colModel, function(i) {
+						if(this.hidden===false){
+							initwidth += parseInt(this.width,10);
+							if(this.fixed) {
+								tw += this.width;
+								gw += this.width+brd;
+							} else {
+								vc++;
+							}
+							cl++;
 						}
-						cl++;
+					});
+					if(vc  == 0) return; 
+					$t.p.tblwidth = initwidth;
+					aw = nwidth-brd*vc-gw;
+					if(!isNaN($t.p.height)) {
+						if($($t.grid.bDiv)[0].clientHeight < $($t.grid.bDiv)[0].scrollHeight){
+							hs = true;
+							aw -= scw;
+						}
 					}
-				});
-				if(vc  == 0) return; 
-				$t.p.tblwidth = initwidth;
-				aw = nwidth-brd*vc-gw;
-				if(!isNaN($t.p.height)) {
-					if($($t.grid.bDiv)[0].clientHeight < $($t.grid.bDiv)[0].scrollHeight){
-						hs = true;
-						aw -= scw;
+					initwidth =0;
+					var cle = $t.grid.cols.length >0;
+					$.each($t.p.colModel, function(i) {
+						var tn = this.name;
+						if(this.hidden === false && !this.fixed){
+							cw = Math.floor((aw)/($t.p.tblwidth-tw)*this.width);
+							this.width =cw;
+							initwidth += cw;
+							$t.grid.headers[i].width=cw;
+							$t.grid.headers[i].el.style.width=cw+"px";
+							if($t.p.footerrow) $t.grid.footers[i].style.width = cw+"px";
+							if(cle) $t.grid.cols[i].style.width = cw+"px";
+							lvc = i;
+						}
+					});
+					cr =0;
+					if (hs) {
+						if(nwidth-gw-(initwidth+brd*vc) !== scw)
+							cr = nwidth-gw-(initwidth+brd*vc)-scw;
+					} else if( Math.abs(nwidth-gw-(initwidth+brd*vc)) !== 1) {
+						cr = nwidth-gw-(initwidth+brd*vc);
 					}
-				}
-				initwidth =0;
-				var cle = $t.grid.cols.length >0;
-				$.each($t.p.colModel, function(i) {
-					var tn = this.name;
-					if(this.hidden === false && !this.fixed){
-						cw = Math.floor((aw)/($t.p.tblwidth-tw)*this.width);
-						this.width =cw;
-						initwidth += cw;
-						$t.grid.headers[i].width=cw;
-						$t.grid.headers[i].el.style.width=cw+"px";
-						if($t.p.footerrow) $t.grid.footers[i].style.width = cw+"px";
-						if(cle) $t.grid.cols[i].style.width = cw+"px";
-						lvc = i;
+					$t.p.colModel[lvc].width += cr;
+					cw= $t.p.colModel[lvc].width;
+					$t.grid.headers[lvc].width = cw;
+					$t.grid.headers[lvc].el.style.width=cw+"px";
+					if(cle) $t.grid.cols[lvc].style.width = cw+"px";
+					$t.p.tblwidth = initwidth+cr+tw+brd*cl;
+					$('table:first',$t.grid.bDiv).css("width",$t.p.tblwidth+"px");
+					$('table:first',$t.grid.hDiv).css("width",$t.p.tblwidth+"px");
+					$t.grid.hDiv.scrollLeft = $t.grid.bDiv.scrollLeft;
+					if($t.p.footerrow) {
+						$t.grid.footers[lvc].style.width = cw+"px";
+						$('table:first',$t.grid.sDiv).css("width",$t.p.tblwidth+"px");
 					}
-				});
-				cr =0;
-				if (hs) {
-					if(nwidth-gw-(initwidth+brd*vc) !== scw)
-						cr = nwidth-gw-(initwidth+brd*vc)-scw;
-				} else if( Math.abs(nwidth-gw-(initwidth+brd*vc)) !== 1) {
-					cr = nwidth-gw-(initwidth+brd*vc);
-				}
-				$t.p.colModel[lvc].width += cr;
-				cw= $t.p.colModel[lvc].width;
-				$t.grid.headers[lvc].width = cw;
-				$t.grid.headers[lvc].el.style.width=cw+"px";
-				if(cle) $t.grid.cols[lvc].style.width = cw+"px";
-				$t.p.tblwidth = initwidth+cr+tw+brd*cl;
-				$('table:first',$t.grid.bDiv).css("width",$t.p.tblwidth+"px");
-				$('table:first',$t.grid.hDiv).css("width",$t.p.tblwidth+"px");
-				$t.grid.hDiv.scrollLeft = $t.grid.bDiv.scrollLeft;
-				if($t.p.footerrow) {
-					$t.grid.footers[lvc].style.width = cw+"px";
-					$('table:first',$t.grid.sDiv).css("width",$t.p.tblwidth+"px");
 				}
 			}
 		});
