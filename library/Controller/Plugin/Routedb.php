@@ -5,22 +5,25 @@ class Zkernel_Controller_Plugin_Routedb extends Zend_Controller_Plugin_Abstract 
 		$model = new Default_Model_Url();
 		$result = $model->fetchAll(null, 'orderid');
 		if ($result) {
-			$router = Zend_Controller_Front::getInstance()->getRouter();
+			$front = Zend_Controller_Front::getInstance();
+			$router = $front->getRouter();
 			foreach ($result as $el) {
 				$map = array();
 				if ($el['map']) {
 					$el['map'] = explode(',', $el['map']);
 					foreach ($el['map'] as $n => $m) $map[$n + 1] = $m;
 				}
+				$reverse = preg_replace('/\((.+?)\)/i', '%s', $el['url']);
 				$route = new Zend_Controller_Router_Route_Regex(
 					$el['url'],
 					array(
-						'controller' => $el['controller'],
-						'action'     => $el['action']
+						'controller' => @$el['controller'] ? $el['controller'] : $front->getDefaultControllerName(),
+						'action'     => @$el['action'] ? $el['action'] : $front->getDefaultAction()
 					),
-					$map
+					$map,
+					$reverse
 				);
-				$router->addRoute('dbroute'.$el['orderid'], $route);
+				$router->addRoute('dbroute'.$el['id'], $route);
 			}
 		}
     }

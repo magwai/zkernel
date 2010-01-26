@@ -25,17 +25,20 @@ class Zkernel_Controller_Txt extends Zkernel_Controller_Action {
 					'validators' => array(array(
 						'validator' => 'Regex',
 						'options' => array('/^[a-z0-9\_\-]*$/i')
-					))
+					)),
+					'order' => 2
 				),
 				'title' => array(
 					'title' => 'Заголовок',
 					'required' => true,
 					'sortable' => true,
-					'unique' => true
+					'unique' => true,
+					'order' => 1
 				),
 				'value' => array(
 					'title' => 'Значение',
 					'type' => 'textarea',
+					'order' => 3
 				)
 			)
 		));

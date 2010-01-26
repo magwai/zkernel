@@ -8,9 +8,9 @@ if ($front->getRequest()->getPost('nd')) {
 	if ($c->data && $c->field) {
     	foreach ($c->data as $el) {
     		$cc = array();
-    		foreach ($el as $k => $el_1) {
-    			if (!$c->field->$k->active || $k == '_level' || $k == '_count') continue;
-    			$cc[]= $el_1;
+    		foreach ($c->field as $k => $el_1) {
+    			if (!$el_1->active || $k == '_level' || $k == '_count') continue;
+    			$cc[]= htmlspecialchars($el[$k]);
     		}
     		if ($c->tree) {
     			$cc[] = $el->_level;
@@ -123,15 +123,16 @@ $.include([
 	    	return d;
 		},
 		gridComplete: function() {'.($c->tree && count($c->tree_opened) ?
-			'$("#list").find("tr[id='.implode('],tr[id=', $c->tree_opened->toArray()).']").each(function() {
+			'var l = $("#list");
+			if (l.attr("opened") != 1) l.find("tr[id='.implode('],tr[id=', $c->tree_opened->toArray()).']").each(function() {
 				var o = $(this).find(".treeclick.tree-plus");
 				if (o.length) {
 				 	$("#list")[0].grid.hDiv.loading = false;
 					o.click();
 				}
-			});' : '').'
+			});
+			l.attr("opened", 1);' : '').'
 		},
-		scroll: 1,
 		prmNames: {page: "_page", rows: "rows", sort: "_orderby", order: "_orderdir", search:"_search", nd: "nd"}
 	});
 	'.($c->drag ? '$("#list").jqGrid("sortableRows", {

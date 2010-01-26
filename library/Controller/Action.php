@@ -1,6 +1,14 @@
 <?php
 
 class Zkernel_Controller_Action extends Zend_Controller_Action {
+
+	/**
+     * Default model object.
+     *
+     * @var Zkernel_Db_Table
+     */
+	public $model;
+
 	function init() {
 		$model = 'Default_Model_'.ucfirst($this->getRequest()->getControllerName());
 

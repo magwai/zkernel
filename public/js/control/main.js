@@ -380,35 +380,28 @@ c.submit = function(apply) {
 	var i = $('#c_form .uploadifyQueueItem');
 	if (i.length == 0) c.sumbit_full(apply);
 	else {
-		c.uploads = {};
 		i.each(function() {
 			var n = $(this).attr('id');
 			n = n.slice(0, n.length - 6);
 			var inp = $('#c_form input[name=' + n + '][type=file]');
-			inp.unbind('complete').bind('complete', function(e, d) {
-				if (d.response && d.response.slice(0, 2) == "1|") {
-					var inp_1 = $('#c_form input[name=' + n + '][type=hidden]');
-					inp_1.val(d.response.slice(2));
-					c.uploads[n] = true;
-					var done = true;
-					for (k in c.uploads) {
-						if (c.uploads[k] == false) {
-							done = false;
-							break;
-						}
-					}
-					if (done) c.sumbit_full(apply);
-				}
-				else {
-					c.info(c.lang['file_error'] + ': ' + d.fileObj.name + ' (' + d.response + ')');
-					c.loading_finish();
-				}
+			inp.unbind('complete').bind('complete', function() {
+				c.sumbit_full(apply);
 			});
 			inp.unbind('error').bind('error', function(e, d) {
-				c.info(c.lang['file_error'] + ': ' + d.fileObj.name);
+				var error = '';
+				var response = d.errorObj.info;
+				var ln = 0;
+				response += '|';
+				for (k = 0; k < response.length; k++) {
+					if (response[k] == '|') {
+						error += (error.length == 0 ? '' : '<br />') + d.fileObj.name + ': ' + response.slice(ln, k);
+						ln = k + 1;
+					}
+				}
+				c.info(error);
+				window.scroll(0, 0);
 				c.loading_finish();
 			});
-			c.uploads[n] = false;
 			inp.uploadifyUpload();
 		});
 	}

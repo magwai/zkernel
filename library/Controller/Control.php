@@ -3,6 +3,7 @@
 /**
  * @zk_title   		Панель управления
  * @zk_config		0
+ * @zk_routable		0
  */
 class Zkernel_Controller_Control extends Zkernel_Controller_Action {
 

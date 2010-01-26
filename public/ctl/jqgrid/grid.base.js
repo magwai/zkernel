@@ -1451,8 +1451,9 @@ $.fn.jqGrid = function( pin ) {
 			if (ts.grid.prevRowHeight && ts.p.scroll) {
                 delete ts.p.lastpage;
 				ts.grid.populateVisible();
-			} else
+			} else {
 				ts.grid.populate();
+			}
 			return false;
 		});
 		if( $.isFunction(this.p.ondblClickRow) ) {

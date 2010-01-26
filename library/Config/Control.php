@@ -50,7 +50,8 @@ class Zkernel_Config_Control implements Countable, Iterator, ArrayAccess {
 				'hidden' => false,
 				'formatter' => '',
 				'formatoptions' => '',
-				'param' => array()
+				'param' => array(),
+				'order' => 1000
 			));
 
 			$v->set($t);

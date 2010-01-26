@@ -27,6 +27,18 @@ class Zkernel_Controller_Action_Helper_Util extends Zend_Controller_Action_Helpe
         return $this;
     }
 
+    function getDate($date, $template = 'd.m.Y') {
+    	if (!$date || $date == '0000-00-00 00:00:00') return '';
+		$res = '';
+		if ($template == 'word' || $template == 'word_noyear') {
+			$months = array("января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря");
+			$dt = strtotime($date);
+			$res = date('d', $dt)." ".$months[date('m', $dt) - 1].($template == 'word_noyear' ? '' : ' '.date('Y', $dt));
+		}
+		else $res = @date($template, @strtotime($date));
+		return $res;
+    }
+
 	function getDateBack($period, $parezh = 'imen', $parts = array('day', 'hour', 'minute'), $round = array()) {
 		global $m;
 		if ($period < 0) return '';

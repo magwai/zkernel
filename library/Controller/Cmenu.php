@@ -16,7 +16,8 @@ class Zkernel_Controller_Cmenu extends Zkernel_Controller_Action {
 			'field' => array(
 				'title' => array(
 					'title' => 'Название',
-					'required' => true
+					'required' => true,
+					'order' => 1
 				),
 				'orderid' => array(
 					'active' => false
@@ -33,13 +34,16 @@ class Zkernel_Controller_Cmenu extends Zkernel_Controller_Action {
 				),
 				'controller' => array(
 					'title' => 'Контроллер',
-					'unique' => true
+					'unique' => true,
+					'order' => 2
 				),
 				'action' => array(
-					'title' => 'Действие'
+					'title' => 'Действие',
+					'order' => 3
 				),
 				'param' => array(
-					'title' => 'Параметры'
+					'title' => 'Параметры',
+					'order' => 4
 				),
 				'show_it' => array(
 					'title' => 'Отображать',

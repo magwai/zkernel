@@ -30,4 +30,16 @@ class Zkernel_Form_Element_Mce extends Zend_Form_Element_Textarea
     	Zend_Controller_Action_HelperBroker::getStaticHelper('js')->addEval($js);
 		return parent::render($view);
 	}
+
+	public function getValue() {
+		$value = parent::getValue();
+		$value = str_ireplace(array(
+			'<p style="margin-top: 0px; margin-right: 0px; margin-bottom: 1em; margin-left: 0px;">',
+			"<p>&nbsp;</p>\n<hr />\n<p>&nbsp;</p>"
+		), array(
+			'<p>',
+			'<hr />'
+		), $value);
+		return $value;
+	}
 }

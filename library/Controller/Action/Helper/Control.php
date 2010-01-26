@@ -60,6 +60,7 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 	    	'pager_perpage' 		=> 0,
 		   	'pager_page' 			=> 1,
 	    	'pre_view'				=> null,
+	    	'func_override'			=> null,
 	    	'func_success'			=> null,
 	    	'navpane'				=> array(
 	    		'start' => array(),
@@ -108,6 +109,8 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 
 			$this->config->view = 'control/'.$view.'.phtml';
 		}
+
+		if (isset($this->config->action_config->{$this->config->action})) $this->config->set($this->config->action_config->{$this->config->action});
 
 		return $this;
 	}
@@ -177,6 +180,17 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 				$this->config->orderby = $k;
 				break;
 			}
+		}
+
+		if ($this->config->field) {
+			$d = array();
+			$d1 = $this->config->field->toArray();
+			foreach ($d1 as $k => $v) {
+				$d[$k] = $v['order'];
+				unset($this->config->field->$k);
+			}
+			array_multisort($d, SORT_ASC, SORT_NUMERIC, $d1);
+			$this->config->field->set($d1);
 		}
 
     	return $this;
@@ -394,7 +408,7 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 			if ($el->type == 'textarea') $p->rows = 10;
 			if ($el->type == 'editarea') $p->rows = 15;
 			if ($el->type == 'uploadify') {
-				if (!isset($p->path)) $p->path = PUBLIC_PATH.'/upload/'.$this->config->controller.'_'.$el->name;
+				if (!isset($p->destination)) $p->destination = PUBLIC_PATH.'/upload/'.$this->config->controller.'_'.$el->name;
 				if (!isset($p->fn)) $p->fn = $this->config->model->fetchOne($el->name, array('`id` = ?' => $id));
 			}
 		   $form->addElement($el->type, $el->name, $p->toArray());
@@ -436,11 +450,11 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 				if ($this->config->form->isValid($_POST)) {
 					if ($this->config->type == 'add') $id = $this->config->model->fetchNextId();
 
-					$data = $this->config->form->getValues();
+					$this->config->data = $this->config->form->getValues();
 
-					if (count($this->config->static_field)) {
+					if (count($this->config->static_field) != @$this->config->data[$this->config->static_field->field_dst]) {
 						$util = Zend_Controller_Action_HelperBroker::getStaticHelper('util');
-						$stitle = $util->stitle($data[$this->config->static_field->field_src], $this->config->static_field->length);
+						$stitle = $util->stitle($this->config->data[$this->config->static_field->field_src], $this->config->static_field->length);
     					$stitle = $stitle ? $stitle : '_';
     					$stitle_n = $stitle;
 						if ($this->config->static_field->unique && $this->config->use_db) {
@@ -454,17 +468,17 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 							}
 							while ($stitle_c > 0);
 						}
-						$data[$this->config->static_field->field_dst] = $stitle_n;
+						$this->config->data[$this->config->static_field->field_dst] = $stitle_n;
 					}
 
 					if (count($this->config->post_field_unset)) {
-						foreach ($this->config->post_field_unset as $k) unset($data[$k]);
+						foreach ($this->config->post_field_unset as $k) unset($this->config->data[$k]);
 					}
-					if (count($this->config->post_field_extend)) $data = array_merge($data, $this->config->post_field_extend->toArray());
+					if (count($this->config->post_field_extend)) $this->config->data->set($this->config->post_field_extend);
 					$m2m_changed = false;
-					foreach ($data as $k => $v) {
+					foreach ($this->config->data as $k => $v) {
 						if (@$this->config->field->$k->m2m) {
-							$m2m_new = @$data[$k];
+							$m2m_new = @$this->config->data[$k];
 							$m2m_model = $this->config->field->$k->m2m->model;
 							$m2m_model = new $m2m_model();
 							$m2m_self = $this->config->field->$k->m2m->self;
@@ -500,12 +514,13 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 						}
 					}
 					$ok = false;
-					if ($this->config->use_db) {
-						foreach ($data as $k => $v) {
-							if (!array_key_exists($k, $this->config->model->info('metadata'))) unset($data[$k]);
+					$this->config->func_override;
+					if ($this->config->use_db && count($this->config->info) == 0) {
+						foreach ($this->config->data as $k => $v) {
+							if (!array_key_exists($k, $this->config->model->info('metadata'))) unset($this->config->data[$k]);
 						}
-						if ($this->config->type == 'add') $ok = $this->config->model->insert($data);
-						if ($this->config->type == 'edit') $ok = $this->config->model->update($data, array('`id` = ?' => $id));
+						if ($this->config->type == 'add') $ok = $this->config->model->insert($this->config->data->toArray());
+						if ($this->config->type == 'edit') $ok = $this->config->model->update($this->config->data->toArray(), array('`id` = ?' => $id));
 					}
 					if ($ok || $m2m_changed) {
 						$this->config->info[] = 'Данные сохранены';
@@ -624,8 +639,7 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 	    			if ($els) {
 	    				foreach ($els as $k => $v) {
 							if ($v->getType() == 'Zkernel_Form_Element_Uploadify') {
-								$path = $v->getAttrib('path');
-								if (isset($item->$k)) @unlink($path.'/'.$item->$k);
+								if (isset($v->destination) && isset($item->$k)) @unlink($v->destination.'/'.$item->$k);
 							}
 	    				}
 	    			}
