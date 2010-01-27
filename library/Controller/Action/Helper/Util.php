@@ -102,6 +102,23 @@ class Zkernel_Controller_Action_Helper_Util extends Zend_Controller_Action_Helpe
 		return $ret;
 	}
 
+	function getInnerIds($param = array()) {
+		$ret = array();
+		$param['where'] = @$param['where'];
+		$param['field'] = @$param['field'] ? $param['field'] : 'parentid';
+		$param['model'] = @$param['model'];
+		$param['id'] = @$param['id'];
+		$result = $param['model']->fetchCol('id', '`'.$param['field'].'` = "'.$param['id'].'"'.($param['where'] ? ' AND ('.$param['where'].')' : ''));
+		if ($result) {
+			foreach ($result as $el) {
+				$ret[] = $el;
+				$param['id'] = $el;
+				$ret += array_merge($ret, $this->getInnerIds($param));
+			}
+		}
+		return $ret;
+	}
+
 	function getById($param = array()) {
 		$param['field'] = @$param['field'];
 		$param['model'] = @$param['model'];

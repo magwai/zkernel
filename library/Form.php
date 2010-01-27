@@ -20,7 +20,8 @@ class Zkernel_Form extends Zend_Form
 			'fileUploadErrorIniSize' => 'размер файла слишком большой',
 			'fileImageSizeNotReadable' => 'невозможно прочитать размер картинки',
 			'fileImageSizeNotDetected' => 'невозможно определить размер картинки',
-			'fileExtensionFalse' => 'Запрещено загружать файлы этого типа'
+			'fileExtensionFalse' => 'Запрещено загружать файлы этого типа',
+			'recordFound' => 'Дублирующееся значение'
 		);
 		return isset($d[$e]) ? $d[$e] : $e;
 	}

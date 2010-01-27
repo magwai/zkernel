@@ -19,7 +19,7 @@ class Zkernel_Db_Table extends Zend_Db_Table_Abstract
     	}
     	return $data;
     }
-
+// mosparter.ru
 	public function fetchCount($where = null) {
 		$select = $this->select()->from($this, 'COUNT(*)');
 	    if ($where) $this->_where($select, $where);

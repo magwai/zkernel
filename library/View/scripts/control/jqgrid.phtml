@@ -103,7 +103,6 @@ $.include([
 	   	colNames: '.Zend_Json::encode($field_title).',
 	   	colModel: '.Zend_Json::encode($field_model).',
 	   	rowNum: '.$c->pager_perpage.',
-	   	pager: "#list_pager",
 	   	'.($c->drag ? '' : 'sortname: "'.$c->orderby.'",').'
 	   	'.($c->drag ? '' : 'sortorder: "'.$c->orderdir.'",').'
 	    viewrecords: true,

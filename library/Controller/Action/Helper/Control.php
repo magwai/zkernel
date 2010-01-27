@@ -62,11 +62,13 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 	    	'pre_view'				=> null,
 	    	'func_override'			=> null,
 	    	'func_success'			=> null,
+	    	'func_preset'			=> null,
 	    	'navpane'				=> array(
 	    		'start' => array(),
 	    		'middle' => true,
 	    		'finish' => array()
 	    	),
+	    	'data' => array(),
 	    	'static_field' => false
 		));
 		return $this;
@@ -437,9 +439,9 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
     	$js = Zend_Controller_Action_HelperBroker::getStaticHelper('js');
     	$request = $this->getRequest();
     	$view = $this->getActionController()->view;
-    	$id = $id_old = (int)$request->getParam('id');
+    	$this->config->id = $id_old = (int)$request->getParam('id');
 
-    	if ($this->config->type == 'edit' && !$id) {
+    	if ($this->config->type == 'edit' && !$this->config->id) {
 			$this->config->info[] = 'Элемент не выбран';
 			$this->config->stop_frame = true;
 		}
@@ -448,7 +450,7 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 
 			if (@(int)$_POST['cposted']) {
 				if ($this->config->form->isValid($_POST)) {
-					if ($this->config->type == 'add') $id = $this->config->model->fetchNextId();
+					if ($this->config->type == 'add') $this->config->id = $this->config->model->fetchNextId();
 
 					$this->config->data = $this->config->form->getValues();
 
@@ -463,7 +465,7 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 								$stitle_p++;
 								$stitle_n = $stitle.($stitle_p == 0 ? '' : $stitle_p);
 								$w = array('`'.$this->config->static_field->field_dst.'` = ?' => $stitle_n);
-								if ($this->config->type == 'edit') $w['`id` != ?'] = $id;
+								if ($this->config->type == 'edit') $w['`id` != ?'] = $this->config->id;
 								$stitle_c = (int)$this->config->model->fetchCount($w);
 							}
 							while ($stitle_c > 0);
@@ -485,7 +487,7 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 							$m2m_foreign = $this->config->field->$k->m2m->foreign;
 
 							$m2m_old = $m2m_model->fetchAll(array(
-								'`'.$m2m_self.'` = ?' => $id
+								'`'.$m2m_self.'` = ?' => $this->config->id
 							));
 							if ($m2m_old) {
 								$m2m_ids = array();
@@ -504,7 +506,7 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 									if (!in_array($m2m_el, $m2m_ids)) {
 										$m2m_changed = true;
 										$m2m_model->insert(array(
-											$m2m_self => $id,
+											$m2m_self => $this->config->id,
 											$m2m_foreign => $m2m_el
 										));
 									}
@@ -520,7 +522,7 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 							if (!array_key_exists($k, $this->config->model->info('metadata'))) unset($this->config->data[$k]);
 						}
 						if ($this->config->type == 'add') $ok = $this->config->model->insert($this->config->data->toArray());
-						if ($this->config->type == 'edit') $ok = $this->config->model->update($this->config->data->toArray(), array('`id` = ?' => $id));
+						if ($this->config->type == 'edit') $ok = $this->config->model->update($this->config->data->toArray(), array('`id` = ?' => $this->config->id));
 					}
 					if ($ok || $m2m_changed) {
 						$this->config->info[] = 'Данные сохранены';
@@ -542,18 +544,18 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 			}
 			else {
 				if ($this->config->type == 'edit') {
-					$data = $this->config->model->fetchRow(array('`id` = ?' => $id));
+					$data = $this->config->model->fetchRow(array('`id` = ?' => $this->config->id));
+					$this->config->data->set($data->toArray());
 
 					if ($this->config->field && isset($this->config->field->{$this->config->field_title})) {
 						$this->config->navpane->finish[] = array(
-		    				't' => $data->{$this->config->field_title},
+		    				't' => $this->config->data->{$this->config->field_title},
 							'c' => $this->getRequest()->getControllerName(),
 							'a' => $this->getRequest()->getActionName(),
 							'p' => ''
 		    			);
 		    		}
-
-					$data = $data ? $data->toArray() : array();
+					//$data = $data ? $data->toArray() : array();
 					$els = $this->config->form->getElements();
 					if ($els) {
 						foreach ($els as $el) {
@@ -562,18 +564,20 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 								$m2m_model = $this->config->field->$k->m2m->model;
 								$m2m_self = $this->config->field->$k->m2m->self;
 								$m2m_foreign = $this->config->field->$k->m2m->foreign;
-								$data[$k] = $m2m_model->fetchCol($m2m_foreign, array(
-									'`'.$m2m_self.'` = ?' => $id
+								$this->config->data->$k = $m2m_model->fetchCol($m2m_foreign, array(
+									'`'.$m2m_self.'` = ?' => $this->config->id
 								));
 							}
 						}
 					}
-					$this->config->form->setDefaults($data);
+					//$this->config->data->set($this->config->data->toArray());
+					$this->config->func_preset;
+					$this->config->form->setDefaults($this->config->data->toArray());
 				}
 			}
-    		if ($this->config->tree && $id) {
+    		if ($this->config->tree && $this->config->id) {
 				$s = new Zend_Session_Namespace();
-				$s->control['history'][$request->getControllerName()]['oid'] = $id;
+				$s->control['history'][$request->getControllerName()]['oid'] = $this->config->id;
 			}
 		}
 		$view->render($this->config->view);
