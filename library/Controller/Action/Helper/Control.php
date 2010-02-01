@@ -490,7 +490,7 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 					$m2m_changed = false;
 					foreach ($this->config->data as $k => $v) {
 						if (@$this->config->field->$k->m2m) {
-							$m2m_new = @$this->config->data[$k];
+							$m2m_new = @$this->config->data[$k]->toArray();
 							$m2m_model = $this->config->field->$k->m2m->model;
 							$m2m_model = new $m2m_model();
 							$m2m_self = $this->config->field->$k->m2m->self;
