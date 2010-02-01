@@ -131,7 +131,9 @@ $.include([
 				}
 			});
 			l.attr("opened", 1);' : '').'
+			$("#list").find("td").attr("unselectable", "on").css({"-moz-user-select":"none","-o-user-select":"none","-khtml-user-select":"none","user-select":"none"});
 		},
+		'.(!$c->drag && !$c->tree ? 'scroll: true,' : '').'
 		prmNames: {page: "_page", rows: "rows", sort: "_orderby", order: "_orderdir", search:"_search", nd: "nd"}
 	});
 	'.($c->drag ? '$("#list").jqGrid("sortableRows", {

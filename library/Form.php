@@ -21,7 +21,8 @@ class Zkernel_Form extends Zend_Form
 			'fileImageSizeNotReadable' => 'невозможно прочитать размер картинки',
 			'fileImageSizeNotDetected' => 'невозможно определить размер картинки',
 			'fileExtensionFalse' => 'Запрещено загружать файлы этого типа',
-			'recordFound' => 'Дублирующееся значение'
+			'recordFound' => 'Дублирующееся значение',
+			'emailAddressInvalidFormat' => 'неверный e-mail адрес'
 		);
 		return isset($d[$e]) ? $d[$e] : $e;
 	}

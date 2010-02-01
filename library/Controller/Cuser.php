@@ -24,16 +24,21 @@ class Zkernel_Controller_Cuser extends Zkernel_Controller_Action {
 			'post_field_unset' => array('password'),
 			'post_field_extend' => $ex,
 			'field' => array(
+				'active' => array(
+					'active' => false
+				),
 				'login' => array(
 					'title' => 'Логин',
 					'required' => true,
 					'sortable' => true,
-					'unique' => true
+					'unique' => true,
+					'order' => 1
 				),
 				'password' => array(
 					'title' => 'Пароль',
 					'type' => 'password',
-					'required' => true
+					'required' => true,
+					'order' => 2
 				),
 				'role' => array(
 					'title' => 'Роль',
@@ -41,39 +46,29 @@ class Zkernel_Controller_Cuser extends Zkernel_Controller_Action {
 					'param' => array(
 						'multioptions' => $role
 					),
-					'required' => true
+					'required' => true,
+					'order' => 3
+				)
+			),
+			'action_config' => array(
+				'ctlshow' => array(
+					'field' => array(
+						'password' => array(
+							'active' => false
+						),
+						'role' => array(
+							'active' => false
+						)
+					)
+				),
+				'ctledit' => array(
+					'field' => array(
+						'password' => array(
+							'required' => false
+						)
+					)
 				)
 			)
 		));
 	}
-
-	public function ctlshowAction()
-    {
-    	$this->_helper->control()->config->set(array(
-			'field' => array(
-				'password' => array(
-					'active' => false
-				),
-				'role' => array(
-					'active' => false
-				)
-			)
-		));
-
-    	$this->_helper->control()->routeDefault();
-    }
-
-	public function ctleditAction()
-    {
-
-    	$this->_helper->control()->config->set(array(
-    		'field' => array(
-				'password' => array(
-					'required' => false
-				)
-			)
-		));
-
-    	$this->_helper->control()->routeDefault();
-    }
 }

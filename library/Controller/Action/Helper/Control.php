@@ -21,6 +21,7 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 		$this->config = new Zkernel_Config_Control(array(
 			'theme'					=> 'redmond',
 			'model' 				=> $model,
+			'where'					=> null,
 			'tree'					=> false,
 			'tree_field'			=> 'parentid',
 			'tree_opened'			=> array(),
@@ -103,6 +104,9 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 					break;
 				case 'none':
 					$view = 'none';
+					break;
+				case 'form':
+					$view = 'form';
 					break;
 				default:
 					$view = 'error';
@@ -194,6 +198,8 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 			array_multisort($d, SORT_ASC, SORT_NUMERIC, $d1);
 			$this->config->field->set($d1);
 		}
+
+		if (!$this->config->drag && !$this->config->tree) $this->config->pager_perpage = 100;
 
     	return $this;
 	}
@@ -309,7 +315,7 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
     	$view = $this->getActionController()->view;
 		if ($request->getPost('nd')) {
 			$rows = array();
-			$where = array();
+			$where = $this->config->where ? $this->config->where->toArray() : array();
 			if ($request->getParam('search')) {
 				foreach ($this->config->field as $el) {
 					if (isset($_POST[$el->name])) $where['`'.$el->name.'` = ?'] = $_POST[$el['name']];
@@ -354,11 +360,13 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 			$menus = $menu_model->fetchAll(array('`parentid` = ?' => @(int)$menu->id, '`show_it` = 0'));
 			if ($menus) {
 				foreach ($menus as $el) {
+					$cl_0 = stripos($el->param, 'cl=0');
 					$this->config->button_top[] = array(
 						'controller' => $el->controller,
 						'action' => $el->action ? $el->action : 'ctlshow',
 						'field' => 'cid',
-						'title' => $el->title
+						'title' => $el->title,
+						'cl' => $cl_0 !== false ? 'f' : 't'
 					);
 				}
 			}
@@ -398,12 +406,14 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 				'validators' => $el->validators ? $el->validators : array()
 			));
 			if ($el->unique) {
+				$select = $this->config->model->getAdapter()->select()->where('`id` != ?', $id);
+				if (isset($el->unique->where)) $select->where($el->unique->where);
 				$p->validators[] = array(
 					'validator' => 'Db_NoRecordExists',
 					'options' => array(
 						$this->config->model->info('name'),
 						$el->name,
-						array('field' => 'id', 'value' => $id)
+						implode(' ', $select->getPart(Zend_Db_Select::WHERE))
 					)
 				);
 			}
@@ -518,11 +528,12 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 					$ok = false;
 					$this->config->func_override;
 					if ($this->config->use_db && count($this->config->info) == 0) {
-						foreach ($this->config->data as $k => $v) {
-							if (!array_key_exists($k, $this->config->model->info('metadata'))) unset($this->config->data[$k]);
+						$data_db = $this->config->data->toArray();
+						foreach ($data_db as $k => $v) {
+							if (!array_key_exists($k, $this->config->model->info('metadata'))) unset($data_db[$k]);
 						}
-						if ($this->config->type == 'add') $ok = $this->config->model->insert($this->config->data->toArray());
-						if ($this->config->type == 'edit') $ok = $this->config->model->update($this->config->data->toArray(), array('`id` = ?' => $this->config->id));
+						if ($this->config->type == 'edit') $ok = $this->config->model->update($data_db, array('`id` = ?' => $this->config->id));
+						else $ok = $this->config->model->insert($data_db);
 					}
 					if ($ok || $m2m_changed) {
 						$this->config->info[] = 'Данные сохранены';

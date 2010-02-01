@@ -278,6 +278,7 @@ c.overlay_hide = function() {
 }
 
 c.do_action = function(obj, parent) {
+	var cl = obj.cl;
 	var controller = obj.controller;
 	var action = obj.action;
 	var param = obj.param;
@@ -285,11 +286,18 @@ c.do_action = function(obj, parent) {
 	var conf = Number(obj.confirm);
 	if (conf && !confirm(parent.value + '?')) return;
 	var l = $('#list');
-
 	if (l.length) {
 		var id = l.getGridParam('selrow');
-		if (c.controller != controller && l.find('tr[id=' + id + '] .treeclick').length != 0) {
+		if (cl == 't' && c.controller != controller && l.find('tr[id=' + id + '] .treeclick').length != 0) {
+			c.info('Разрешено переходить только в концевые рубрики');
 			return false;
+		}
+		else if (cl == 'f' && c.controller != controller) {
+			var tdds = l.find('tr[id=' + id + ']>td');
+			if (Number(tdds.eq(tdds.length - 4).text()) != 0) {
+				c.info('Разрешено переходить только в рубрики верхнего уровня');
+				return false;
+			}
 		}
 		var ids = l.getGridParam('selarrrow');
 		param += (param.length ? '&' : '') + '_' + field + '=' + (id ? id : 0);

@@ -6,8 +6,7 @@ class Zkernel_Form_Element_Mce extends Zend_Form_Element_Textarea
     {
     	$js =
 '$.include([
-	"/zkernel/js/jquery/jquery.tinymce.js",
-	"/zkernel/ctl/edit_area/edit_area_full.js"
+	"/zkernel/js/jquery/jquery.tinymce.js"
 ], function() {
     $("textarea[name='.$this->getName().']").tinymce({
 		script_url: "/zkernel/ctl/mce/tiny_mce.js",

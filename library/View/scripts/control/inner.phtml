@@ -8,8 +8,9 @@ if (count($this->ah('control')->config->button_top)) {
 <?php
 
 	foreach ($this->ah('control')->config->button_top as $el) {
+		if (!$el->title) continue;
 ?>
-<input default="<?php echo (int)$el->default; ?>" type="button" value="<?php echo $el->title; ?>" onclick="c.do_action({controller:'<?php echo $el->controller; ?>',action:'<?php echo $el->action; ?>',param:'<?php echo $el->param ?>',confirm:'<?php echo (int)$el->confirm; ?>'<?php echo $el->field ? ',field:\''.$el->field.'\'' : ''; ?>}, this)" />
+<input default="<?php echo (int)$el->default; ?>" type="button" value="<?php echo $el->title; ?>" onclick="c.do_action({controller:'<?php echo $el->controller; ?>',action:'<?php echo $el->action; ?>',param:'<?php echo $el->param ?>',confirm:'<?php echo (int)$el->confirm; ?>'<?php echo $el->field ? ',field:\''.$el->field.'\'' : ''; ?>,cl:'<?php echo $el->cl ?>'}, this)" />
 <?php
 
 	}
@@ -28,9 +29,9 @@ if (count($this->ah('control')->config->button_bottom)) {
 <?php
 
 	foreach ($this->ah('control')->config->button_bottom as $el) {
-
+		if (!$el->title) continue;
 ?>
-<input default="<?php echo (int)$el->default; ?>" type="button" value="<?php echo $el->title; ?>" onclick="c.do_action({controller:'<?php echo $el->controller; ?>',action:'<?php echo $el->action; ?>',param:'<?php echo $el->param ?>',confirm:'<?php echo (int)$el->confirm; ?>'}, this)" />
+<input default="<?php echo (int)$el->default; ?>" type="button" value="<?php echo $el->title; ?>" onclick="c.do_action({controller:'<?php echo $el->controller; ?>',action:'<?php echo $el->action; ?>',param:'<?php echo $el->param ?>',confirm:'<?php echo (int)$el->confirm; ?>'<?php echo $el->field ? ',field:\''.$el->field.'\'' : ''; ?>,cl:'<?php echo $el->cl ?>'}, this)" />
 <?php
 
 	}

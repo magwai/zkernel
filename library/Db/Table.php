@@ -19,7 +19,7 @@ class Zkernel_Db_Table extends Zend_Db_Table_Abstract
     	}
     	return $data;
     }
-// mosparter.ru
+
 	public function fetchCount($where = null) {
 		$select = $this->select()->from($this, 'COUNT(*)');
 	    if ($where) $this->_where($select, $where);
@@ -56,4 +56,9 @@ class Zkernel_Db_Table extends Zend_Db_Table_Abstract
 		return @(int)$result[0]['Auto_increment'];
     }
 
+	public function fetchMax($col = 'id', $where = null) {
+		$select = $this->select()->from($this, 'MAX(`'.$col.'`)');
+    	if ($where) $this->_where($select, $where);
+    	return $this->getAdapter()->fetchOne($select);
+    }
 }

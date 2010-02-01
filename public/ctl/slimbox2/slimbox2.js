@@ -60,33 +60,34 @@
 			var p = [];
 			var r = $(this).attr('rel');
 			var i = r.indexOf('[');
-			if (i == -1) continue;
-			r = r.slice(i + 1);
-			r = r.replace(/\]/gi, '|');
-			var ln = 0;
-			for (var i = 0; i < r.length; i++) {
-				if (r[i] == '|') {
-					p.push(r.slice(ln, i));
-					ln = i + 1;
+			if (i != -1) {
+				r = r.slice(i + 1);
+				r = r.replace(/\]/gi, '|');
+				var ln = 0;
+				for (var i = 0; i < r.length; i++) {
+					if (r[i] == '|') {
+						p.push(r.slice(ln, i));
+						ln = i + 1;
+					}
 				}
+				$(this).slimbox(o, function(el) {
+					return ['/zkernel/img/_.gif', el.title];
+				}, function(el) {
+					$('#lbImage').width(p[2]).height(p[3]);
+					$('object#lbObject').remove();
+					var o = $('<div id="lbObject" />');
+					$('#lbImage').prepend(o);
+					new swfobject.embedSWF("/zkernel/swf/uppod.swf", 'lbObject', p[2], p[3], "9.0.0", false, {
+						"st": p[1],
+						"file": p[0]
+					}, {
+						wmode: "transparent",
+						allowScriptAccess: "always"
+					});
+					window.setTimeout('$("#lbObject").css("visibility", "visible");', 1000);
+					return (this == el) || ((this.rel.length > 8) && (this.rel == el.rel));
+				}, c);
 			}
-			$(this).slimbox(o, function(el) {
-				return ['/zkernel/img/_.gif', el.title];
-			}, function(el) {
-				$('#lbImage').width(p[2]).height(p[3]);
-				$('object#lbObject').remove();
-				var o = $('<div id="lbObject" />');
-				$('#lbImage').prepend(o);
-				new swfobject.embedSWF("/zkernel/swf/uppod.swf", 'lbObject', p[2], p[3], "9.0.0", false, {
-					"st": p[1],
-					"file": p[0]
-				}, {
-					wmode: "transparent",
-					allowScriptAccess: "always"
-				});
-				window.setTimeout('$("#lbObject").css("visibility", "visible");', 1000);
-				return (this == el) || ((this.rel.length > 8) && (this.rel == el.rel));
-			}, c);
 		});
 	};
 	// Open Slimbox with the specified parameters

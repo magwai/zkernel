@@ -7,16 +7,7 @@
  */
 class Zkernel_Controller_Page extends Zkernel_Controller_Action {
 	function indexAction() {
-		$id = $this->getRequest()->getParam('id');
-		$this->view->card = $this->model->fetchRow(array(
-			'`stitle` = ?' => $id
-		));
-		if (!$this->view->card) $this->view->card = $this->model->fetchRow('`stitle` = "error"');
-		$sp = preg_split('/\<hr(\ )\/\>/si', $this->view->card->message);
-		if (count($sp) > 1) {
-			array_shift($sp);
-			$this->view->card->message = preg_replace('/^\<\/p\>/i', '', trim(implode('<hr />', $sp)));
-		}
+		$this->view->id = $this->getRequest()->getParam('id');
 	}
 
 	function ctlinit() {
@@ -33,7 +24,7 @@ class Zkernel_Controller_Page extends Zkernel_Controller_Action {
 					'title' => 'Псевдоним',
 					'required' => true,
 					'formatter' => 'function',
-					'formatoptions' => 'return Number(data.cedit) || '.$this->_helper->user()->acl->isAllowed(
+					'formatoptions' => 'return Number(data.cedit) || '.(int)$this->_helper->user()->acl->isAllowed(
 						$this->_helper->user()->role,
 						$this->_helper->util()->getById(array(
 							'model' => new Default_Model_Cresource(),
@@ -127,7 +118,7 @@ class Zkernel_Controller_Page extends Zkernel_Controller_Action {
 							'key' => 'key',
 							'id' => 'admin'
 						))
-					) || (int)$this->model->fetchOne('cedit', array('`id` = ?' => $this->getRequest('id')))
+					) || (int)$this->model->fetchOne('cedit', array('`id` = ?' => $this->getRequest()->getParam('id')))
 				),
 				'cedit' => array(
 					'active' => $this->_helper->user()->acl->isAllowed(

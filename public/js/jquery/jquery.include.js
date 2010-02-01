@@ -12,6 +12,8 @@ jQuery.extend({
 	 * include timer
 	 */
 	includeTimer: null,
+	
+	includeInited: false,
 
 	/*
 	 * include
@@ -120,6 +122,13 @@ jQuery.extend({
 	 * jQuery.ready replacement
 	 */
 	ready: function () {
+		if (!jQuery.includeInited) {
+			$('script').each(function() {
+				var s = $(this).attr('src');
+				if (s) jQuery.includedScripts[s] = true;
+			});
+			jQuery.includeInited = true;
+		}
 		isReady = true;
 
 		for (var s in jQuery.includedScripts) {
@@ -135,3 +144,4 @@ jQuery.extend({
 		}
 	}
 });
+
