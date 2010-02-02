@@ -227,7 +227,7 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 		if ($this->config->tree && $this->config->type == 'add' && $this->config->field && isset($this->config->field->{$this->config->tree_field})) $this->config->post_field_extend->set(array(
     		$this->config->tree_field => (int)$request->getParam('id')
     	));
-    	if ($request->getParam('cid')) {
+    	if ($request->getParam('cid') && isset($this->config->field->{$this->config->field_link})) {
     		$this->config->post_field_extend->set(array(
     			$this->config->field_link => $request->getParam('cid')
     		));
@@ -332,7 +332,7 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 				$where['`'.$this->config->tree_field.'` = ?'] = $parentid;
 				$parentid = $parentid == 0 ? null : $parentid;
 			}
-			if ($request->getParam('cid')) $where['`'.$this->config->field_link.'` = ?'] = $request->getParam('cid');
+			if ($request->getParam('cid') && isset($this->config->field->{$this->config->field_link})) $where['`'.$this->config->field_link.'` = ?'] = $request->getParam('cid');
 
 			$rd = $this->config->model->fetchAll(
 		    	$where,
@@ -486,11 +486,13 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 					if (count($this->config->post_field_unset)) {
 						foreach ($this->config->post_field_unset as $k) unset($this->config->data[$k]);
 					}
+
 					if (count($this->config->post_field_extend)) $this->config->data->set($this->config->post_field_extend);
 					$m2m_changed = false;
+
 					foreach ($this->config->data as $k => $v) {
 						if (@$this->config->field->$k->m2m) {
-							$m2m_new = @$this->config->data[$k]->toArray();
+							$m2m_new = isset($this->config->data->$k) ? $this->config->data->$k->toArray() : array();
 							$m2m_model = $this->config->field->$k->m2m->model;
 							$m2m_model = new $m2m_model();
 							$m2m_self = $this->config->field->$k->m2m->self;
@@ -499,6 +501,7 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 							$m2m_old = $m2m_model->fetchAll(array(
 								'`'.$m2m_self.'` = ?' => $this->config->id
 							));
+
 							if ($m2m_old) {
 								$m2m_ids = array();
 								// Удаляем несуществующие связи
@@ -522,9 +525,10 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 									}
 								}
 							}
-							unset($data[$k]);
+							unset($this->config->data[$k]);
 						}
 					}
+
 					$ok = false;
 					$this->config->func_override;
 					if ($this->config->use_db && count($this->config->info) == 0) {

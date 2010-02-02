@@ -43,7 +43,7 @@ class Zkernel_Application_Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 	protected function _initPapp() {
 		$this->bootstrap('db');
     	$cache = Zend_Cache::factory('Core', 'Memcached', array('automatic_serialization' => true));
-    	//Zend_Db_Table_Abstract::setDefaultMetadataCache($cache);
+    	Zend_Db_Table_Abstract::setDefaultMetadataCache($cache);
 		if ($this->hasOption('zfdebug')/* && $this->getOption('zfdebug.active') == 'true'*/) {
     		$c = $this->getOption('zfdebug');
     		if (isset($c['plugins']['Database'])) $c['plugins']['Database']['adapter']['standard'] = $this->getPluginResource('db')->getDbAdapter();
