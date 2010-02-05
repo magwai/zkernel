@@ -536,7 +536,7 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 							if (!array_key_exists($k, $this->config->model->info('metadata'))) unset($data_db[$k]);
 						}
 						if ($this->config->type == 'edit') $ok = $this->config->model->update($data_db, array('`id` = ?' => $this->config->id));
-						else $ok = $this->config->data->id = $this->config->model->insert($data_db);
+						else $ok = $this->config->data->id =  $this->config->model->insert($data_db);
 					}
 					if ($ok || $m2m_changed) {
 						$this->config->info[] = 'Данные сохранены';
