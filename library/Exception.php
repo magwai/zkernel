@@ -1,5 +1,5 @@
 <?php
 
-class Magwai_Exception extends Zend_Exception {
+class Zkernel_Exception extends Zend_Exception {
 
 }

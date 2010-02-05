@@ -344,7 +344,7 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 		    		? ($this->config->pager_page - 1) * $this->config->pager_perpage
 		    		: null
 		    );
-		    $this->config->data_cnt = $this->config->model->fetchCount();
+		    $this->config->data_cnt = $this->config->model->fetchCount($where);
 		   	$data = $rd->toArray();
 		    if ($this->config->tree && $data && $this->config->field) {
 		    	foreach ($data as &$el) {
@@ -501,7 +501,6 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 							$m2m_old = $m2m_model->fetchAll(array(
 								'`'.$m2m_self.'` = ?' => $this->config->id
 							));
-
 							if ($m2m_old) {
 								$m2m_ids = array();
 								// Удаляем несуществующие связи
@@ -518,14 +517,14 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 								if ($m2m_new) foreach ($m2m_new as $m2m_el) {
 									if (!in_array($m2m_el, $m2m_ids)) {
 										$m2m_changed = true;
-										$m2m_model->insert(array(
+										$yyy = $m2m_model->insert(array(
 											$m2m_self => $this->config->id,
 											$m2m_foreign => $m2m_el
 										));
 									}
 								}
 							}
-							unset($this->config->data[$k]);
+							unset($this->config->data->$k);
 						}
 					}
 
@@ -537,7 +536,7 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 							if (!array_key_exists($k, $this->config->model->info('metadata'))) unset($data_db[$k]);
 						}
 						if ($this->config->type == 'edit') $ok = $this->config->model->update($data_db, array('`id` = ?' => $this->config->id));
-						else $ok = $this->config->model->insert($data_db);
+						else $ok = $this->config->data->id = $this->config->model->insert($data_db);
 					}
 					if ($ok || $m2m_changed) {
 						$this->config->info[] = 'Данные сохранены';

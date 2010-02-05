@@ -182,6 +182,7 @@ class Zkernel_Controller_Control extends Zkernel_Controller_Action {
 		$row = $db->fetchRow(array('id = ?' => $parentid));
 
 		$result = $db->fetchAll(array('parentid = ?' => $parentid, '`show_it` = 1'), 'orderid');
+
 		if ($result) {
 			foreach ($result as $num => $el) {
 				if (!@$el['title']) continue;

@@ -35,6 +35,15 @@ class Zkernel_Controller_Action_Helper_User extends Zend_Controller_Action_Helpe
 	function initAcl() {
 		$this->acl = new Zend_Acl();
 
+		/*$roles = $this->models->role->fetchCol($this->models->role->getAdapter()->select()
+			->from(array('r' => $this->models->role->info('name')), array('id'))
+			->joinLeft(array('f' => $this->models->role_refer->info('name')), 'r.id = f.role', '')
+			->group('r.id')
+			->order('COUNT(f.id) = 0 desc')
+		);
+*/
+
+
 		$roles = $this->models->role->fetchCol('id');
 		if ($roles) {
 			foreach ($roles as $el) {
@@ -49,7 +58,6 @@ class Zkernel_Controller_Action_Helper_User extends Zend_Controller_Action_Helpe
 				$this->acl->addRole($r, $p);
 			}
 		}
-
 		$res = $this->models->resource->fetchAll();
 		if ($res) {
 			foreach ($res as $el) {
