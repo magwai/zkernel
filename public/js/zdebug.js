@@ -16,9 +16,11 @@ window.onload = function(){
 };
 
 function ZkernelCollapsed() {
-    /*ZkernelPanel();
-    jQuery("#Zkernel_toggler").html("&#187;");
-    return jQuery("#Zkernel_debug").css("left", "-"+parseInt(jQuery("#Zkernel_debug").outerWidth()-jQuery("#Zkernel_toggler").outerWidth()+1)+"px");*/
+    if (window.zdebug_collapsed) {
+		ZkernelPanel();
+	    jQuery("#Zkernel_toggler").html("&#187;");
+	    return jQuery("#Zkernel_debug").css("left", "-"+parseInt(jQuery("#Zkernel_debug").outerWidth()-jQuery("#Zkernel_toggler").outerWidth()+1)+"px");
+    }
 }
 
 function ZkernelPanel(name) {

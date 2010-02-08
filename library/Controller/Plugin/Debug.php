@@ -388,8 +388,7 @@ class Zkernel_Controller_Plugin_Debug extends Zend_Controller_Plugin_Abstract
      */
     protected function _headerOutput() {
         $collapsed = isset($_COOKIE['ZkernelCollapsed']) ? $_COOKIE['ZkernelCollapsed'] : 0;
-
-        return ('<link href="/zkernel/img/debug/main.css" media="screen" rel="stylesheet" type="text/css" /><script src="/zkernel/js/zdebug.js" type="text/javascript"></script>');
+        return ('<script type="text/javascript">window.zdebug_collapsed = '.($collapsed ? 'true' : 'false').';</script><script src="/zkernel/js/zdebug.js" type="text/javascript"></script>');
     }
 
     /**
@@ -401,7 +400,7 @@ class Zkernel_Controller_Plugin_Debug extends Zend_Controller_Plugin_Abstract
     protected function _output($html)
     {
         $response = $this->getResponse();
-        $response->setBody(preg_replace('/(<head.*>)/i', '$1' . $this->_headerOutput(), $response->getBody()));
-        $response->setBody(str_ireplace('</body>', '<div id="Zkernel_debug">'.$html.'</div></body>', $response->getBody()));
+        $response->setBody(preg_replace('/(<head.*>)/i', '$1' . '<link href="/zkernel/img/debug/main.css" media="screen" rel="stylesheet" type="text/css" />', $response->getBody()));
+        $response->setBody(str_ireplace('</body>', '<div id="Zkernel_debug">'.$html.'</div>'.$this->_headerOutput().'</body>', $response->getBody()));
     }
 }

@@ -17,4 +17,12 @@ class Zkernel_Common {
 		}
 		return $ret;
 	}
+
+	static function strtolower($str) {
+		return iconv('windows-1251', 'utf-8', strtolower(strtr(
+			iconv('utf-8', 'windows-1251', $str),
+			iconv('utf-8', 'windows-1251', 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'),
+			iconv('utf-8', 'windows-1251', 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя')
+		)));
+	}
 }

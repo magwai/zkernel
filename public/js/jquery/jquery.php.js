@@ -62,6 +62,7 @@ php = {
      */
      success:function (response, textStatus) {
         // call jQuery methods
+
 		for (var i=0;i<response['q'].length; i++) {
 		   
 			var selector  = $(response['q'][i]['s']);
@@ -157,7 +158,6 @@ php = {
 				}
 		    }
 	    }
-
         // predefined actions named as 
         // Methods of ObjResponse in PHP side 
         $.each(response['a'], function (func, params) {
