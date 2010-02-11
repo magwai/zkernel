@@ -9,7 +9,7 @@ class Zkernel_Form extends Zend_Form
 		);
 	}
 
-	function translateError($e) {
+	function translateError($e, $v = null) {
 		$d = array(
 			'isEmpty' => 'обязательно для заполнения',
 			'regexNotMatch' => 'недопустимые символы',
@@ -22,15 +22,29 @@ class Zkernel_Form extends Zend_Form
 			'fileImageSizeNotDetected' => 'невозможно определить размер картинки',
 			'fileExtensionFalse' => 'Запрещено загружать файлы этого типа',
 			'recordFound' => 'Дублирующееся значение',
-			'emailAddressInvalidFormat' => 'неверный e-mail адрес'
+			'emailAddressInvalidFormat' => 'неверный e-mail адрес',
+			'stringLengthTooShort' => 'слишком коротко',
+			'stringLengthTooLong' => 'слишком длинно'
 		);
-		return isset($d[$e]) ? $d[$e] : $e;
+		return is_numeric($e) ? $v : (isset($d[$e]) ? $d[$e] : $e);
 	}
 
 	function translateErrors($e) {
 		if ($e) foreach ($e as &$el) $el = self::translateError($el);
 		return $e;
 	}
+
+	public function getMessages($name = null, $suppressArrayNotation = false) {
+    	$e = parent::getMessages($name, $suppressArrayNotation);
+		if ($e) {
+			foreach ($e as &$el) {
+				if ($el) {
+					foreach ($el as $k => &$el_1) $el_1 = $this->translateError($k, $el_1);
+				}
+			}
+		}
+		return $e;
+    }
 
 	function getErrors() {
 		$e = parent::getErrors();

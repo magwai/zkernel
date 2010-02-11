@@ -17,7 +17,6 @@ class Zkernel_Controller_Fu extends Zkernel_Controller_Action {
     		Zend_Session::setId(@$_POST['sid']);
     		$s = new Zend_Session_Namespace();
 			$tmp_name = $_FILES[$key]['tmp_name'];
-
     		$validators = array('Zend_Validate_File_Upload' => new Zend_Validate_File_Upload());
     		if (@$s->form[$key]['validators']) $validators = array_merge($validators, $s->form[$key]['validators']);
 

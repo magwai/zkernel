@@ -18,6 +18,22 @@ class Zkernel_Common {
 		return $ret;
 	}
 
+	static function getOuterIds($param = array()) {
+		$param['where'] = @$param['where'];
+		$param['field'] = @$param['field'] ? $param['field'] : 'parentid';
+		$param['model'] = @$param['model'];
+		$param['id'] = @$param['id'];
+		$ret = array();
+		$id = $param['model']->fetchOne($param['field'], '`id` = "'.$param['id'].'"'.($param['where'] ? ' AND ('.$param['where'].')' : ''));
+		if ($id) {
+			$ret[] = $id;
+			$param['id'] = $id;
+			$ret_1 = self::getOuterIds($param);
+			$ret = array_merge($ret, $ret_1);
+		}
+		return $ret;
+	}
+
 	static function strtolower($str) {
 		return iconv('windows-1251', 'utf-8', strtolower(strtr(
 			iconv('utf-8', 'windows-1251', $str),
