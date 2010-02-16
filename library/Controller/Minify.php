@@ -80,6 +80,8 @@ class Zkernel_Controller_Minify extends Zend_Controller_Action {
 			$expires = $modified;
 			$response->setHttpResponseCode(404);
 		}
+		Zend_Controller_Front::getInstance()->unregisterPlugin('Zkernel_Controller_Plugin_Debug');
+
 		$response	->setHeader('Cache-Control', 'no-cache')
 					->setHeader('Pragma', 'no-cache')
 					->setHeader('Last-Modified', $modified)
