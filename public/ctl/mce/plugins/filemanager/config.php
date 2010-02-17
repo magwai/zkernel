@@ -154,4 +154,9 @@
         $mcFileManagerConfig['imagemanager.urlprefix'] = "../../../imagemanager/?type=im";  // need to add "imagemanager" button to tools as well.
         $mcFileManagerConfig['imagemanager.allow_override'] = "*";
         $mcFileManagerConfig['imagemanager.allow_export'] = "urlprefix";
+
+        session_start();
+        if (isset($_SESSION['mce_filemanager'])) $mcFileManagerConfig = array_merge($mcFileManagerConfig, $_SESSION['mce_filemanager']);
+        if (!file_exists($mcFileManagerConfig['filesystem.rootpath'])) @mkdir($mcFileManagerConfig['filesystem.rootpath'], 0777, true);
+		if (!file_exists($mcFileManagerConfig['filesystem.path'])) @mkdir($mcFileManagerConfig['filesystem.path'], 0777, true);
 ?>

@@ -138,4 +138,9 @@
 	$mcImageManagerConfig['log.format'] = "[{time}] [{level}] {message}";
 	$mcImageManagerConfig['log.max_size'] = "100k";
 	$mcImageManagerConfig['log.max_files'] = "10";
+
+	session_start();
+	if (isset($_SESSION['mce_imagemanager'])) $mcImageManagerConfig = array_merge($mcImageManagerConfig, $_SESSION['mce_imagemanager']);
+	if (!file_exists($mcImageManagerConfig['filesystem.rootpath'])) @mkdir($mcImageManagerConfig['filesystem.rootpath'], 0777, true);
+	if (!file_exists($mcImageManagerConfig['filesystem.path'])) @mkdir($mcImageManagerConfig['filesystem.path'], 0777, true);
 ?>
