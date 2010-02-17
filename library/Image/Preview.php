@@ -1,4 +1,11 @@
 <?php
+/**
+ * Zkernel
+ *
+ * Copyright (c) 2010 Magwai Ltd. <info@magwai.ru>, http://magwai.ru
+ * Licensed under the MIT License:
+ * http://www.opensource.org/licenses/mit-license.php
+ */
 
 require_once APPLICATION_PATH.'/../library/Zkernel/Other/Lib/Phpthumb/ThumbLib.inc.php';
 

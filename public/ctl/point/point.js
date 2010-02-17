@@ -1,3 +1,11 @@
+/**
+ * Zkernel
+ *
+ * Copyright (c) 2010 Magwai Ltd. <info@magwai.ru>, http://magwai.ru
+ * Licensed under the MIT License:
+ * http://www.opensource.org/licenses/mit-license.php
+ */
+
 var point = {};
 
 point.init = function(id, value, opt) {
@@ -36,4 +44,4 @@ point.set = function(id, x, y) {
 		});
 		d.val(x + "|" + y);
 	}
-}
+};

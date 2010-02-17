@@ -1,4 +1,11 @@
 <?php
+/**
+ * Zkernel
+ *
+ * Copyright (c) 2010 Magwai Ltd. <info@magwai.ru>, http://magwai.ru
+ * Licensed under the MIT License:
+ * http://www.opensource.org/licenses/mit-license.php
+ */
 
 class Zkernel_Form_Element_Rubr extends Zend_Form_Element_Multi
 {

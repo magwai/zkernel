@@ -1,3 +1,11 @@
+/**
+ * Zkernel
+ *
+ * Copyright (c) 2010 Magwai Ltd. <info@magwai.ru>, http://magwai.ru
+ * Licensed under the MIT License:
+ * http://www.opensource.org/licenses/mit-license.php
+ */
+
 var gmap = {};
 
 gmap.init = function(id, value, opt) {
@@ -40,4 +48,4 @@ gmap.init = function(id, value, opt) {
 	if (value) google.maps.event.trigger(gmap[id], 'click', {
 		latLng: opt.center
 	});
-}
+};
