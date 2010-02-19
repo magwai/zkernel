@@ -7,7 +7,9 @@
  */
 
 zuf = {
-	uploads: {}
+	uploads: {},
+	results: {},
+	inited: false
 };
 
 zuf.init = function(o) {
@@ -16,20 +18,22 @@ zuf.init = function(o) {
 	var h = $('input[name=' + n + '][type=hidden]');
 	var e = h.prevAll('em');
 	var oo = {
+		'multi': typeof o.multi == 'undefined' ? false : true,
 		'uploader': '/zkernel/ctl/uploadify/uploadify.swf',
 		'cancelImg': '/zkernel/ctl/uploadify/cancel.png',
 		'script': '/fu/',
 		'onComplete': function(e, queueID, fileObj, response, data) {
 			if (response && response.slice(0, 2) == "u|") {
 				var v = response.slice(2);
-				h.val(response);
+				zuf.results[n] += (zuf.results[n].length ? '*' : '') + response;
 				var sd = o.scriptData;
-				sd.old = v;
+				if (sd.old != 'multi') sd.old = v;
 				hh.uploadifySettings('scriptData', sd);
-				zuf.uploads[n] = true;
+				zuf.uploads[n]--;
+				if (zuf.uploads[n] == 0) h.val((h.val().length ? (h.val() + '*') : '') + zuf.results[n]);
 				var done = true;
 				for (k in zuf.uploads) {
-					if (zuf.uploads[k] == false) {
+					if (zuf.uploads[k] > 0) {
 						done = false;
 						break;
 					}
@@ -39,7 +43,12 @@ zuf.init = function(o) {
 			else hh.trigger('error', {queueID: queueID, fileObj: fileObj, errorObj: {type: 'Security', info: response}});
 		},
 		'onSelectOnce': function(e, d) {
-			zuf.uploads[n] = false;
+			zuf.uploads[n] = d.fileCount;
+			zuf.results[n] = '';
+			hh.trigger('select');
+		},
+		'onCancel': function(e, queueID, fileObj, data) {
+			hh.trigger('cancel');
 		},
 		'onError': function(e, queueID, fileObj, errorObj) { hh.trigger('error', {queueID: queueID, fileObj: fileObj, errorObj: errorObj}); },
 		'onSelect': function() { if (h.hasClass("zuf_deleted")) hh.prevAll("em").find(">a").click(); }
@@ -47,7 +56,9 @@ zuf.init = function(o) {
 
 	hh.uploadify($.extend(oo, o));
 
-	e.find('>a').click(function() {
+	zuf.inited = true;
+	
+	/*e.find('>a').click(function() {
 		if (h.hasClass('zuf_deleted')) {
 			e.find('span').css({
 				'text-decoration': 'none',
@@ -77,20 +88,94 @@ zuf.init = function(o) {
 			$('input[name=' + n + '][type=file]').uploadifyClearQueue();
 		}
 		return false;
-	});
+	});*/
 };
 
-zuf.set = function(n, title, url, required) {
-	var h = $('input[name=' + n + '][type=hidden]');
+zuf.add = function(n, title, url, required) {
+	if (!zuf.inited) {
+		window.setTimeout(function() {
+			zuf.add(n, title, url, required);
+		}, 100);
+		return;
+	}
+	var i = $('input[name=' + n + '][type=hidden]');	
+	var v = zuf.explode('*', i.val());
+	var exist = false;
+	for (k in v) if (v[k].slice(2) == title) {
+		exist = true;
+		v[k] = title;
+		break;
+	}
+	if (!exist) {
+		o = i.prev('div.uploadifyQueue');
+		o.append('<div rel="' + title + '" class="uploadifyQueueItem uploadifyQueueLoaded">\
+			' + (required ? '' : '<div class="cancel">\
+				<a href="javascript:zuf.del(\'' + n + '\', \'' + title + '\')"><img src="/zkernel/ctl/uploadify/cancel.png" border="0" /></a>\
+			</div>') + '\
+			<span class="fileName"><a target="_blank" href="' + url + '/' + title + '" title="Открыть">' + title + '</a></span><span class="percentage"></span>\
+			<div class="uploadifyProgress">\
+				<div class="uploadifyProgressBar" style="width:100%;"><!--Progress Bar--></div>\
+			</div>\
+		</div>');
+	}
+	i.val(zuf.implode('*', v));
+	/*var h = $('input[name=' + n + '][type=hidden]');
 	var e = h.prevAll('em');
 	e.find('span>a').attr('href', url).html(title);
 	e.show();
 	h.val(h.val().slice(2));
 	if (!required) e.find('>a').show();
-	if (h.hasClass('zuf_deleted')) e.find('>a').click();
+	if (h.hasClass('zuf_deleted')) e.find('>a').click();*/
 };
 
-zuf.remove = function(n) {
-	var h = $('input[name=' + n + '][type=hidden]');
-	h.val('').prevAll('em').hide();
+zuf.remove = function(n, k) {
+	var i = $('input[name=' + n + '][type=hidden]');
+	var o = i.prev('div.uploadifyQueue').find('div[rel="' + k + '"]');
+	o.remove();
+	var v = zuf.explode('*', i.val());
+	var vv = o.find('.fileName').text();
+	for (kk in v) if (v[kk] == 'd|' + vv) v[kk] = '';
+	i.val(zuf.implode('*', v));
 };
+
+zuf.del = function(n, k) {
+	var i = $('input[name=' + n + '][type=hidden]');
+	var o = i.prev('div.uploadifyQueue').find('div[rel="' + k + '"]');
+	var v = zuf.explode('*', i.val());
+	var vv = o.find('.fileName').text();
+	if (o.hasClass('zuf_deleted')) {
+		for (kk in v) if (v[kk] == 'd|' + vv) v[kk] = vv;
+		o.css({
+			'text-decoration': 'none',
+			'opacity': 1
+		}).removeClass('zuf_deleted');
+	}
+	else {
+		for (kk in v) if (v[kk] == vv) v[kk] = 'd|' + v[kk];
+		o.css({
+			'text-decoration': 'line-through',
+			'opacity': .3
+		}).addClass('zuf_deleted');
+	}
+	i.val(zuf.implode('*', v));
+};
+
+zuf.implode = function(g, arr) {
+	var str = '';
+	for (k in arr) str += arr[k].length ? ((str.length ? g : '') + arr[k]) : '';
+	return str;
+};
+
+zuf.explode = function(d, str) {
+	str += d;
+	var dt = [];
+	var ln = 0;
+	for (var i = 0; i < str.length; i++) {
+		if (str[i] == d) {
+			dt.push(str.slice(ln, i));
+			ln = i + 1;
+		}
+	}
+	return dt;
+};
+

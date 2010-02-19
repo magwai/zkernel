@@ -40,7 +40,7 @@ class Zkernel_Controller_Fu extends Zkernel_Controller_Action {
 		    	$new_dir = @$_POST['folder'];
 				if ($new_dir && !file_exists($new_dir)) @mkdir($new_dir, 0755, true);
 	    		if (file_exists($new_dir)) {
-		    		if (@$_POST['old']) @unlink($new_dir.'/'.$_POST['old']);
+		    		if (@$_POST['old'] && $_POST['old'] != 'multi') @unlink($new_dir.'/'.$_POST['old']);
 	    			$filter = new Zkernel_Filter_File_Uploadify(array(
 		    			'directory' => $new_dir
 		    		));
