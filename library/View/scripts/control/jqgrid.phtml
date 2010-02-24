@@ -41,12 +41,13 @@ else {
 <div class="c_table">
 	<table id="list" class="scroll" cellpadding="0" cellspacing="0"></table>
 	<div id="list_pager"></div>
+	<div id="filter"></div>
 </div>
 <?php
 	// Схема таблицы для списка и дерева
 	$field_title = $field_model = array();
 	$is_fmatter = false;
-
+	$is_search = false;
 	if ($c->field) foreach ($c->field as $el) {
 	    if (!$el->active) continue;
 	    $field_title[] = $el->title;
@@ -55,6 +56,10 @@ else {
 	    );
 	    if ($el->align) $dt['align'] = $el->align;
 	    if ($el->width) $dt['width'] = $el->width;
+	    if ($el->search) {
+	    	$is_search = $dt['search'] = true;
+	    }
+	    else $dt['search'] = false;
 	    if ($el->hidden) $dt['hidden'] = true;
 	    if ($el->stype) $dt['stype'] = $el->stype;
 	    if ($el->editoptions) $dt['editoptions'] = $el->editoptions;
@@ -83,6 +88,7 @@ else {
 $.include([
 	"/zkernel/ctl/jqgrid/i18n/grid.locale-ru.js",
 	"/zkernel/ctl/jqgrid/grid.base.js",
+	'.($is_search ? '"/zkernel/ctl/jqgrid/grid.custom.js",' : '').'
 	'.($c->tree ? '"/zkernel/ctl/jqgrid/grid.treegrid.js",' : '').'
 	'.($is_fmatter ? '"/zkernel/js/jquery/jquery.fmatter.js",' : '').'
 	"/zkernel/js/jquery/ui/ui.core.js",
@@ -136,6 +142,7 @@ $.include([
 		'.(!$c->drag && !$c->tree ? 'scroll: true,' : '').'
 		prmNames: {page: "_page", rows: "rows", sort: "_orderby", order: "_orderdir", search:"_search", nd: "nd"}
 	});
+	'.($is_search ? '$("#list").jqGrid("filterToolbar");$("#list").setGridHeight(c.table_height());' : '').'
 	'.($c->drag ? '$("#list").jqGrid("sortableRows", {
 		helper: "clone",
 		distance: 2,

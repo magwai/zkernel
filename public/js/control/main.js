@@ -500,6 +500,9 @@ c.table_height = function() {
 	$('.c_button').each(function() {
 		th += $(this).get(0).offsetHeight;
 	});
+	$('.ui-search-toolbar').each(function() {
+		th += $(this).get(0).offsetHeight;
+	});
 	return $(window).height() - th - 105;
 }
 c.parse_url = function(c) {

@@ -7,14 +7,19 @@
  * http://www.opensource.org/licenses/mit-license.php
  */
 
-class Zkernel_Application_Bootstrap extends Zend_Application_Bootstrap_Bootstrap
-{
+class Zkernel_Application_Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
+    /**
+     * Инициализация приложения
+     */
+
 	protected function _initApp() {
 		Zend_Controller_Action_HelperBroker::addPrefix('Zkernel_Controller_Action_Helper');
 	}
 
-	protected function _initAutoload()
-    {
+    /**
+     * Инициализация автозагрузки
+     */
+	protected function _initAutoload() {
         $autoloader = new Zend_Application_Module_Autoloader(array(
             'namespace' => 'Default_',
             'basePath'  => APPLICATION_PATH,
@@ -22,6 +27,9 @@ class Zkernel_Application_Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         return $autoloader;
     }
 
+    /**
+     * Инициализация конфигурации
+     */
 	protected function _initConfig() {
 		$path = APPLICATION_PATH.'/../library/Zkernel/Application/configs';
 		$config = new Zend_Config(array(), true);
@@ -47,6 +55,10 @@ class Zkernel_Application_Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$this->setOptions($config->toArray());
 	}
 
+    /**
+     * Инициализация отладчика
+     * TODO: Здесь мусорно. Инит кэша метаданых тут не нужен
+     */
 	protected function _initPapp() {
 		$this->bootstrap('db');
     	$cache = Zend_Cache::factory('Core', 'Memcached', array('automatic_serialization' => true));
@@ -62,6 +74,10 @@ class Zkernel_Application_Bootstrap extends Zend_Application_Bootstrap_Bootstrap
        	}
 	}
 
+    /**
+     * Инициализация загрузчика файлов
+     * TODO: Это нужно отсюда убрать в модуль
+     */
 	public function _initFu() {
        	$router = Zend_Controller_Front::getInstance()->getRouter();
 		$route = new Zend_Controller_Router_Route_Regex(

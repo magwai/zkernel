@@ -14,11 +14,24 @@ class Zkernel_Config_Control implements Countable, Iterator, ArrayAccess {
     protected $_key;
     protected $_skipNextIteration;
 
+    /**
+     * Конструктор
+     * Можно передать ассоциативный массив или несколько массивов. Все будет склеено
+     */
 	public function __construct() {
 		$a = func_get_args();
         if ($a) foreach ($a as $e) $this->set($e);
     }
 
+    /**
+     * Запись конфига
+     *
+     * @param string $k Ключ
+     * @param array $k Ассоциативный массив
+     * @param string $v Значение
+     * @param array $v Значение
+     * @return Zkernel_Config_Control
+     */
     function set($k, $v = null) {
 		if (is_array($k) || $k instanceof Zkernel_Config_Control) {
 			if ($k) foreach ($k as $_k => $_v) {

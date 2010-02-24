@@ -313,8 +313,7 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
     	return $ret;
     }
 
-	public function routeShow()
-    {
+	public function routeShow() {
     	$js = Zend_Controller_Action_HelperBroker::getStaticHelper('js');
     	$menu_model = new Default_Model_Cmenu();
 		$menu = $menu_model->fetchRow(array('`controller` = ?' => $this->getRequest()->getControllerName()));
@@ -323,9 +322,9 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 		if ($request->getPost('nd')) {
 			$rows = array();
 			$where = $this->config->where ? $this->config->where->toArray() : array();
-			if ($request->getParam('search')) {
+			if ($request->getParam('search') != 'false') {
 				foreach ($this->config->field as $el) {
-					if (isset($_POST[$el->name])) $where['`'.$el->name.'` = ?'] = $_POST[$el['name']];
+					if (isset($_POST[$el->name])) $where['`'.$el->name.'` LIKE ?'] = '%'.$_POST[$el['name']].'%';
 				}
 			}
 			if ($this->config->tree) {
@@ -351,6 +350,7 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 		    		? ($this->config->pager_page - 1) * $this->config->pager_perpage
 		    		: null
 		    );
+
 		    $this->config->data_cnt = $this->config->model->fetchCount($where);
 		   	$data = $rd->toArray();
 		    if ($this->config->tree && $data && $this->config->field) {
