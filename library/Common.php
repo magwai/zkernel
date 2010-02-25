@@ -48,4 +48,18 @@ class Zkernel_Common {
 			iconv('utf-8', 'windows-1251', 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя')
 		)));
 	}
+
+	static function hex2rgb ($hex , $asString = false) {
+		if ( 0 === strpos ( $hex , '#' )) {
+		$hex = substr ( $hex , 1 );
+		} else if ( 0 === strpos ( $hex , '&H' )) {
+		$hex = substr ( $hex , 2 );
+		}
+		$cutpoint = ceil ( strlen ( $hex ) / 2 )- 1 ;
+		$rgb = explode ( ':' , wordwrap ( $hex , $cutpoint , ':' , $cutpoint ), 3 );
+		$rgb [ 0 ] = ( isset ( $rgb [ 0 ]) ? hexdec ( $rgb [ 0 ]) : 0 );
+		$rgb [ 1 ] = ( isset ( $rgb [ 1 ]) ? hexdec ( $rgb [ 1 ]) : 0 );
+		$rgb [ 2 ] = ( isset ( $rgb [ 2 ]) ? hexdec ( $rgb [ 2 ]) : 0 );
+		return ( $asString ? "{$rgb[0]} {$rgb[1]} {$rgb[2]}" : $rgb );
+	}
 }

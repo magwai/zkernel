@@ -124,19 +124,19 @@ return	$item->controller.
 			),
 			'func_override' =>
 'php_function:
-if ($control->config->data["cap"] && !$control->config->data["url"]) {
-	$p = explode("|", $control->config->data["cap"]);
-	$control->config->data["controller"] = @$p[0];
-	$control->config->data["action"] = @$p[1];
-	$control->config->data["param"] = @$p[2];
-	$control->config->data["route"] = @$p[3];
+if ($control->config->data["cap"] && !$control->config->data->url) {
+	$p = explode("|", $control->config->data->cap);
+	$control->config->data->controller = @$p[0];
+	$control->config->data->action = @$p[1];
+	$control->config->data->param = @$p[2];
+	$control->config->data->route = @$p[3];
 }
 else {
-	$control->config->data["controller"] = "";
-	$control->config->data["action"] = "";
-	$control->config->data["param"] = "";
-	$control->config->data["route"] = "";
-	//if (!$control->config->data["url"]) $control->config->info[] = "Заполните поле \"Раздел\" или \"URL\"";
+	$control->config->data->controller = "";
+	$control->config->data->action = "";
+	$control->config->data->param = "";
+	$control->config->data->route = "";
+	//if (!$control->config->data->url) $control->config->info[] = "Заполните поле \"Раздел\" или \"URL\"";
 }
 '
 		));

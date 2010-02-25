@@ -29,7 +29,7 @@ class Zkernel_Controller_Plugin_Menu extends Zend_Controller_Plugin_Abstract {
 				$mp = $router->getRoute($el->route)->getVariables();
 				if ($mp) foreach ($mp as $k_1 => $el_1) $p[$el_1] = @$pp[$k_1];
 			}
-			$menu[] = array(
+			$md = array(
 				'label' => $el->title,
 				'controller' => $el->controller,
 				'action' => $el->action,
@@ -38,6 +38,7 @@ class Zkernel_Controller_Plugin_Menu extends Zend_Controller_Plugin_Abstract {
 				'uri' => $el->url,
 				'pages' => $this->getDeeper($el->id)
 			);
+			$menu[] = array_merge($el->toArray(), $md);
 		}
 		return $menu;
     }
