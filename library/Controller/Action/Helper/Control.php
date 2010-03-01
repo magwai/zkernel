@@ -471,7 +471,7 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 
 					$this->config->data = $this->config->form->getValues();
 
-					if (count($this->config->static_field) != @$this->config->data[$this->config->static_field->field_dst]) {
+					if ($this->config->static_field && !@$this->config->data->{$this->config->static_field->field_dst}) {
 						$util = Zend_Controller_Action_HelperBroker::getStaticHelper('util');
 						$stitle = $util->stitle($this->config->data[$this->config->static_field->field_src], $this->config->static_field->length);
     					$stitle = $stitle ? $stitle : '_';

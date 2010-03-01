@@ -156,7 +156,8 @@ class Zkernel_Controller_Action_Helper_Util extends Zend_Controller_Action_Helpe
 	}
 
 	function stitle($str, $length = 56000) {
-		$str = strtolower($this->translit($str));
+		$str = $this->translit($str);
+		$str = strtolower($str);
 		$str = @preg_replace('/[^\w]/', '_', $str);
 		while (strpos($str, '__') !== false) $str = str_replace('__', '_', $str);
 		$str = trim($str, '_');

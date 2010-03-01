@@ -45,7 +45,7 @@ class Zkernel_Video_Preview {
 		if ($width / 2 != floor($width / 2)) $width++;
 		if ($height / 2 != floor($height / 2)) $height++;
 
-		@exec('ffmpeg -i "'.$this->image_path.'/'.$name.'" '.($width && $height ? '-s '.$width.'x'.$height : '').' -y -f flv -acodec pcm_s16le -ac 2 -ar 44100 "'.$this->path.'/'.$prefix.$name.'"');
+		@exec('ffmpeg -i "'.$this->image_path.'/'.$name.'" '.($width && $height ? '-s '.$width.'x'.$height : '').' -y -f flv -acodec libmp3lame -ac 2 -ar 44100 "'.$this->path.'/'.$prefix.$name.'"');
 
 		return true;
 	}

@@ -34,7 +34,7 @@ a#c_mlink .ui-icon{float:right;margin:11px 0 0 5px;}
 
 #c_menu{padding:20px 20px 10px 20px;color:#ffffff;font-weight:bold;font-size:16px;}
 #c_menu a,#c_menu a:link,#c_menu a:visited{color:#ffffff;display:block;margin:0 0 10px 0;text-decoration:none;}
-#c_menu span{display:block;padding:0 0 10px 10px;display:none;}
+#c_menu div{padding:0 0 10px 10px;display:none;}
 
 #c_info{z-index:5000;position:fixed;top:50px;right:20px;display:none;padding:10px;}
 #c_info .ui-icon{float:right;margin:0 0 0 10px;}

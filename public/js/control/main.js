@@ -137,12 +137,12 @@ c.build_menu = function(data, obj) {
 			if (inner.length || controller) {
 				var o = obj.append('<a />').find('a:last').html(t).attr('href', '#');
 				if (inner.length) {
-					var i_o = obj.append('<span />').find('span:last');
+					var i_o = obj.append('<div />').find('div:last');
 					c.build_menu(inner, i_o);
 					o.click(function() {
-						$(this).next('span:hidden:first').length
-							? $(this).next('span:hidden:first').slideDown('fast')
-							: $(this).next('span:visible:first').slideUp('fast');
+						$(this).next('div:hidden:first').length
+							? $(this).next('div:hidden:first').slideDown('fast')
+							: $(this).next('div:visible:first').slideUp('fast');
 						return false;
 					});
 				}
