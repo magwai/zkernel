@@ -148,7 +148,6 @@ class Zkernel_Controller_Action_Helper_Control extends Zend_Controller_Action_He
 
 		if (isset($conf->use_db)) $this->config->use_db = $conf->use_db;
 
-
 		// Поля из модели
     	if ($this->config->use_db && $this->config->model) {
     		$meta = $this->config->model->info('metadata');

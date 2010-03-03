@@ -43,6 +43,13 @@ zuf.init = function(o) {
 			else hh.trigger('error', {queueID: queueID, fileObj: fileObj, errorObj: {type: 'Security', info: response}});
 		},
 		'onSelectOnce': function(e, d) {
+			if (o.scriptData.old != 'multi') {
+				var ob = h.prev('div.uploadifyQueue');
+				if (ob.find('.uploadifyQueueLoaded').length > 0) {
+					ob.find('.uploadifyQueueLoaded').remove();
+					h.val('');
+				}
+			}
 			zuf.uploads[n] = d.fileCount;
 			zuf.results[n] = '';
 			hh.trigger('select');
@@ -98,7 +105,7 @@ zuf.add = function(n, title, url, required) {
 		}, 100);
 		return;
 	}
-	var i = $('input[name=' + n + '][type=hidden]');	
+	var i = $('input[name=' + n + '][type=hidden]');
 	var v = zuf.explode('*', i.val());
 	var exist = false;
 	for (k in v) if (v[k].slice(2) == title) {
