@@ -40,7 +40,10 @@ class Zkernel_Controller_Fu extends Zkernel_Controller_Action {
     		}
     		if ($valid) {
     			$name = $_FILES[$key]['name'];
-		    	$new_dir = @$_POST['folder'];
+		    	$new_dir = ltrim(@$_POST['folder'], '/');
+		    	$new_dir = strpos($new_dir, ':') === false
+		    		? '/'.$new_dir
+		    		: $new_dir;
 				if ($new_dir && !file_exists($new_dir)) @mkdir($new_dir, 0755, true);
 	    		if (file_exists($new_dir)) {
 		    		if (@$_POST['old'] && $_POST['old'] != 'multi') @unlink($new_dir.'/'.$_POST['old']);
