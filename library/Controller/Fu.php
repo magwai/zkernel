@@ -26,6 +26,8 @@ class Zkernel_Controller_Fu extends Zkernel_Controller_Action {
     		if (@$s->form[$key]['validators']) $validators = array_merge($validators, $s->form[$key]['validators']);
 
     		$valid = true;
+    		$is = @getimagesize($tmp_name);
+    		if (@$is['mime']) $_FILES[$key]['type'] = $is['mime'];
     		foreach ($validators as $k => $el) {
     			$el = clone $el;
     			$tocheck = $k == 'Zend_Validate_File_Upload' ? $key : $tmp_name;
