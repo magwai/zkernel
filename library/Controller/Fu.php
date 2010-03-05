@@ -30,6 +30,7 @@ class Zkernel_Controller_Fu extends Zkernel_Controller_Action {
     		if (@$is['mime']) $_FILES[$key]['type'] = $is['mime'];
     		foreach ($validators as $k => $el) {
     			$el = clone $el;
+    			if ($el instanceof Zend_Validate_File_IsImage) $el->enableHeaderCheck(true);
     			$tocheck = $k == 'Zend_Validate_File_Upload' ? $key : $tmp_name;
     			if (!$el->isValid($tocheck, $_FILES[$key])) {
     				$valid = false;
