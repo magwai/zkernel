@@ -7,8 +7,7 @@
  * http://www.opensource.org/licenses/mit-license.php
  */
 
-class Zkernel_Form extends Zend_Form
-{
+class Zkernel_Form extends Zend_Form {
 	function init() {
 		$this->addPrefixPath(
 			'Zkernel_Form_',

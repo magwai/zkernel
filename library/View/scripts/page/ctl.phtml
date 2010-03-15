@@ -1,0 +1,112 @@
+<?php
+
+$this->control(array(
+	'static_field' => true,
+	'field' => array(
+		'title' => array(
+			'title' => 'Заголовок',
+			'required' => true,
+			'sortable' => true,
+			'order' => 1
+		),
+		'stitle' => array(
+			'title' => 'Псевдоним',
+			'unique' => true,
+			'required' => true,
+			'formatter' => 'function',
+			'formatoptions' => 'return Number(data.cedit) || '.(int)$this->user()->isAllowed(
+				$this->user('role'),
+				Zkernel_Common::getById(array(
+					'model' => new Default_Model_Cresource(),
+					'field' => 'id',
+					'key' => 'key',
+					'id' => 'admin'
+				))
+			).' ? "/page/<strong>" + data.stitle + "</strong>" : "";',
+			'sortable' => true,
+			'validators' => array(array(
+				'validator' => 'Regex',
+				'options' => array('/^[a-z0-9\_\-]*$/i')
+			)),
+			'order' => 2
+		),
+		'message' => array(
+			'title' => 'Текст',
+			'type' => 'mce',
+			'required' => true,
+			'order' => 3
+		),
+		'cedit' => array(
+			'title' => 'Можно редактировать',
+			'type' => 'select',
+			'param' => array(
+				'multioptions' => array('1' => 'Да', '0' => 'Нет')
+			),
+			'order' => 4
+		)
+	),
+	'action_config' => array(
+		'ctlshow' => array(
+			'field' => array(
+				'message' => array(
+					'active' => false
+				),
+				'cedit' => array(
+					'hidden' => true
+				)
+			)
+		),
+		'ctladd' => array(
+			'field' => array(
+				'stitle' => array(
+					'active' => $this->user()->isAllowed(
+						$this->user('role'),
+						Zkernel_Common::getById(array(
+							'model' => new Default_Model_Cresource(),
+							'field' => 'id',
+							'key' => 'key',
+							'id' => 'admin'
+						))
+					)
+				),
+				'cedit' => array(
+					'active' => $this->user()->isAllowed(
+						$this->user('role'),
+						Zkernel_Common::getById(array(
+							'model' => new Default_Model_Cresource(),
+							'field' => 'id',
+							'key' => 'key',
+							'id' => 'admin'
+						))
+					)
+				)
+			)
+		),
+		'ctledit' => array(
+			'field' => array(
+				'stitle' => array(
+					'active' => $this->user()->isAllowed(
+						$this->user('role'),
+						Zkernel_Common::getById(array(
+							'model' => new Default_Model_Cresource(),
+							'field' => 'id',
+							'key' => 'key',
+							'id' => 'admin'
+						))
+					) || (int)$this->config->model->fetchOne('cedit', array('`id` = ?' => $this->config->param['id']))
+				),
+				'cedit' => array(
+					'active' => $this->user()->isAllowed(
+						$this->user('role'),
+						Zkernel_Common::getById(array(
+							'model' => new Default_Model_Cresource(),
+							'field' => 'id',
+							'key' => 'key',
+							'id' => 'admin'
+						))
+					)
+				)
+			)
+		)
+	)
+));

@@ -64,9 +64,9 @@ class Zkernel_Config_Control implements Countable, Iterator, ArrayAccess {
 				'width' => '',
 				'description' => '',
 				'sortable' => false,
-				'active' => $k != 'id',
+				'active' => $k != 'parentid' && $k != 'orderid' && $k != 'id' && !preg_match('/^ml\_[^\_]+\_[\d]+$/i', $k),
 				'name' => $k,
-				'title' => $k,
+				'title' => $k == 'title' ? 'Название' : $k,
 				'hidden' => false,
 				'formatter' => '',
 				'formatoptions' => '',
@@ -137,7 +137,8 @@ class Zkernel_Config_Control implements Countable, Iterator, ArrayAccess {
 			$ret = $this->_data[$k];
 			if (is_string($ret) && substr($ret, 0, 13) == 'php_function:') {
 				$f = create_function('$control', substr($ret, 13));
-				$control = Zend_Controller_Action_HelperBroker::getStaticHelper('control');
+				$viewRenderer = Zend_Controller_Action_HelperBroker::getStaticHelper('viewRenderer');
+				$control = $viewRenderer->view->control();
 				$ret = $f($control);
 				if ($ret) {
 					$this->set($k, $ret);

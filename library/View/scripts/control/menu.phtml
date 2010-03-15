@@ -1,0 +1,30 @@
+<?php
+
+$this->control();
+$menu = array();
+menuInner($this, $menu);
+echo $this->json($menu);
+
+function menuInner($view, &$menu, $parentid = 0) {
+	$res = new Default_Model_Cresource();
+	$db = new Default_Model_Cmenu();
+	$row = $db->fetchRow(array('id = ?' => $parentid));
+
+	$result = $db->fetchAll(array('parentid = ?' => $parentid, '`show_it` = 1'), 'orderid');
+
+	if ($result) {
+		foreach ($result as $num => $el) {
+			if (!@$el['title']) continue;
+			if (!$el->resource || $view->user()->isAllowed($view->user('role'), $el->resource)) {
+				$item = array(
+					't' => $el['title']
+				);
+				if (@$el['controller']) $item['c'] = $el['controller'];
+				if (@$el['action']) $item['a'] = $el['action'];
+				if (@$el['param']) $item['p'] = Zkernel_Common::url2array($el['param']);
+				menuInner($view, $item['e'], $el['id']);
+				$menu[] = $item;
+			}
+		}
+	}
+}

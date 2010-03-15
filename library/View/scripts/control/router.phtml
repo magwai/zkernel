@@ -1,0 +1,11 @@
+<?php
+
+$this->layout()->setLayout('control/layout');
+
+$this->control(array(
+	'controller' => $this->controller,
+	'action' => $this->action,
+	'param' => $this->param,
+	'post' => $this->post,
+	'model' => $this->model
+))->route()->render();

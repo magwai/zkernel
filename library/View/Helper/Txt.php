@@ -12,9 +12,11 @@ class Zkernel_View_Helper_Txt extends Zend_View_Helper_Abstract  {
     	if ($key === null) return $this;
     	else {
 			$model = new Default_Model_Txt();
-   			return $model->fetchOne($field, array(
+			$ret = $model->fetchRow(array(
    				'`key` = ?' => $key
    			));
+   			$ret = $this->view->override()->overrideSingle($ret, 'txt');
+   			return $ret->$field;
     	}
     }
 }

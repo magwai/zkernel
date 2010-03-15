@@ -7,10 +7,8 @@
  * http://www.opensource.org/licenses/mit-license.php
  */
 
-class Zkernel_View_Helper_FormDate extends Zend_View_Helper_FormText
-{
-    public function formDate($name, $value = null, $attribs = null)
-    {
+class Zkernel_View_Helper_FormDate extends Zend_View_Helper_FormText {
+    public function formDate($name, $value = null, $attribs = null) {
 		if ($value) {
 			$value = strtotime($value);
 			$value = date('d.m.Y', $value);

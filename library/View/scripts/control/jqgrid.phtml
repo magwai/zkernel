@@ -1,9 +1,8 @@
 <?php
 
-$front = Zend_Controller_Front::getInstance();
-$c = $this->ah('control')->config;
+$c = $this->control()->config;
 
-if ($front->getRequest()->getPost('nd')) {
+if ($c->post['nd']) {
 	$rows = array();
 	if ($c->data && $c->field) {
     	foreach ($c->data as $el) {
@@ -32,7 +31,7 @@ if ($front->getRequest()->getPost('nd')) {
     	'records' => $c->data_cnt,
     	'rows' => $rows
     );
-	$this->placeholder('content')->set(Zend_Json::encode($data));
+	$this->layout()->json = $data;
     $c->response_type = 'json';
 }
 else {
@@ -48,6 +47,8 @@ else {
 	$field_title = $field_model = array();
 	$is_fmatter = false;
 	$is_search = false;
+	$reg = Zend_Registry::isRegistered('Zkernel_Multilang') ? Zend_Registry::get('Zkernel_Multilang') : '';
+
 	if ($c->field) foreach ($c->field as $el) {
 	    if (!$el->active) continue;
 	    $field_title[] = $el->title;
@@ -80,10 +81,11 @@ else {
 	}
 
 	$this->placeholder('text')->captureEnd();
+	$this->content = $this->placeholder('text');
 
-	$this->placeholder('content')->set($this->render('control/inner.phtml'));
+	echo $this->render('control/inner.phtml');
 
-	$this->ah('js')->addEval(
+	$this->inlineScript('script',
 '$.include("/zkernel/ctl/jqgrid/css/ui.jqgrid.css|link");
 $.include([
 	"/zkernel/ctl/jqgrid/i18n/grid.locale-ru.js",
@@ -103,7 +105,7 @@ $.include([
 		ExpandColumn: "'.$field_model[0]['name'].'",'
 :		''
 ).'
-	   	url: "/control/router/",
+	   	url: "'.($reg ? '/'.$reg->stitle : '').'/'.$c->controller.'/'.$c->action.'",
 	   	mtype: "post",
 		datatype: "json",
 	   	colNames: '.Zend_Json::encode($field_title).',
@@ -122,11 +124,6 @@ $.include([
 	    forceFit: true,
 	    shrinkToFit: true,
 	    altRows: true,
-	    serializeGridData: function(d) {
-	    	d._controller = "'.$front->getRequest()->getControllerName().'";
-	    	d._action = "'.$front->getRequest()->getActionName().'";
-	    	return d;
-		},
 		gridComplete: function() {'.($c->tree && count($c->tree_opened) ?
 			'var l = $("#list");
 			if (l.attr("opened") != 1) l.find("tr[id='.implode('],tr[id=', $c->tree_opened->toArray()).']").each(function() {
@@ -140,7 +137,7 @@ $.include([
 			$("#list").find("td").attr("unselectable", "on").css({"-moz-user-select":"none","-o-user-select":"none","-khtml-user-select":"none","user-select":"none"});
 		},
 		'.(!$c->drag && !$c->tree ? 'scroll: true,' : '').'
-		prmNames: {page: "_page", rows: "rows", sort: "_orderby", order: "_orderdir", search:"_search", nd: "nd"}
+		prmNames: {page: "_page", rows: "rows", sort: "_orderby", order: "_orderdir", search:"search", nd: "nd"}
 	});
 	'.($is_search ? '$("#list").jqGrid("filterToolbar");$("#list").setGridHeight(c.table_height());' : '').'
 	'.($c->drag ? '$("#list").jqGrid("sortableRows", {
@@ -164,7 +161,7 @@ $.include([
 			var prev = r ? (r.parent_id == ui.item.get(0).parent_id ? r.id : 0) : 0;
 			if (prev == this._was) return;
 			prev = typeof prev == "undefined" ? 0 : prev;
-			c.go(c.controller, "ctldrag", "_id=" + id + "&_prev=" + prev);
+			c.go(c.cfg.controller, "ctldrag", {"id": id, "prev": prev});
 			'.($c->tree ? '$("#list").updateNodeChildren(ui.item.get(0));' : '$("#list").updateRowNum();').'
 		}
 	});' : '').'

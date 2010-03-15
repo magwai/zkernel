@@ -1,17 +1,19 @@
 <?php
 
-$c = $this->ah('control')->config;
+$c = $this->control()->config;
 
 if ($c->form) {
-	if (@!(int)$_POST['cposted']) {
+	if (@!(int)$c->post['cposted']) {
 		$this->placeholder('text')->captureStart();
 
 ?>
-<div class="c_text"><?= $c->form->render() ?></div>
+<div class="c_text"><?php echo $c->form->render() ?></div>
 <?php
 
 		$this->placeholder('text')->captureEnd();
-		$this->placeholder('content')->set($this->render('control/inner.phtml'));
+		$this->content = $this->placeholder('text');
+
+		echo $this->render('control/inner.phtml');
 	}
 }
 $c->response_type = 'jqphp';

@@ -1,0 +1,41 @@
+<?php
+
+$tt = $this->model->fetchPairs('id', 'title', array(
+	'`id` != ?' => (int)$this->control()->config->param['id']
+));
+if ($tt) $ft = array(
+	'title' => 'Родители',
+	'type' => 'multiCheckbox',
+	'param' => array(
+		'multioptions' => $tt
+	),
+	'm2m' => array(
+		'model' => new Default_Model_Crolerefer(),
+		'self' => 'role',
+		'foreign' => 'parentid'
+	)
+);
+else $ft = array(
+	'active' => false
+);
+
+$this->control(array(
+	'field' => array(
+		'title' => array(
+			'title' => 'Название',
+			'required' => true,
+			'sortable' => true,
+			'unique' => true
+		),
+		'role' => $ft
+	),
+	'action_config' => array(
+		'ctlshow' => array(
+			'field' => array(
+    			'role' => array(
+    				'active' => false
+    			)
+    		)
+		)
+	)
+));

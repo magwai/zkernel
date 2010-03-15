@@ -1,0 +1,16 @@
+<?php
+
+$this->control();
+$login = 'none';
+if (isset($this->post['login']) && isset($this->post['password'])) {
+	if ($this->post['login'] == '' && $this->post['password'] == '') $this->user()->logout();
+	else {
+		$ok = $this->user()->login($this->post['login'], $this->post['password'], true);
+		if ($ok) $login = $this->user('login');
+	}
+}
+else if ($this->user('id')) $login = $this->user('login');
+
+echo $this->json(array(
+	'login' => $login
+));

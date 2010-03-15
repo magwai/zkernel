@@ -1,0 +1,275 @@
+<?php
+
+$this->render('cconf/ctl.phtml');
+
+$this->control(array(
+	'type' => 'add',
+    'use_db' => false,
+	'oac_apply' => false,
+    'field' => array(
+		'controller' => array(
+			'active' => false
+		),
+		'type' => array(
+			'active' => false
+		),
+		'key' => array(
+			'active' => false
+		),
+		'value' => array(
+			'active' => false
+		),
+		'action' => array(
+			'active' => false
+		)
+	)
+));
+
+switch ($this->control()->config->param['step']) {
+    case 'select':
+    	$cnr = $this->control()->config->param['wcontroller'];
+    	if ($cnr) {
+			$fld = array(
+				'kind' => array(
+					'title' => 'Тип ключа',
+					'type' => 'select',
+					'param' => array(
+						'value' => $this->control()->config->param['kind'],
+						'multioptions' => array(
+							'action' => 'Значение действия',
+							'field' => 'Значение поля'
+						)
+					)
+				),
+				'action' => array(
+					'active' => true
+				)
+			);
+    	}
+    	else {
+    		$fld = array(
+    			'kind' => array(
+    				'title' => 'Тип ключа',
+    				'type' => 'select',
+    				'param' => array(
+	   	 				'value' => 'global',
+	   	 				'multioptions' => array(
+							'global' => 'Глобальный параметр'
+						)
+	   	 			)
+    			)
+    		);
+    	}
+
+    	$this->control(array(
+			'request_ok' => array(
+				'controller' => 'cconf',
+				'action' => 'ctlwizard',
+				'param' => 'waction='.$this->control()->config->post['action'].'&step='.$this->control()->config->post['kind']
+			),
+			'request_cancel' => array(
+				'controller' => 'cconf',
+				'action' => 'ctlwizard',
+				'param' => 'step=default&waction=0&kind=0'
+			),
+    		'field' => $fld
+		));
+    	break;
+    case 'action':
+    	$tt = array();
+    	$t = $this->control()->config->model->getActionKeys();
+    	if ($t) foreach ($t as $k => $el) $tt[$k] = $el['title'];
+    	$this->control(array(
+			'request_ok' => array(
+				'controller' => 'cconf',
+				'action' => 'ctlwizard',
+				'param' =>	'wkey='.$this->control()->config->post['key'].'&step=type'
+			),
+			'request_cancel' => array(
+				'controller' => 'cconf',
+				'action' => 'ctlwizard',
+				'param' => 'step=select&kind=action'
+			),
+    		'field' => array(
+				'key' => array(
+		    		'active' => true,
+		    		'type' => 'select',
+			    	'param' => array(
+			    		'multioptions' => $tt
+			    	)
+		    	)
+			)
+		));
+    	break;
+    case 'global':
+    	$tt = array();
+    	$t = $this->control()->config->model->getGlobalKeys();
+    	if ($t) foreach ($t as $k => $el) $tt[$k] = $el['title'];
+    	$this->control(array(
+			'request_ok' => array(
+				'controller' => 'cconf',
+				'action' => 'ctlwizard',
+				'param' =>	'wkey='.$this->control()->config->post['key'].'&step=type'
+			),
+			'request_cancel' => array(
+				'controller' => 'cconf',
+				'action' => 'ctlwizard',
+				'param' => 'step=select'
+			),
+    		'field' => array(
+				'key' => array(
+		    		'active' => true,
+		    		'type' => 'select',
+			    	'param' => array(
+			    		'multioptions' => $tt
+			    	)
+		    	)
+			)
+		));
+    	break;
+    case 'field':
+    	$tt = array();
+    	$t = $this->control()->config->model->getFieldKeys();
+    	if ($t) foreach ($t as $k => $el) $tt[$k] = $el['title'];
+    	$ft = array(
+    		'active' => true,
+    		'type' => 'select',
+	    	'param' => array(
+	    		'multioptions' => $tt
+	    	)
+    	);
+		$ff = array(
+			'active' => true,
+			'title' => 'Название поля'
+		);
+    	$this->control(array(
+			'request_ok' => array(
+				'controller' => 'cconf',
+				'action' => 'ctlwizard',
+				'param' =>	'wkey=field_'.$this->control()->config->post['field'].'_'.$this->control()->config->post['key'].'&step=type'
+			),
+			'request_cancel' => array(
+				'controller' => 'cconf',
+				'action' => 'ctlwizard',
+				'param' => 'step=select&kind=field'
+			),
+    		'field' => array(
+				'key' => $ft,
+				'field' => $ff
+			)
+		));
+    	break;
+    case 'type':
+    	$ex = array();
+    	$type = 'add';
+    	$ft = array(
+   	 		'active' => true
+   	 	);
+    	$exist = $this->control()->config->model->fetchRow(array(
+			'`controller` = ?' => $this->control()->config->param['wcontroller'],
+			'`action` = ?' => $this->control()->config->param['waction'],
+			'`key` = ?' => $this->control()->config->param['wkey']
+		));
+		$id = 0;
+		if ($exist) {
+			$id = $exist->id;
+			$type = 'edit';
+		}
+		else $ex = array(
+			'controller' => $this->control()->config->param['wcontroller'],
+			'action' => $this->control()->config->param['waction'],
+			'key' => $this->control()->config->param['wkey']
+		);
+   		$p = $this->control()->config->model->getFeildParam($this->control()->config->param['wkey']);
+   	 	$tt = array();
+   	 	if ($p['vtype']) {
+   	 		$ks = array_keys($p['vtype']);
+   	 		$t = $this->control()->config->model->getTypes();
+   	 		foreach ($t as $k => $v) {
+   	 			if (array_key_exists($k, $p['vtype'])) $tt[$k] = $v;
+   	 		}
+   	 	}
+   	 	$ft = array_merge($ft, $tt
+   	 		?	array(
+		   	 		'type' => 'select',
+		   	 		'param' => array(
+		   	 			'value' => @$ks[0],
+		   	 			'multioptions' => $tt
+		   	 		)
+		   	 	)
+		   	:	array(
+	   	 			'param' => array(
+	   	 				'value' => 'text',
+	   	 				'disabled' => true
+	   	 			)
+   	 			)
+   	 	);
+   	 	$kk = $this->control()->config->param['wkey'];
+   	 	$step = (substr($kk, 0, 6) == 'field_' ? 'field' : 'action');
+   	 	$ks = $this->control()->config->model->getActionKeys();
+   	 	if (!array_key_exists($kk, $ks)) $step = 'global';
+
+    	$this->control(array(
+			'type' => $type,
+    		'post_field_extend' => $ex,
+			'request_ok' => array(
+				'controller' => 'cconf',
+				'action' => 'ctledit',
+				'param' =>	'wcontroller=0&waction=0&wkey=0&step=default&kind=0&id='.($id ? $id : $this->control()->config->model->fetchNextId())
+			),
+			'request_cancel' => array(
+				'controller' => 'cconf',
+				'action' => 'ctlwizard',
+				'param' => 'wkey=0&step='.$step
+			),
+			'use_db' => true,
+    		'field' => array(
+				'type' => $ft
+			)
+		));
+    	break;
+    default:
+    	$ft = array(
+    		'active' => true
+    	);
+    	$tt = array('' => '[ любой контроллер ]');
+    	$dir = Zend_Controller_Front::getInstance()->getControllerDirectory();
+    	$dir = @$dir['default'];
+    	$handle = @opendir($dir);@readdir($handle);@readdir($handle);
+		while ($path = @readdir($handle)) {
+			if (is_file($dir.'/'.$path)) {
+				$n = $nn = strtolower(str_ireplace('Controller.php', '', $path));
+				$c = ucfirst($n).'Controller';
+				if (!class_exists($c)) include $dir.'/'.$path;
+				$db = Zkernel_Common::getDocblock($c);
+				if (isset($db['zk_title'])) $nn = $db['zk_title'].' ('.$n.')';
+				if ($db && array_key_exists('zk_config', $db) && !$db['zk_config']) continue;
+				$tt[$n] = $nn;
+			}
+		}
+		//asort($tt);
+		@closedir($handle);
+    	if (count($tt) > 1) $ft = array_merge($ft, array(
+    		'type' => 'select',
+	    	'param' => array(
+    			'value' => $this->control()->config->param['wcontroller'],
+	    		'multioptions' => $tt
+	    	)
+    	));
+    	$this->control(array(
+			'request_ok' => array(
+				'controller' => 'cconf',
+				'action' => 'ctlwizard',
+				'param' => 'wcontroller='.$this->control()->config->post['controller'].'&step=select'
+			),
+			'request_cancel' => array(
+				'controller' => 'cconf',
+				'action' => 'ctlshow',
+				'param' => 'wcontroller=0'
+			),
+    		'field' => array(
+				'controller' => $ft
+			)
+		));
+    	break;
+}

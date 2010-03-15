@@ -57,37 +57,15 @@ class Zkernel_Application_Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 
     /**
      * Инициализация отладчика
-     * TODO: Здесь мусорно. Инит кэша метаданых тут не нужен
      */
-	protected function _initPapp() {
-		$this->bootstrap('db');
-    	$cache = Zend_Cache::factory('Core', 'Memcached', array('automatic_serialization' => true));
-    	Zend_Db_Table_Abstract::setDefaultMetadataCache($cache);
-		if ($this->hasOption('zfdebug')/* && $this->getOption('zfdebug.active') == 'true'*/) {
-    		$c = $this->getOption('zfdebug');
-    		if (isset($c['plugins']['Database'])) $c['plugins']['Database']['adapter']['standard'] = $this->getPluginResource('db')->getDbAdapter();
-    		if (isset($c['plugins']['Cache'])) $c['plugins']['Cache']['backend'] = $cache->getBackend();
-    		$c['image_path'] = '/zkernel/img/debug';
-    		$c['jquery_path'] = '/zkernel/js/jquery/jquery.js';
-    		$zfdebug = new Zkernel_Controller_Plugin_Debug($c);
-            Zend_Controller_Front::getInstance()->registerPlugin($zfdebug);
+	protected function _initDebug() {
+		if ($this->hasOption('zfdebug')) {
+			$opt = $this->getOption('zfdebug');
+			if ($opt['active']) {
+				$this->bootstrap('db');
+	            Zend_Controller_Front::getInstance()->registerPlugin(new Zkernel_Controller_Plugin_Debug($opt));
+			}
        	}
 	}
-
-    /**
-     * Инициализация загрузчика файлов
-     * TODO: Это нужно отсюда убрать в модуль
-     */
-	public function _initFu() {
-       	$router = Zend_Controller_Front::getInstance()->getRouter();
-		$route = new Zend_Controller_Router_Route_Regex(
-			'/fu',
-			array(
-				'controller' => 'fu',
-				'action'     => 'index'
-			)
-		);
-		$router->addRoute('fu', $route);
-    }
 }
 

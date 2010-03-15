@@ -7,10 +7,8 @@
  * http://www.opensource.org/licenses/mit-license.php
  */
 
-class Zkernel_Form_Element_Editarea extends Zend_Form_Element_Textarea
-{
-	public function render(Zend_View_Interface $view = null)
-    {
+class Zkernel_Form_Element_Editarea extends Zend_Form_Element_Textarea {
+	public function render(Zend_View_Interface $view = null) {
     	$js =
 '$.include("/zkernel/ctl/edit_area/edit_area_full.js", function() {
 	EAL.prototype.window_loaded();
@@ -27,7 +25,7 @@ class Zkernel_Form_Element_Editarea extends Zend_Form_Element_Textarea
 	window.cb_'.$this->getName().' = function(id) { $("#'.$this->getName().'").val(editAreaLoader.getValue(id)); };
 });
 ';
-    	Zend_Controller_Action_HelperBroker::getStaticHelper('js')->addEval($js);
+    	$this->getView()->inlineScript('script', $js);
 		return parent::render($view);
 	}
 }

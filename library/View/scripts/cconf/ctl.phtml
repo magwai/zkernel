@@ -1,0 +1,114 @@
+<?php
+
+$item = $this->control()->config->model->fetchRow(array(
+    '`id` = ?' => (int)$this->control()->config->param['id']
+));
+
+$vl = $vl_sf = array();
+if ($item) {
+    $p = $this->control()->config->model->getFeildParam($item->key);
+    if ($p) $vl = $p;
+    $pp = @$p['vtype'][$item->type];
+    if ($pp) {
+    	$vl = array_merge(
+    		$vl,
+    		$pp
+    	);
+    }
+    if (@$p['func_success']) $vl_sf = $p['func_success'];
+}
+
+$this->control(array(
+	'field' => array(
+		'controller' => array(
+			'title' => 'Контроллер',
+			'sortable' => true,
+			'order' => 1
+		),
+		'action' => array(
+			'title' => 'Действие',
+			'sortable' => true,
+			'order' => 2
+		),
+		'key' => array(
+			'title' => 'Ключ',
+			'sortable' => true,
+			'order' => 3
+		),
+		'value' => array(
+			'title' => 'Значение',
+			'sortable' => true,
+			'order' => 5
+		),
+		'type' => array(
+			'title' => 'Тип значения',
+			'sortable' => true,
+			'order' => 4
+		)
+	),
+	'action_config' => array(
+		'ctlshow' => array(
+			'button_top' => array(
+				'add',
+				'edit',
+				'delete',
+				array(
+					'title' => 'Мастер',
+					'controller' => 'cconf',
+					'action' => 'ctlwizard',
+					'param' => 'step=default'
+				)
+			),
+    		'field' => array(
+				'type' => array(
+					'active' => false
+				),
+				'controller' => array(
+					'formatter' => 'function',
+					'formatoptions' => 'return value.length ? value : "Все";'
+				),
+				'action' => array(
+					'formatter' => 'function',
+					'formatoptions' => 'return value.length ? value : "Все";'
+				)
+			)
+		),
+		'ctladd' => array(
+			'field' => array(
+				'value' => array(
+					'active' => false
+				),
+				'type' => array(
+		    		'type' => 'select',
+			    	'param' => array(
+			    		'multioptions' => $this->control()->config->model->getTypes()
+			    	)
+		    	)
+			)
+		),
+		'ctledit' => array(
+			'button_top' => array(array(
+				'title' => 'Удалить',
+				'controller' => 'cconf',
+				'action' => 'ctldelete',
+				'param' => 'id='.(int)$this->control()->config->param['id']
+			)),
+    		'field' => array(
+				'action' => array(
+					'active' => false
+				),
+				'type' => array(
+					'active' => false
+				),
+				'controller' => array(
+					'active' => false
+				),
+				'key' => array(
+					'active' => false
+				),
+				'value' => $vl
+			),
+			'func_success' => $vl_sf
+		)
+	)
+));

@@ -1,46 +1,59 @@
 <?php
-/**
- * Zkernel
- *
- * Copyright (c) 2010 Magwai Ltd. <info@magwai.ru>, http://magwai.ru
- * Licensed under the MIT License:
- * http://www.opensource.org/licenses/mit-license.php
- */
 
 class Zkernel_Controller_Plugin_Menu extends Zend_Controller_Plugin_Abstract {
-	public $model;
+	const DEFAULT_REGISTRY_KEY = 'Zend_Navigation';
+    const DEFAULT_MODEL = 'Default_Model_Menu';
+    private $_model;
+	protected $_menu = null;
+	protected $_key = null;
+	protected $_default = null;
 
-	public function routeStartup(Zend_Controller_Request_Abstract $request) {
-		$this->model = new Default_Model_Menu();
-		$menu = $this->getDeeper();
-		$n = new Zend_Navigation($menu);
-		Zend_Registry::set('Zend_Navigation', $n);
+	public function __construct($options = array()) {
+		$class = isset($options['model']) ? $options['model'] : self::DEFAULT_MODEL;
+		$this->_model = new $class();
+		$this->_key = isset($options['registry']) ? $options['registry'] : self::DEFAULT_REGISTRY_KEY;
     }
 
-    function getDeeper($id = 0) {
-    	$m = $this->model->fetchAll(array('`parentid` = ?' => $id), 'orderid');
-		$menu = array();
-		$router = Zend_Controller_Front::getInstance()->getRouter();
+	public function routeShutdown(Zend_Controller_Request_Abstract $request) {
+		$this->_menu = new Zend_Navigation($this->getDeeper());
+		$this->save();
+	}
 
+	private function getDeeper($id = 0) {
+    	$m = $this->_model->fetchAll(array('`parentid` = ?' => $id), 'orderid');
+		$mu = new Default_Model_Url();
+    	$menu = array();
+		$front = Zend_Controller_Front::getInstance();
+		$router = $front->getRouter();
+		$request = $front->getRequest();
+		$reg = Zend_Registry::isRegistered('Zkernel_Multilang') ? Zend_Registry::get('Zkernel_Multilang') : '';
+		$view = Zend_Controller_Action_HelperBroker::getStaticHelper('viewRenderer')->view;
 		if ($m) foreach ($m as $el) {
-			$p = array();
-			if ($el->route && $el->param) {
-				$pp = explode(',', $el->param);
-				$mp = $router->getRoute($el->route)->getVariables();
-				if ($mp) foreach ($mp as $k_1 => $el_1) $p[$el_1] = @$pp[$k_1];
+			if (!$el->route || $router->hasRoute($el->route)) {
+				$el = $view->override()->overrideSingle($el, 'menu');
+				$p = $reg ? array('lang' => $reg->stitle) : array();
+				if ($el->route && $el->param && strpos($el->route, 'dbroute') !== false) {
+					$map = $mu->fetchOne('map', array('`id` = ?' => substr($el->route, 7)));
+					$mp = explode(',', $map);
+					$pp = explode(',', $el->param);
+					if ($mp && $pp) foreach ($mp as $n => $mp1) $p[$mp1] = $pp[$n];
+				}
+				$md = array(
+					'label' => $el->title,
+					'controller' => $el->controller,
+					'action' => $el->action,
+					'params' => $p,
+					'route' => $el->route ? $el->route : 'default',
+					'uri' => $el->url,
+					'pages' => $this->getDeeper($el->id)
+				);
+				$menu[] = array_merge($el->toArray(), $md);
 			}
-			$md = array(
-				'label' => $el->title,
-				'controller' => $el->controller,
-				'action' => $el->action,
-				'params' => $p,
-				'route' => $el->route ? $el->route : 'default',
-				'uri' => $el->url,
-				'pages' => $this->getDeeper($el->id)
-			);
-			$menu[] = array_merge($el->toArray(), $md);
 		}
 		return $menu;
     }
-}
 
+	public function save() {
+		Zend_Registry::set($this->_key, $this->_menu);
+	}
+}

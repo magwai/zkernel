@@ -1,0 +1,45 @@
+<?php
+
+$this->control(array(
+	'field' => array(
+		'controller' => array(
+			'title' => 'Контроллер',
+			'order' => 1
+		),
+		'action' => array(
+			'title' => 'Действие',
+			'order' => 2
+		),
+		'map' => array(
+			'title' => 'Привязка параметров',
+			'description' => 'Список переменных. Разделитель - запятая',
+			'order' => 3
+		),
+		'url' => array(
+			'title' => 'Адрес',
+			'required' => true,
+			'unique' => true,
+			'order' => 4
+		),
+		'orderid' => array(
+			'active' => false
+		)
+	),
+	'action_config' => array(
+		'ctlshow' => array(
+			'button_top' => array('add', 'edit', 'delete', array(
+				'title' => 'Адреса из контроллеров',
+				'controller' => 'url',
+				'action' => 'ctlc2u'
+			)),
+			'field' => array(
+				'message' => array(
+					'active' => false
+				),
+				'cedit' => array(
+					'hidden' => true
+				)
+			)
+		)
+	)
+));

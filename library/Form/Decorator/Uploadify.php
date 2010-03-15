@@ -12,8 +12,7 @@ class Zend_Form_Decorator_Uploadify
 {
     protected $_attribBlacklist = array('helper', 'placement', 'separator', 'value', 'path', 'url', 'required');
 
-    public function render($content)
-    {
+    public function render($content) {
         $separator = $this->getSeparator();
         $element 	= $this->getElement();
         $name      	= $element->getName();

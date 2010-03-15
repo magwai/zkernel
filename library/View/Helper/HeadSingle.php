@@ -30,8 +30,8 @@ class Zkernel_View_Helper_HeadSingle extends Zend_View_Helper_HeadScript  {
 				$c .= file_get_contents($el)."\n";
 			}
 			$c = trim($c);
-			if ($include &&  $jquery && $inc) $c .= 'jQuery.includedScripts = '.Zend_Json::encode($inc);
-			if (!@file_exists(PUBLIC_PATH.'/pc/js')) mkdir(PUBLIC_PATH.'/pc/js', 0755, true);
+			if ($include/* && $jquery*/ && $inc) $c .= 'jQuery.includedScripts = '.Zend_Json::encode($inc);
+			if (!@file_exists(PUBLIC_PATH.'/pc/js')) mkdir(PUBLIC_PATH.'/pc/js', 0777, true);
 			file_put_contents(PUBLIC_PATH.$nm, $c);
 			@chmod(PUBLIC_PATH.$nm, 0755);
 		}

@@ -104,6 +104,10 @@ class Zkernel_View_Data implements Countable, Iterator, ArrayAccess {
 		$this->_count = count($this->_data);
 		$this->_skipNextIteration = true;
 	}
+
+	public function toArray() {
+		return $this->_data;
+	}
 }
 
 

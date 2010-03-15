@@ -1,0 +1,79 @@
+<?php
+
+$this->layout()->disableLayout(true);
+$path = PUBLIC_PATH.'/'.$this->path.'.'.$this->ext;
+$file = basename($path);
+$content_type = '';
+
+if ($path && $file) {
+	$res = '';
+
+	$content_type = $this->ext == 'js'
+		? 'application/javascript'
+		: 'text/css';
+
+	$modified = gmdate('D, d M Y H:i:s', filemtime($path)).' GMT';
+
+	$expires = gmdate('D, d M Y H:i:s', time() + 2592000).' GMT';
+
+	if ($modified && @$_SERVER['HTTP_IF_MODIFIED_SINCE'] === $modified) Zend_Controller_Front::getInstance()->getResponse()->setHttpResponseCode(304);
+	else {
+		$res = file_get_contents($path);
+		if ($res) {
+			$md5 = md5($path.$modified);
+
+			$cache = Zend_Registry::get('Zkernel_Cache');
+
+			$res_1 = $cache->test($md5)
+				? "/* memcached */\n".$cache->load($md5)
+				: '';
+
+			if ($res_1) $res = $res_1;
+			else {
+				$process = popen('java -client -Xmx64m', 'r');
+				$ret = false;
+				if (is_resource($process)) {
+					$read = fread($process, 1024);
+					pclose($process);
+					if ($read) $ret = true;
+				}
+				if ($ret) {
+					$desc = array(
+					   0 => array("pipe", "r"),
+					   1 => array("pipe", "w")
+					);
+					$process = proc_open('java -client -Xmx64m -jar "'.realpath(APPLICATION_PATH.'/../library/Zkernel/Other/Jar/yuicompressor.jar').'" --charset utf-8 --type '.$this->ext, $desc, $pipes);
+					if (is_resource($process)) {
+						fwrite($pipes[0], $res);
+						fclose($pipes[0]);
+						$res_1 = stream_get_contents($pipes[1]);
+						fclose($pipes[1]);
+						if ($res_1) {
+							$res = "/* yuicompressor */\n".$res_1;
+						}
+						proc_close($process);
+					}
+				}
+				$cache->save($res, $md5);
+			}
+		}
+		echo $res;
+	}
+	Zend_Controller_Front::getInstance()->getResponse()
+		->setHeader('Cache-Control', 'max-age=0', true);
+}
+else {
+	$modified = gmdate('D, d M Y H:i:s').' GMT';
+	$expires = $modified;
+	Zend_Controller_Front::getInstance()->getResponse()
+		->setHttpResponseCode(404)
+		->setHeader('Cache-Control', 'no-cache', true)
+		->setHeader('Pragma', 'no-cache', true);
+}
+
+Zend_Controller_Front::getInstance()->unregisterPlugin('Zkernel_Controller_Plugin_Debug');
+Zend_Controller_Front::getInstance()->getResponse()
+	->setHeader('Last-Modified', $modified, true)
+	->setHeader('Expires', $expires, true);
+if ($content_type) Zend_Controller_Front::getInstance()->getResponse()
+	->setHeader('Content-type', $content_type, true);

@@ -1,0 +1,20 @@
+<?php
+
+$model = new Default_Model_Lang();
+$list = $model->fetchAll(null, 'orderid');
+$reg = Zend_Registry::get('Zkernel_Multilang') ? Zend_Registry::get('Zkernel_Multilang') : '';
+
+?>
+<div id="c_lang">
+<?php
+
+if (count($list)) foreach ($list as $el) {
+
+?>
+	<a<?php echo $reg->id == $el->id ? ' class="cur"' : '' ?> href="/<?php echo $el->stitle ?>/control"><?php echo $el->title ?></a>
+<?php
+
+}
+
+?>
+</div>

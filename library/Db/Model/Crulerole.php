@@ -7,7 +7,6 @@
  * http://www.opensource.org/licenses/mit-license.php
  */
 
-class Zkernel_Db_Model_Crulerole extends Zkernel_Db_Table
-{
+class Zkernel_Db_Model_Crulerole extends Zkernel_Db_Table {
 	protected $_name = 'crule_role';
 }

@@ -7,10 +7,8 @@
  * http://www.opensource.org/licenses/mit-license.php
  */
 
-class Zkernel_View_Helper_FormRubr extends Zend_View_Helper_FormMultiCheckbox
-{
-    public function formRubr($name, $value = null, $attribs = null, $options = null)
-    {
+class Zkernel_View_Helper_FormRubr extends Zend_View_Helper_FormMultiCheckbox {
+    public function formRubr($name, $value = null, $attribs = null, $options = null) {
 		$options = array();
 		if ($value) {
 			$model = $attribs['rubr']['model'];

@@ -19,7 +19,7 @@ class Zkernel_View_Helper_Preview extends Zend_View_Helper_Abstract  {
 		if (!$modified_o) return @$param['default'];
 		$modified = @filemtime(PUBLIC_PATH.'/pc/'.$dir.'/'.$prefix.$name);
 		if ($modified < $modified_o) {
-			if (!@file_exists(PUBLIC_PATH.'/pc/'.$dir)) mkdir(PUBLIC_PATH.'/pc/'.$dir, 0755, true);
+			if (!@file_exists(PUBLIC_PATH.'/pc/'.$dir)) mkdir(PUBLIC_PATH.'/pc/'.$dir, 0777, true);
 			if ($ctype == 'image') {
 				$preview = new Zkernel_Image_Preview(
 					PUBLIC_PATH.'/pc/'.$dir,
@@ -34,7 +34,7 @@ class Zkernel_View_Helper_Preview extends Zend_View_Helper_Abstract  {
 				);
 				$preview->create($name, $param);
 			}
-			@chmod(PUBLIC_PATH.'/pc/'.$dir.'/'.$prefix.$name, 0755);
+			@chmod(PUBLIC_PATH.'/pc/'.$dir.'/'.$prefix.$name, 0777);
 	    }
 	    return $modified || @file_exists(PUBLIC_PATH.'/pc/'.$dir.'/'.$prefix.$name)
 	    	? '/pc/'.$dir.'/'.$prefix.$name

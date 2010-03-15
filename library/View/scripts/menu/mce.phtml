@@ -1,0 +1,29 @@
+<?php
+
+$this->layout()->disableLayout(true);
+Zend_Controller_Front::getInstance()->unregisterPlugin('Zkernel_Controller_Plugin_Debug');
+$menu = $this->navigation()->menu()->renderMenu();
+$menu = preg_replace('/href\=\"([^\"]+)\"/si', 'onclick="return m_set_url(\'$1\')" href="#"', $menu);
+
+echo $this->doctype('HTML5');
+
+?>
+<html>
+	<head>
+		<meta charset=utf-8>
+		<style>
+body{margin:10px 10px 10px 0;padding:0;background:#fff;color:#000;font-size:13px;line-height:16px;font-family:arial;}
+a{color:#000;margin:0 0 5px 0;display:block;}
+a:hover{text-decoration:none;}
+ul{margin:0;padding:0 0 0 20px;list-style:none;}
+		</style>
+		<script type="text/javascript">
+function m_set_url(url) {
+	window.parent.document.getElementById('href').value = url;
+	window.parent.mcTabs.displayTab('general_tab','general_panel');
+	return false;
+}
+		</script>
+	</head>
+	<body><?php echo $menu ? $menu : '<div style="padding:0 0 0 10px;">Ссылки отсутствуют. Вы можете поставить ссылку, скопировав ее из панели адреса браузера.</div>' ?></body>
+</html>

@@ -1,0 +1,53 @@
+<?php
+
+$this->layout()->disableLayout(true);
+$ret = array();
+$ok = '';
+$key = array_keys($this->files);
+$key = @$key[0];
+if ($key){
+    Zend_Session::setId(@$this->post['sid']);
+    $s = new Zend_Session_Namespace();
+	$tmp_name = $this->files[$key]['tmp_name'];
+    $validators = array('Zend_Validate_File_Upload' => new Zend_Validate_File_Upload());
+    if (@$s->form[$key]['validators']) $validators = array_merge($validators, $s->form[$key]['validators']);
+    $valid = true;
+    $is = @getimagesize($tmp_name);
+    if (@$is['mime']) $this->files[$key]['type'] = $is['mime'];
+    foreach ($validators as $k => $el) {
+    	$el = clone $el;
+    	if ($el instanceof Zend_Validate_File_IsImage) $el->enableHeaderCheck(true);
+    	$tocheck = $k == 'Zend_Validate_File_Upload' ? $key : $tmp_name;
+    	if (!$el->isValid($tocheck, $this->files[$key])) {
+    		$valid = false;
+    		$e = $el->getErrors();
+    		if ($e) foreach ($e as $el_1) if (!in_array($el_1, $ret)) $ret[] = $el_1;
+    	}
+    }
+
+    if ($valid) {
+    	$name = $this->files[$key]['name'];
+    	$new_dir = ltrim(@$this->post['folder'], '/');
+    	$new_dir = strpos($new_dir, ':') === false
+    		? '/'.$new_dir
+    		: $new_dir;
+		if ($new_dir && !file_exists($new_dir)) @mkdir($new_dir, 0755, true);
+    	if (file_exists($new_dir)) {
+    		if (@$this->post['old'] && $this->post['old'] != 'multi') @unlink($new_dir.'/'.$this->post['old']);
+    		$filter = new Zkernel_Filter_File_Uploadify(array(
+    			'directory' => $new_dir
+    		));
+    		$name = $filter->filter($name);
+    		$path = $new_dir.'/'.$name;
+    		$res = @move_uploaded_file($tmp_name, $path);
+			if ($res) {
+				$ok = 'u|'.$name;
+				@chmod($path, 0755);
+			}
+			else $ret[] = 'uploadifyNocopy';
+    	}
+    	else $ret[] = 'uploadifyNofolder';
+    }
+}
+$ret = Zkernel_Form::translateErrors($ret);
+echo $ok ? $ok : implode('|', $ret);

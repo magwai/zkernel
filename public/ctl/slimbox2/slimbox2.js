@@ -85,6 +85,11 @@
 						allowScriptAccess: "always"
 					});
 					window.setTimeout('$("#lbObject").css("visibility", "visible");', 1000);
+					$('#lbCloseLink').add($('#lbOverlay')).unbind('click').click(function() {
+						$('#lbObject').remove();
+						close();
+						return false;
+					});
 					return (this == el) || ((this.rel.length > 8) && (this.rel == el.rel));
 				}, c);
 			}
@@ -179,7 +184,7 @@
 	function setup(open) {
 		$("object").add(ie6 ? "select" : "embed").each(function(index, el) {
 			if (open) $.data(el, "slimbox", el.style.visibility);
-			el.style.visibility = open ? "hidden" : $.data(el, "slimbox");
+			el.style.visibility = open ? "hidden" : /*$.data(el, "slimbox")*/'visible';
 		});
 		var fn = open ? "bind" : "unbind";
 		win[fn]("scroll resize", position);

@@ -17,8 +17,7 @@ class Zkernel_Form_Element_Date extends Zend_Form_Element_Text
 		));
 	}
 
-	public function render(Zend_View_Interface $view = null)
-    {
+	public function render(Zend_View_Interface $view = null) {
     	$js =
 '$.include("/zkernel/js/jquery/ui/ui.datepicker.js", function() {
 	$("input[name='.$this->getName().']").datepicker({
@@ -26,8 +25,7 @@ class Zkernel_Form_Element_Date extends Zend_Form_Element_Text
 		firstDay: 1
 	});
 });';
-    	Zend_Controller_Action_HelperBroker::getStaticHelper('js')->addEval($js);
-
+    	$this->getView()->inlineScript('script', $js);
     	return parent::render($view);
 	}
 

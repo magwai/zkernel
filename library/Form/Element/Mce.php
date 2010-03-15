@@ -35,7 +35,7 @@ class Zkernel_Form_Element_Mce extends Zend_Form_Element_Textarea {
     $("textarea[name='.$this->getName().']").tinymce('.Zend_Json::encode($o).');
 });
 ';
-    	Zend_Controller_Action_HelperBroker::getStaticHelper('js')->addEval($js);
+    	$this->getView()->inlineScript('script', $js);
 		return parent::render($view);
 	}
 

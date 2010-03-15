@@ -7,12 +7,10 @@
  * http://www.opensource.org/licenses/mit-license.php
  */
 
-class Zkernel_Form_Element_Uploadify extends Zend_Form_Element_Hidden
-{
+class Zkernel_Form_Element_Uploadify extends Zend_Form_Element_Hidden {
 	public $helper = 'formUploadify';
 
-	public function render(Zend_View_Interface $view = null)
-    {
+	public function render(Zend_View_Interface $view = null) {
     	$o = array(
     		'fileDataName' => $this->getName(),
 	    	'folder' => '/'.$this->destination,
@@ -28,8 +26,7 @@ class Zkernel_Form_Element_Uploadify extends Zend_Form_Element_Hidden
 $.include(["/zkernel/js/swfobject.js", "/zkernel/ctl/uploadify/jquery.uploadify.js", "/zkernel/ctl/uploadify/zuploadify.js"], function() {
 	zuf.init('.Zend_Json::encode($o).');
 });';
-    	Zend_Controller_Action_HelperBroker::getStaticHelper('js')->addEval($js);
-		if (!isset($this->url)) $this->url = str_ireplace(PUBLIC_PATH, '', $this->destination);
+    	if (!isset($this->url)) $this->url = str_ireplace(PUBLIC_PATH, '', $this->destination);
 		$this->required = $this->isRequired();
 
 		$s->form[$this->getName()] = array(
@@ -37,11 +34,11 @@ $.include(["/zkernel/js/swfobject.js", "/zkernel/ctl/uploadify/jquery.uploadify.
 			'value' => $this->getValue(),
 			'validators' => $this->getValidators()
 		);
+		$this->getView()->inlineScript('script', $js);
     	return parent::render($view);
 	}
 
-	public function getValue()
-    {
+	public function getValue() {
     	$value = parent::getValue();
 		if (!isset($this->url)) $this->url = str_ireplace(PUBLIC_PATH, '', $this->destination);
     	$values = explode('*', $value);
@@ -49,14 +46,14 @@ $.include(["/zkernel/js/swfobject.js", "/zkernel/ctl/uploadify/jquery.uploadify.
 	    	$ss = substr($v, 0, 2);
 	    	if ($ss == 'u|') {
 	    		$values[$num] = $v = str_replace('u|', '', $v);
-	    		Zend_Controller_Action_HelperBroker::getStaticHelper('js')->addEval('zuf.add("'.$this->getName().'", "'.$v.'", "'.$this->url.'", '.(int)$this->isRequired().');');
+	    		$this->getView()->inlineScript('script', 'zuf.add("'.$this->getName().'", "'.$v.'", "'.$this->url.'", '.(int)$this->isRequired().');');
 	    	}
 	    	else if ($ss == 'd|') {
 	    		$v = str_replace('d|', '', $v);
 	    		@unlink($this->destination.'/'.$v);
 	    		unset($values[$num]);
 	    		$this->setValue(implode('*', $values));
-	    		Zend_Controller_Action_HelperBroker::getStaticHelper('js')->addEval('zuf.remove("'.$this->getName().'", "'.$v.'");');
+	    		$this->getView()->inlineScript('script', 'zuf.remove("'.$this->getName().'", "'.$v.'");');
 	    	}
     	}
     	return implode('*', $values);

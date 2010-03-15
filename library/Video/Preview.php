@@ -36,16 +36,34 @@ class Zkernel_Video_Preview {
 			fclose($pipes[2]);
 			proc_close($process);
 		}
-		if (!$width || !$height) return false;
-		if (!$max_width || !$max_height) return false;
+		if (@$param['time']) {
+			$name = explode('.', $name);
+			array_pop($name);
+			$name = implode('.', $name);
+			@exec('ffmpeg -i "'.$this->image_path.'/'.$name.'.avi" -an -ss '.(int)$param['time'].' -r 1 -vframes 1 '.($max_width && $max_height ? '-s '.$max_width.'x'.$max_height : '').' -y -f mjpeg "'.$this->path.'/'.$prefix.$name.'.jpg"');
+			$preview = new Zkernel_Image_Preview(
+				$this->path,
+				$this->path
+			);
+			$param['prefix'] = '';
+			$preview->create($prefix.$name.'.jpg', $param);
+			copy($this->path.'/'.$prefix.$name.'.jpg', $this->path.'/'.$prefix.$name.'.avi');
+			unlink($this->path.'/'.$prefix.$name.'.jpg');
+			@chmod($this->path.'/'.$prefix.$name.'.avi', 0777);
+		}
+		else {
+			if (!$width || !$height) return false;
+			if (!$max_width || !$max_height) return false;
 
-		if ($width > $max_width) $width = $max_width;
-		if ($height > $max_height) $height = $max_height;
+			if ($width > $max_width) $width = $max_width;
+			if ($height > $max_height) $height = $max_height;
 
-		if ($width / 2 != floor($width / 2)) $width++;
-		if ($height / 2 != floor($height / 2)) $height++;
+			if ($width / 2 != floor($width / 2)) $width++;
+			if ($height / 2 != floor($height / 2)) $height++;
 
-		@exec('ffmpeg -i "'.$this->image_path.'/'.$name.'" '.($width && $height ? '-s '.$width.'x'.$height : '').' -y -f flv -acodec libmp3lame -ac 2 -ar 44100 "'.$this->path.'/'.$prefix.$name.'"');
+			@exec('ffmpeg -i "'.$this->image_path.'/'.$name.'" '.($width && $height ? '-s '.$width.'x'.$height : '').' -y -f flv -acodec libmp3lame -ac 2 -ar 44100 "'.$this->path.'/'.$prefix.$name.'"');
+			if (!file_exists($this->path.'/'.$prefix.$name)) @exec('ffmpeg -i "'.$this->image_path.'/'.$name.'" '.($width && $height ? '-s '.$width.'x'.$height : '').' -y -f flv -ac 2 -ar 44100 "'.$this->path.'/'.$prefix.$name.'"');
+		}
 
 		return true;
 	}

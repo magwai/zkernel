@@ -7,9 +7,12 @@
  * http://www.opensource.org/licenses/mit-license.php
  */
 
-class Zkernel_Db_Model_Page extends Zkernel_Db_Table
-{
+class Zkernel_Db_Model_Page extends Zkernel_Db_Table {
 	protected $_name = 'page';
+	protected $_multilang_field = array(
+		'title',
+		'message'
+	);
 
 	function fetchCard($id) {
 		$ret = $this->fetchRow(array('`stitle` = ?' => $id));

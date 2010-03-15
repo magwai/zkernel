@@ -1,0 +1,51 @@
+<?php
+
+$this->control(array(
+	'field' => array(
+		'key' => array(
+			'active' => $this->user()->isAllowed(
+				$this->user('role'),
+				Zkernel_Common::getById(array(
+					'model' => new Default_Model_Cresource(),
+					'field' => 'id',
+					'key' => 'key',
+					'id' => 'admin'
+				))
+			),
+			'title' => 'Ключ',
+			'required' => true,
+			'sortable' => true,
+			'unique' => true,
+			'validators' => array(array(
+				'validator' => 'Regex',
+				'options' => array('/^[a-z0-9\_\-]*$/i')
+			)),
+			'order' => 2
+		),
+		'title' => array(
+			'title' => 'Заголовок',
+			'required' => true,
+			'sortable' => true,
+			'unique' => true,
+			'order' => 1
+		),
+		'value' => array(
+			'title' => 'Значение',
+			'type' => 'textarea',
+			'order' => 3
+		)
+	),
+	'action_config' => array(
+		'ctlshow' => array(
+			'button_top' => $this->user()->isAllowed(
+				$this->user('role'),
+				Zkernel_Common::getById(array(
+					'model' => new Default_Model_Cresource(),
+					'field' => 'id',
+					'key' => 'key',
+					'id' => 'admin'
+				))
+			) ? array() : array('edit')
+		)
+	)
+));

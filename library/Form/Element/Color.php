@@ -7,10 +7,8 @@
  * http://www.opensource.org/licenses/mit-license.php
  */
 
-class Zkernel_Form_Element_Color extends Zend_Form_Element_Text
-{
-	public function render(Zend_View_Interface $view = null)
-    {
+class Zkernel_Form_Element_Color extends Zend_Form_Element_Text {
+	public function render(Zend_View_Interface $view = null) {
     	$js =
 '$.include("/zkernel/ctl/colorpicker/css/colorpicker.css|link");
 $.include("/zkernel/ctl/colorpicker/colorpicker.js", function() {
@@ -26,7 +24,7 @@ $.include("/zkernel/ctl/colorpicker/colorpicker.js", function() {
     });
 });
 ';
-    	Zend_Controller_Action_HelperBroker::getStaticHelper('js')->addEval($js);
+    	$this->getView()->inlineScript('script', $js);
 		return parent::render($view);
 	}
 }

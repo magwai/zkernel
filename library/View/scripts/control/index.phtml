@@ -1,63 +1,6 @@
-<?
+<?php
 
-$this	->headScript('file', '/zkernel/js/jquery/jquery.include.js')
-		->headScript('file', '/zkernel/js/jquery/jquery.php.js')
-		->headScript('file', '/zkernel/ctl/jqgrid/i18n/grid.locale-ru.js')
-		->headScript('file', '/zkernel/ctl/jqgrid/grid.base.js')
-		->headScript('file', '/zkernel/ctl/jqgrid/grid.treegrid.js')
-		->headScript('file', '/zkernel/js/jquery/jquery.fmatter.js')
-		->headScript('file', '/zkernel/ctl/jqgrid/grid.jqueryui.js')
-		->headScript('file', '/zkernel/js/jquery/ui/ui.core.js')
-		->headScript('file', '/zkernel/js/jquery/ui/ui.sortable.js')
-		->headScript('file', '/zkernel/ctl/jqgrid/grid.zkernel.js')
-		->headScript('file', '/zkernel/js/swfobject.js')
-		->headScript('file', '/zkernel/ctl/uploadify/jquery.uploadify.js')
-		->headScript('file', '/zkernel/ctl/uploadify/zuploadify.js')
-		->headScript('file', '/zkernel/js/jquery/jquery.tinymce.js')
-		->headScript('file', '/zkernel/js/control/main.js');
-
-$this	->inlineScript('script', '$(function() { c.init(); });');
-
-$this	->headLink(array('rel' => 'favicon', 'href' => '/zkernel/img/favicon.ico'))
-		->appendStylesheet('/zkernel/img/jquery/ui/themes/'.$this->ah('control')->config->theme.'/ui.all.css')
-		->appendStylesheet('/zkernel/ctl/jqgrid/css/ui.jqgrid.css')
-		->appendStylesheet('/zkernel/ctl/uploadify/uploadify.css')
-		->appendStylesheet('/zkernel/img/control/main.css');
-
-echo $this->doctype();
+$this->layout()->setLayout('control/layout');
 
 ?>
-<html>
-	<head>
-		<meta charset=utf-8>
-		<?php echo $this->headTitle() ?>
-		<?php echo $this->headLink() ?>
-		<script type="text/javascript" src="/zkernel/js/jquery/jquery.js"></script>
-		<script type="text/javascript" src="/zkernel/ctl/mce/tiny_mce.js"></script>
-		<?php echo $this->headSingle() ?>
-	</head>
-	<body class="c_body">
-		<div class="ui-widget ui-widget-header ui-corner-bottom" id="c_menu_frame"><div id="c_menu"></div></div>
-		<div class="ui-widget ui-widget-header ui-corner-bottom c_tline">
-			<div class="h">
-				<div class="mf">
-					<a href="#" id="c_mlink" onclick="return false"><span class="ui-icon ui-icon-triangle-1-s"></span>Меню</a>
-					<em>|</em>
-				</div>
-				<div id="c_login"><form action="" method="post">
-					<span title="Имя пользователя" class="ui-icon ui-icon-person"></span><span title="Пароль" class="ui-icon ui-icon-key"></span>
-					<input type="text" name="login" />
-					<input type="password" name="password" />
-					<span><input type="submit" value="Войти" /></span>
-				</form></div>
-				<div id="c_navpane"></div>
-			</div>
-			<div id="c_tl">загрузка панели управления</div>
-		</div>
-		<script type="text/javascript">document.getElementById("c_tl").style.display = "block";</script>
-		<div id="c_loader"></div>
-		<div id="c_info" class="ui-widget ui-corner-all"></div>
-		<div id="c_content"><noscript><div class="c_text" style="text-align:center;">Ваш браузер не поддерживает JavaScript, либо их использование ограничено политикой безопасности. Для работы панели управления необходимо разрешить использование JavaScript.</div></noscript></div>
-		<?echo $this->inlineScript() ?>
-	</body>
-</html>
+<noscript><div class="c_text" style="text-align:center;">Ваш браузер не поддерживает JavaScript, либо их использование ограничено политикой безопасности. Для работы панели управления необходимо разрешить использование JavaScript.</div></noscript>

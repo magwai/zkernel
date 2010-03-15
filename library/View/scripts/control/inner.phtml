@@ -1,13 +1,12 @@
 <?php
 
-if (count($this->ah('control')->config->button_top)) {
-	$this->placeholder('button_top')->captureStart();
+if (count($this->control()->config->button_top)) {
 
 ?>
 <div class="c_button">
 <?php
 
-	foreach ($this->ah('control')->config->button_top as $el) {
+	foreach ($this->control()->config->button_top as $el) {
 		if (!$el->title) continue;
 ?>
 <input default="<?php echo (int)$el->default; ?>" type="button" value="<?php echo $el->title; ?>" onclick="c.do_action({controller:'<?php echo $el->controller; ?>',action:'<?php echo $el->action; ?>',param:'<?php echo $el->param ?>',confirm:'<?php echo (int)$el->confirm; ?>'<?php echo $el->field ? ',field:\''.$el->field.'\'' : ''; ?>,cl:'<?php echo $el->cl ?>'}, this)" />
@@ -19,16 +18,26 @@ if (count($this->ah('control')->config->button_top)) {
 </div>
 <?php
 
-	$this->placeholder('button_top')->captureEnd();
+
 }
-if (count($this->ah('control')->config->button_bottom)) {
-	$this->placeholder('button_bottom')->captureStart();
+
+if ($this->control()->config->text) {
+
+?>
+<div class="c_text"><?php echo $this->control()->config->text ?></div>
+<?php
+
+}
+
+echo $this->content;
+
+if (count($this->control()->config->button_bottom)) {
 
 ?>
 <div class="c_button">
 <?php
 
-	foreach ($this->ah('control')->config->button_bottom as $el) {
+	foreach ($this->control()->config->button_bottom as $el) {
 		if (!$el->title) continue;
 ?>
 <input default="<?php echo (int)$el->default; ?>" type="button" value="<?php echo $el->title; ?>" onclick="c.do_action({controller:'<?php echo $el->controller; ?>',action:'<?php echo $el->action; ?>',param:'<?php echo $el->param ?>',confirm:'<?php echo (int)$el->confirm; ?>'<?php echo $el->field ? ',field:\''.$el->field.'\'' : ''; ?>,cl:'<?php echo $el->cl ?>'}, this)" />
@@ -40,9 +49,4 @@ if (count($this->ah('control')->config->button_bottom)) {
 </div>
 <?php
 
-	$this->placeholder('button_bottom')->captureEnd();
 }
-echo	(count($this->ah('control')->config->button_top) ? $this->placeholder('button_top')->getValue() : '').
-		($this->ah('control')->config->text ? '<div class="c_text">'.$this->ah('control')->config->text.'</div>' : '').
-		$this->placeholder('text')->getValue().
-		(count($this->ah('control')->config->button_bottom) ? $this->placeholder('button_bottom')->getValue() : '');

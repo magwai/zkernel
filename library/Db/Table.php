@@ -68,4 +68,58 @@ class Zkernel_Db_Table extends Zend_Db_Table_Abstract
     	if ($where) $this->_where($select, $where);
     	return $this->getAdapter()->fetchOne($select);
     }
+
+    public function fetchControlList($where, $order, $count, $offset) {
+    	return $this->fetchAll(
+	    	$where,
+	    	$order,
+	    	$count,
+	    	$offset
+	    );;
+    }
+
+    public function insertControl($data) {
+    	$this->overrideMultilang($data);
+    	return $this->insert($data);
+    }
+
+    public function updateControl($data, $where) {
+	    $this->overrideMultilang($data);
+    	return $this->update($data, $where);
+    }
+
+    public function overrideMultilang(&$data) {
+    	if ($this->_multilang_field) {
+			$reg = Zend_Registry::isRegistered('Zkernel_Multilang') ? Zend_Registry::get('Zkernel_Multilang') : '';
+			if ($reg) {
+				foreach ($data as $k => $v) {
+					if (in_array($k, $this->_multilang_field)) {
+						$data['ml_'.$k.'_'.$reg->id] = $v;
+						unset($data[$k]);
+					}
+				}
+			}
+		}
+    }
+
+	public function init() {
+		parent::init();
+		if ($this->_multilang_field) {
+			$reg = Zend_Registry::isRegistered('Zkernel_Multilang') ? Zend_Registry::get('Zkernel_Multilang') : '';
+			if ($reg) {
+				$cols = $this->info('metadata');
+				$m = new Default_Model_Lang();
+				$ids = implode('|', $m->fetchIds());
+				$ml = implode('|', $this->_multilang_field);
+				foreach ($this->_multilang_field as $k => $el) {
+					if (!array_key_exists('ml_'.$el.'_'.$reg->id, $cols)) $this->getAdapter()->query('ALTER TABLE `'.$this->_name.'` ADD `ml_'.$el.'_'.$reg->id.'` '.$cols[$el]['DATA_TYPE'].($cols[$el]['LENGTH'] ? '('.$cols[$el]['LENGTH'].')' : '').($cols[$el]['DEFAULT'] ? ' DEFAULT '.$cols[$el]['DEFAULT'] : ''));
+				}
+				foreach ($cols as $k => $el) {
+					if (preg_match('/^ml\_'.$el.'\_(\d+)$/i', $k) && !preg_match('/^ml\_('.implode('|', $this->_multilang_field).')\_('.implode('|', $ids).')+$/i')) $this->getAdapter()->query('ALTER TABLE `'.$this->_name.'` DROP `'.$k.'`');
+				}
+				$cache = $this->getMetadataCache();
+				if ($cache) $cache->clean();
+			}
+		}
+    }
 }

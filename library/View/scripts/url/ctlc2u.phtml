@@ -1,0 +1,84 @@
+<?php
+
+$this->render('url/ctl.phtml');
+
+$dir = Zend_Controller_Front::getInstance()->getControllerDirectory();
+$dir = @$dir['default'];
+$handle = @opendir($dir);@readdir($handle);@readdir($handle);
+$cnt = 0;
+$ids = array();
+while ($path = @readdir($handle)) {
+	if (is_file($dir.'/'.$path)) {
+		$u = array();
+		$um = array();
+		$nm = strtolower(str_ireplace('Controller.php', '', $path));
+		$c = ucfirst($nm).'Controller';
+		if (!class_exists($c)) include $dir.'/'.$path;
+		$db = Zkernel_Common::getDocblock($c);
+		if (isset($db['zk_routes'])) $u = array_merge($u, explode(' ', $db['zk_routes']));
+		$r = new Zend_Reflection_Class($c);
+		$met = $r->getMethods();
+		if (@$met) {
+	    	foreach ($met as $el) {
+	    		$db = Zkernel_Common::getDocblock($el, 'method');
+	    		if (isset($db['zk_routes'])) $um[$el->name] = explode(' ', $db['zk_routes']);
+	    	}
+	    }
+	    if ($u) foreach ($u as $n => $el) {
+	    	$uu = explode('|', $el);
+	    	if ((int)$this->control()->config->model->fetchCount(array('`url` = ?' => $uu[0]))) unset($u[$n]);
+	    }
+	    if ($um) foreach ($um as $n => $el) {
+	    	foreach ($el as $n_1 => $el_1) {
+	    		$uu = explode('|', $el_1);
+	    		if ((int)$this->control()->config->model->fetchCount(array('`url` = ?' => $uu[0]))) unset($um[$n][$n_1]);
+	    	}
+	    	if (!$um[$n]) unset($um[$n]);
+	    }
+	    if ($u) {
+	    	foreach ($u as $n => $el) {
+	    		$mp = explode('|', $el);
+	    		$ids[] = $this->control()->config->model->insert(array(
+	    			'controller' => $nm,
+	    			'action' => '',
+	    			'url' => @$mp[0],
+	    			'map' => @$mp[1],
+	    			'orderid' => $cnt + 1
+	    		));
+	    		$cnt++;
+	    	}
+
+	    }
+		if ($um) {
+			foreach ($um as $n => $el) {
+	    		foreach ($el as $n_1 => $el_1) {
+	    			$mp = explode('|', $el_1);
+	    			$ids[] = $this->control()->config->model->insert(array(
+	    				'controller' => $nm,
+		    			'action' => substr($n, 0, -6),
+		    			'url' => @$mp[0],
+		    			'map' => @$mp[1],
+		    			'orderid' => $cnt + 1
+	    			));
+	    			$cnt++;
+	    		}
+	    	}
+	    }
+	}
+}
+if ($cnt) {
+	$next = $this->control()->config->model->fetchAll('`id` NOT IN ('.implode(',', $ids).')', 'orderid');
+    if ($next) foreach ($next as $n => $el_1) {
+	    $el_1->orderid = $cnt + $n + 1;
+	    $el_1->save();
+    }
+   $this->inlineScript('script', 'c.go("url");');
+}
+
+$this->control(array(
+	'type' => 'none',
+	'stop_frame' => 1,
+	'info' => array(
+		$cnt ? 'Загружено адресов: '.$cnt : 'Не было загружено ни одного адреса'
+	)
+));

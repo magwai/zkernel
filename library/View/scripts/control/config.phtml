@@ -1,0 +1,12 @@
+<?php
+
+$s = new Zend_Session_Namespace();
+
+echo $this->json(array(
+	'title' => 'Панель управления',
+	//'multilang' => Zend_Registry::isRegistered('Zkernel_Multilang') ? 1 : 0,
+	'def_controller' => 'cindex',
+	'def_action' => 'ctlshow',
+	'controller' => @$s->control['last']['controller'] ? $s->control['last']['controller'] : 'cindex',
+	'action' => $s->control['last']['action'] ? $s->control['last']['action'] : 'ctlshow'
+));

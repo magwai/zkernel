@@ -7,12 +7,10 @@
  * http://www.opensource.org/licenses/mit-license.php
  */
 
-class Zkernel_Form_Element_Point extends Zend_Form_Element_Text
-{
+class Zkernel_Form_Element_Point extends Zend_Form_Element_Text {
 	public $helper = 'formPoint';
 
-	public function render(Zend_View_Interface $view = null)
-    {
+	public function render(Zend_View_Interface $view = null) {
     	$color = $this->getAttrib('color');
     	$value = $this->getValue();
     	$js =
@@ -24,8 +22,7 @@ class Zkernel_Form_Element_Point extends Zend_Form_Element_Text
 });
 ';
     	$js = str_replace(',}', '}', $js);
-    	Zend_Controller_Action_HelperBroker::getStaticHelper('js')->addEval($js);
-
+    	$this->getView()->inlineScript('script', $js);
     	return parent::render($view);
 	}
 }

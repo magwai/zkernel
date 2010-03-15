@@ -1,0 +1,32 @@
+<?php
+
+$this->control(array(
+	'tree' => true,
+	'field' => array(
+		'title' => array(
+			'title' => 'Название',
+			'required' => true,
+			'sortable' => true,
+			'order' => 1,
+			'unique' => true
+		),
+		'key' => array(
+			'title' => 'Ключ',
+			'sortable' => true,
+			'order' => 2,
+			'unique' => true
+		),
+		'parentid' => array(
+			'active' => false
+		)
+	),
+	'action_config' => array(
+		'ctlshow' => array(
+			'field' => array(
+    			'resource' => array(
+    				'active' => false
+    			)
+    		)
+		)
+	)
+));

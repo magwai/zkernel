@@ -17,20 +17,28 @@ class Zkernel_View_Helper_Override extends Zend_View_Helper_Abstract  {
 		}
 	}
 
-	public function overrideSingle($data, $type = null) {
+	public function overrideSingle($data, $type = null, $options = null) {
 		$r = $data instanceof Zkernel_View_Data ? $data : new Zkernel_View_Data($data);
+		$reg = Zend_Registry::isRegistered('Zkernel_Multilang') ? Zend_Registry::get('Zkernel_Multilang') : '';
+		if ($reg) {
+			foreach ($r as $k => $v) if (preg_match('/^ml\_([^\_]+)\_'.$reg->id.'$/i', $k, $f)) {
+				$r->{$f[1]} = $v === null && !@$options['multilang_nofall']
+					? $r->{'ml_'.$f[1].'_'.$reg->_default->id}
+					: $v;
+			}
+		}
 		if (isset($r->title)) $r->title_valid = htmlspecialchars($r->title);
-		if (isset($r->date)) $r->date_valid = Zend_Controller_Action_HelperBroker::getStaticHelper('util')->getDate($r->date);
-		if ($type !== null) $this->{'override'.ucfirst($type)}($r);
+		if (isset($r->date)) $r->date_valid = Zkernel_Common::getDate($r->date);
+		if ($type !== null && method_exists($this, 'override'.ucfirst($type))) $this->{'override'.ucfirst($type)}($r);
 		return $r;
 	}
 
-	public function override($data = null, $type = null) {
+	public function override($data = null, $type = null, $options = null) {
 		if ($data === null) return $this;
 		$nd = array();
 		if (!$data) return $nd;
 		foreach ($data as $el) {
-			$nd[] = $this->overrideSingle($el, $type);
+			$nd[] = $this->overrideSingle($el, $type, $options);
 		}
 		return $nd;
 	}
