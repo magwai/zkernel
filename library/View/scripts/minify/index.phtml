@@ -24,7 +24,7 @@ if ($path && $file) {
 
 			$cache = Zend_Registry::get('Zkernel_Cache');
 
-			$res_1 = $cache->test($md5)
+			$res_1 = $cache && $cache->test($md5)
 				? "/* memcached */\n".$cache->load($md5)
 				: '';
 
@@ -54,7 +54,11 @@ if ($path && $file) {
 						proc_close($process);
 					}
 				}
-				$cache->save($res, $md5);
+				else if (stripos($file, '.css' === false)) {
+					require_once 'Zkernel/Other/Lib/JSMin/JSMin.php';
+					$res = JSMin::minify($res);
+				}
+				if ($cache) $cache->save($res, $md5);
 			}
 		}
 		echo $res;
