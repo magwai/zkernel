@@ -75,7 +75,13 @@ class Zkernel_Db_Table extends Zend_Db_Table_Abstract
 	    	$order,
 	    	$count,
 	    	$offset
-	    );;
+	    );
+    }
+
+	public function fetchControlCard($where) {
+    	return $this->fetchRow(
+	    	$where
+	    );
     }
 
     public function insertControl($data) {
@@ -86,6 +92,10 @@ class Zkernel_Db_Table extends Zend_Db_Table_Abstract
     public function updateControl($data, $where) {
 	    $this->overrideMultilang($data);
     	return $this->update($data, $where);
+    }
+
+	public function deleteControl($where) {
+    	return $this->delete($where);
     }
 
     public function overrideMultilang(&$data) {

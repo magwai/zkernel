@@ -62,6 +62,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 	    	'func_override'			=> null,
 	    	'func_success'			=> null,
 	    	'func_preset'			=> null,
+			'func_check'			=> null,
 	    	'navpane'				=> array(
 	    		'start' => array(),
 	    		'middle' => true,
@@ -505,7 +506,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
     }
 
 	public function routeForm() {
-    	$id = $id_old = (int)$this->config->param['id'];
+    	$id = $id_old = $this->config->param['id'];
 
     	if ($this->config->type == 'edit' && !$id) {
 			$this->config->info[] = 'Элемент не выбран';
@@ -585,6 +586,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 
 					$ok = false;
 					$this->config->func_override;
+					$this->config->func_check;
 					if ($this->config->use_db && count($this->config->info) == 0) {
 						$data_db = $this->config->data->toArray();
 						foreach ($data_db as $k => $v) {
@@ -613,7 +615,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 			}
 			else {
 				if ($this->config->type == 'edit') {
-					$data = $this->config->model->fetchRow(array('`id` = ?' => $id));
+					$data = $this->config->model->fetchControlCard(array('`id` = ?' => $id));
 
 					$data = $this->view->override()->overrideSingle($data, $this->config->controller, array('multilang_nofall' => true));
 
@@ -698,8 +700,8 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
     	$cnt = 0;
     	if ($ids) {
 	    	foreach ($ids as $el) {
-	    		$item = $this->config->model->fetchRow(array('`id` = ?' => $el));
-	    		$ok = $this->config->model->delete(array('`id` = ?' => $el));
+	    		$item = $this->config->model->fetchControlCard(array('`id` = ?' => $el));
+	    		$ok = $this->config->model->deleteControl(array('`id` = ?' => $el));
 	    		if ($ok) {
 	    			$form = $this->buildForm();
 	    			$els = $form->getElements();
