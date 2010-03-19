@@ -722,7 +722,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 		else $this->config->info[] = 'Элемент не выбран';
 		if ($cnt) {
 			$this->config->func_success;
-			$this->view->inlineScript('script', 'c.go("'.$this->config->request_ok->controller.'", "'.$this->config->request_ok->action.'");');
+			$this->view->inlineScript('script', 'c.go("'.$this->config->request_ok->controller.'", "'.$this->config->request_ok->action.'", '.Zend_Json::encode(Zkernel_Common::url2array($this->config->request_ok->param)).');');
 		}
 		else $this->config->stop_frame = true;
 		echo $this->view->render($this->config->view);
