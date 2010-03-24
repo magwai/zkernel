@@ -11,9 +11,9 @@ class Zkernel_View_Helper_Override extends Zend_View_Helper_Abstract  {
 	function overridePage(&$r) {
 		$sp = preg_split('/\<hr(\ )\/\>/si', $r->message);
 		if (count($sp) > 1) {
-			$r->description = $sp[0];
+			$r->description_valid = $sp[0];
 			array_shift($sp);
-			$r->message = preg_replace('/^\<\/p\>/i', '', trim(implode('<hr />', $sp)));
+			$r->message_valid = preg_replace('/^\<\/p\>/i', '', trim(implode('<hr />', $sp)));
 		}
 	}
 

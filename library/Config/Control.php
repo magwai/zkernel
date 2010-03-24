@@ -95,7 +95,8 @@ class Zkernel_Config_Control implements Countable, Iterator, ArrayAccess {
 				$field = $v->field;
 			}
 			if (!$controller) $controller = Zend_Controller_Front::getInstance()->getRequest()->getControllerName();
-			switch ($action) {
+			if ($v->title) $title = $v->title;
+			else switch ($action) {
 				case 'ctladd':
 					$title = 'Добавить';
 					break;
@@ -104,9 +105,6 @@ class Zkernel_Config_Control implements Countable, Iterator, ArrayAccess {
 					break;
 				case 'ctldelete':
 					$title = 'Удалить';
-					break;
-				default:
-					$title = $v->title;
 					break;
 			}
 			$v = new Zkernel_Config_Control(array(
