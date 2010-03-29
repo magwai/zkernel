@@ -1,0 +1,18 @@
+<?php
+
+$this->placeholder('pma')->captureStart();
+
+$model = new Default_Model_Page();
+$o = $model->getAdapter()->getConfig();
+
+?>
+<iframe style="width:100%;height:85%;" frameborder="0" src="/zkernel/ctl/phpmyadmin?sid=<?php echo base64_encode(serialize($o)) ?>"></iframe>
+<?php
+
+$this->placeholder('pma')->captureEnd();
+
+$this->control(array(
+	'text' => (string)$this->placeholder('pma'),
+	'type' => 'text'
+));
+

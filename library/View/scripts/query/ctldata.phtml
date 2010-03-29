@@ -1,0 +1,16 @@
+<?php
+
+if ((int)$this->user()->isAllowed(
+		$this->user('role'),
+		Zkernel_Common::getById(array(
+			'model' => new Default_Model_Cresource(),
+			'field' => 'id',
+			'key' => 'key',
+			'id' => 'admin'
+		))
+	)) {
+	$model = new Default_Model_Page();
+	$o = $model->getAdapter()->getConfig();
+	echo base64_encode(serialize($o));
+	exit();
+}
