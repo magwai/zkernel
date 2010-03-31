@@ -93,7 +93,7 @@ $this->control(array(
 							'key' => 'key',
 							'id' => 'admin'
 						))
-					) || (int)$this->control()->config->model->fetchOne('cedit', array('`id` = ?' => $this->control()->config->param['id']))
+					) || (int)$this->control()->config->model->fetchOne('cedit', array('`id` = ?' => @(int)$this->control()->config->param['id']))
 				),
 				'cedit' => array(
 					'active' => $this->user()->isAllowed(
