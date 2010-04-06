@@ -1,0 +1,52 @@
+<?php
+
+header('Content-Type: image/png');
+
+$this->layout()->disableLayout(true);
+if ($this->coord) {
+	$dir = PUBLIC_PATH.'/pc/poly';
+	if (!file_exists($dir)) {
+		mkdir($dir, true);
+		chmod($dir, 0777);
+	}
+
+	$md5 = md5($this->coord_original.$this->color);
+
+	$file = $dir.'/'.$md5.'.png';
+	if (file_exists($file)) {
+
+	}
+	else {
+		$mx = $my = $arr = array();
+		foreach ($this->coord as $el) {
+			$mx[] = $el[0];
+			$my[] = $el[1];
+			$arr[] = $el[0];
+			$arr[] = $el[1];
+		}
+		$x_max = max($mx);
+		$y_max = max($my);
+		$x_min = min($mx);
+		$x_min = min($my);
+
+		$i = imagecreatetruecolor($x_max, $y_max);
+		$rgb = Zkernel_Common::hex2rgb($this->color);
+		$color = imagecolorallocate($i, $rgb[0], $rgb[1], $rgb[2]);
+		$trans = imagecolorallocate($i, 255, 255, 0);
+		imagecolortransparent($i, $trans);
+		imagefilledrectangle($i, 0, 0, $x_max - 1, $y_max - 1, $trans);
+		imagefilledpolygon($i, $arr, count($this->coord), $color);
+		imagepng($i, $file);
+		chmod($file, 0777);
+	}
+	$modified = gmdate('D, d M Y H:i:s', filemtime($file)).' GMT';
+	header('Last-Modified: '.$modified);
+	$expires = gmdate('D, d M Y H:i:s', time() + 2592000).' GMT';
+	header('Expires: '.$expires);
+	echo file_get_contents($file);
+}
+else {
+	$i = imagecreatetruecolor(1, 1);
+	imagepng($i);
+}
+exit();

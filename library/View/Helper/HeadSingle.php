@@ -10,11 +10,16 @@
 class Zkernel_View_Helper_HeadSingle extends Zend_View_Helper_HeadScript  {
 	function headSingle() {
 		$m = 0;
-		$items = array();
+		$aitems = $items = array();
         $this->getContainer()->ksort();
         foreach ($this as $item) {
             if (!$this->_isValid($item)) continue;
+        	if (stripos($item->attributes['src'], 'maps.google.com') !== false) {
+            	$aitems[] = $item->attributes['src'];
+            	continue;
+            }
             $i = PUBLIC_PATH.$item->attributes['src'];
+
             $items[] = $i;
             $m .= filemtime($i);
         }
@@ -36,6 +41,7 @@ class Zkernel_View_Helper_HeadSingle extends Zend_View_Helper_HeadScript  {
 			@chmod(PUBLIC_PATH.$nm, 0755);
 		}
 		$this->headScript('file', $nm, 'set');
+		if ($aitems) foreach ($aitems as $el) $this->headScript('file', $el);
 		return $this->headScript();
 	}
 }

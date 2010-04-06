@@ -1,0 +1,11 @@
+<?php
+
+$model = new Default_Model_Page();
+$cache = $model->getMetadataCache();
+if ($cache) $cache->clean();
+
+$this->control(array(
+	'type' => 'none',
+	'stop_frame' => true,
+	'info' => array('Кэш очищен')
+));

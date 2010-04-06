@@ -4,7 +4,7 @@ $this->render('url/ctl.phtml');
 
 $dir = Zend_Controller_Front::getInstance()->getControllerDirectory();
 $dir = @$dir['default'];
-$handle = @opendir($dir);@readdir($handle);@readdir($handle);
+$handle = @opendir($dir);
 $cnt = 0;
 $ids = array();
 while ($path = @readdir($handle)) {

@@ -13,6 +13,12 @@ $this->placeholder('pma')->captureEnd();
 
 $this->control(array(
 	'text' => (string)$this->placeholder('pma'),
-	'type' => 'text'
+	'type' => 'text',
+	'button_top' => array(
+		array(
+			'title' => 'Очистить кэш',
+			'action' => 'ctlcache'
+		)
+	)
 ));
 

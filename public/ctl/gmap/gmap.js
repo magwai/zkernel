@@ -45,7 +45,11 @@ gmap.init = function(id, value, opt) {
 			latlng.lng().toFixed(6)
 		);
 	});
-	if (value) google.maps.event.trigger(gmap[id], 'click', {
-		latLng: opt.center
-	});
+	if (value) {
+		var ll = new google.maps.LatLng(value[0], value[1]);
+		google.maps.event.trigger(gmap[id], 'click', {
+			latLng: ll
+		});
+		gmap[id].setCenter(ll);
+	}
 };
