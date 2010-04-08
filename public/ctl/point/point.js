@@ -15,11 +15,19 @@ point.init = function(id, value, opt) {
 	var type = opt.type ? opt.type : 'point';
 
 	var i = $('<img id="point_' + id + '_i" alt="" style="cursor:crosshair;" />').click(function(e) {
-		var st = window.pageYOffset;
-		if (typeof st == 'undefined') st = document.body.scrollTop;
-		var sl = window.pageXOffset;
-		if (typeof sl == 'undefined') sl = document.body.scrollLeft;
-		
+		var st = typeof window.pageYOffset == 'undefined'
+			? (typeof document.documentElement.scrollTop == 'undefined'
+				? document.scrollTop
+				: document.documentElement.scrollTop
+			)
+			: window.pageYOffset;
+		var sl = typeof window.pageXOffset == 'undefined'
+			? (typeof document.documentElement.scrollLeft == 'undefined'
+				? document.scrollLeft
+				: document.documentElement.scrollLeft
+			)
+			: window.pageYOffset;
+
 		var f = $(this).offset();
 		var x = e.clientX - f.left + sl;
 		var y = e.clientY - f.top + st;
