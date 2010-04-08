@@ -19,8 +19,9 @@ jQuery.extend({
 	 * include
 	 */
 	include: function (url, onload) {
-		if (typeof url != "string" && url.length == 1) url = url[0];
-		if (typeof url != "string") {
+		if (!url || url == '') return;
+		if (typeof url == "object" && url.length == 1) url = url[0];
+		if (typeof url != "string" && url) {
 			var u = url.shift();
 			$.include(u, function() {
 				$.include(url, onload);

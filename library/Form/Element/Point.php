@@ -24,9 +24,9 @@ class Zkernel_Form_Element_Point extends Zend_Form_Element_Text {
     	$js =
 '$.include("/zkernel/ctl/point/point.js", function() {
 	point.init("'.$this->getName().'", '.($value ? Zend_Json::encode($val) : 'null').', {
-    	url: "'.$this->getAttrib('url').'",'.
-    	($type ? 'type: "'.$type.'",' : '').','.
-    	($color ? 'color: "'.$color.'",' : '').
+    	"url": "'.$this->getAttrib('url').'",'.
+    	($type ? '"type": "'.$type.'",' : '').
+    	($color ? '"color": "'.$color.'",' : '').
     '});
 });
 ';

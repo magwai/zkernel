@@ -48,13 +48,13 @@ point.init = function(id, value, opt) {
 	if (type == 'point') o.prepend($('<div title="Удалить отметку" id="point_' + id + '_p" style="overflow:hidden;width:6px;height:6px;position:absolute;display:none;cursor:pointer;background-color:' + color + ';" />').click(function() {
 		point.set_point(id, -1, -1);
 	}));
-	else if (type == 'rect') o.prepend($('<div title="Удалить область" id="point_' + id + '_p" style="overflow:hidden;position:absolute;display:none;cursor:pointer;background-color:' + color + ';border:1px solid ' + color + ';opacity: .5;" />').click(function() {
+	else if (type == 'rect') o.prepend($('<div title="Удалить область" id="point_' + id + '_p" style="overflow:hidden;position:absolute;display:none;cursor:pointer;background-color:' + color + ';border:1px solid ' + color + ';opacity:.5;filter:alpha(opacity=50);" />').click(function() {
 		point.set_rect(id, -1, -1);
 	}).data('x', -1).data('y', -1));
 	else if (type == 'poly')
 		o.prepend($('<div title="Закончить фигуру" id="point_' + id + '_p" style="overflow:hidden;width:6px;height:6px;position:absolute;display:none;cursor:pointer;background-color:' + color + ';" color_original="' + color + '" />').click(function() {
 			point.set_poly_finish(id);
-		})).prepend($('<img title="Удалить область" id="point_' + id + '_pa" style="position:absolute;display:none;cursor:pointer;opacity: .5;" />').click(function() {
+		})).prepend($('<img title="Удалить область" id="point_' + id + '_pa" style="position:absolute;display:none;cursor:pointer;opacity:.5;filter:alpha(opacity=50);" />').click(function() {
 			point.set_poly(id, -1, -1);
 		}));
 };

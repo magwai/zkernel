@@ -42,6 +42,7 @@ $.include(["/zkernel/js/swfobject.js", "/zkernel/ctl/uploadify/jquery.uploadify.
     	$value = parent::getValue();
 		if (!isset($this->url)) $this->url = str_ireplace(PUBLIC_PATH, '', $this->destination);
     	$values = explode('*', $value);
+    	if (!$this->getAttrib('multi')) $values = array($values[0]);
     	foreach ($values as $num => $v) {
 	    	$ss = substr($v, 0, 2);
 	    	if ($ss == 'u|') {
