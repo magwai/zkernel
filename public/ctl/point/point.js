@@ -74,8 +74,9 @@ point.set_point = function(id, x, y) {
 		p.show();
 		x = document.body.scrollLeft + x;
 		y = document.body.scrollTop + y;
-		var xx = x - p.get(0).offsetWidth / 2;
-		var yy = y - p.get(0).offsetHeight / 2;
+		var po = p.get(0);
+		var xx = x - po.offsetWidth / 2;
+		var yy = y - po.offsetHeight / 2;
 		p.css({
 			marginLeft: xx,
 			marginTop: yy
