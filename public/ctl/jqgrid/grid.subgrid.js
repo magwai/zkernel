@@ -21,15 +21,16 @@ setSubGrid : function () {
 	});
 },
 addSubGridCell :function (pos,iRow) {
-	var prp='',gv;
+	var prp='',gv,sid;
 	this.each(function(){
 		prp = this.formatCol(pos,iRow);
 		gv = this.p.gridview;
+		sid= this.p.id;
 	});
 	if( gv === false ){
-		return "<td role='grid' class='ui-sgcollapsed sgcollapsed' "+prp+"><a href='javascript:void(0);'><span class='ui-icon ui-icon-plus'></span></a></td>";
+		return "<td role=\"grid\" aria-describedby=\""+sid+"_subgrid\" class=\"ui-sgcollapsed sgcollapsed\" "+prp+"><a href='javascript:void(0);'><span class='ui-icon ui-icon-plus'></span></a></td>";
 	} else  {
-		return "<td role='grid' " +prp +"></td>";
+		return "<td role=\"grid\" aria-describedby=\""+sid+"_subgrid\" " +prp +"></td>";
 	}
 },
 addSubGrid : function(t,pos) {
@@ -77,7 +78,8 @@ addSubGrid : function(t,pos) {
 		var populatesubgrid = function( rd ) {
 			var res,sid,dp, i, j;
 			sid = $(rd).attr("id");
-			dp = {id:sid, nd_: (new Date().getTime())};
+			dp = {nd_: (new Date().getTime())};
+			dp[ts.p.prmNames['subgridid']]=sid;
 			if(!ts.p.subGridModel[0]) { return false; }
 			if(ts.p.subGridModel[0].params) {
 				for(j=0; j < ts.p.subGridModel[0].params.length; j++) {
@@ -92,8 +94,11 @@ addSubGrid : function(t,pos) {
 				ts.grid.hDiv.loading = true;
 				$("#load_"+ts.p.id).show();
 				if(!ts.p.subgridtype) ts.p.subgridtype = ts.p.datatype;
-				ts.p.subgridtype = ts.p.subgridtype.toLowerCase();
-				if($.isFunction(ts.p.subgridtype)) {ts.p.subgridtype(dp);}
+				if($.isFunction(ts.p.subgridtype)) {
+					ts.p.subgridtype(dp);
+				} else {
+					ts.p.subgridtype = ts.p.subgridtype.toLowerCase();
+				}
 				switch(ts.p.subgridtype) {
 					case "xml":
 					case "json":
@@ -125,7 +130,7 @@ addSubGrid : function(t,pos) {
 			dummy = $("<table cellspacing='0' cellpadding='0' border='0'><tbody></tbody></table>"),
 			trdiv = $("<tr></tr>");
 			for (i = 0; i<ts.p.subGridModel[0].name.length; i++) {
-				tddiv = $("<th class='ui-state-default ui-th-column ui-th-"+ts.p.direction+"'></th>");
+				tddiv = $("<th class='ui-state-default ui-th-subgrid ui-th-column ui-th-"+ts.p.direction+"'></th>");
 				$(tddiv).html(ts.p.subGridModel[0].name[i]);
 				$(tddiv).width( ts.p.subGridModel[0].width[i]);
 				$(trdiv).append(tddiv);
@@ -161,7 +166,7 @@ addSubGrid : function(t,pos) {
 			dummy = $("<table cellspacing='0' cellpadding='0' border='0'><tbody></tbody></table>"),
 			trdiv = $("<tr></tr>");
 			for (i = 0; i<ts.p.subGridModel[0].name.length; i++) {
-				tddiv = $("<th class='ui-state-default ui-th-column ui-th-"+ts.p.direction+"'></th>");
+				tddiv = $("<th class='ui-state-default ui-th-subgrid ui-th-column ui-th-"+ts.p.direction+"'></th>");
 				$(tddiv).html(ts.p.subGridModel[0].name[i]);
 				$(tddiv).width( ts.p.subGridModel[0].width[i]);
 				$(trdiv).append(tddiv);

@@ -15,9 +15,15 @@ point.init = function(id, value, opt) {
 	var type = opt.type ? opt.type : 'point';
 
 	var i = $('<img id="point_' + id + '_i" alt="" style="cursor:crosshair;" />').click(function(e) {
+		var st = window.pageYOffset;
+		if (typeof st == 'undefined') st = document.body.scrollTop;
+		var sl = window.pageXOffset;
+		if (typeof sl == 'undefined') sl = document.body.scrollLeft;
+		
 		var f = $(this).offset();
-		var x = e.clientX - f.left;
-		var y = e.clientY - f.top;
+		var x = e.clientX - f.left + sl;
+		var y = e.clientY - f.top + st;
+
 		if (type == 'point') point.set_point(id, x, y);
 		else if (type == 'rect') point.set_rect(id, x, y);
 		else if (type == 'poly') point.set_poly(id, x, y);

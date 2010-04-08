@@ -1,16 +1,11 @@
 ;(function ($) {
 /*
- * 
- * 
- * BUG IN 644 LINE - commented
- * 
- * 
- * jqGrid  3.6.2 - jQuery Grid
+ * jqGrid  3.6.4 - jQuery Grid
  * Copyright (c) 2008, Tony Tomov, tony@trirand.com
  * Dual licensed under the MIT and GPL licenses
  * http://www.opensource.org/licenses/mit-license.php
  * http://www.gnu.org/licenses/gpl.html
- * Date: 2009-12-10
+ * Date: 2010-02-14
  */
 $.jgrid = $.jgrid || {};
 $.extend($.jgrid,{
@@ -37,8 +32,12 @@ $.extend($.jgrid,{
 	stripHtml : function(v) {
 		v = v+"";
 		var regexp = /<("[^"]*"|'[^']*'|[^'">])*>/gi;
-		if(v) {	return v.replace(regexp,"");}
-		else {return v;}
+		if (v) {
+			v = v.replace(regexp,"");
+			return (v && v !== '&nbsp;' && v !== '&#160;') ? v : "";
+		} else {
+			return v;
+		}
 	},
 	stringToDoc : function (xmlString) {
 		var xmlDoc;
@@ -59,13 +58,10 @@ $.extend($.jgrid,{
 		if (js.substr(0,9) == "while(1);") { js = js.substr(9); }
 		if (js.substr(0,2) == "/*") { js = js.substr(2,js.length-4); }
 		if(!js) { js = "{}"; }
-		($.jgrid.useJSON===true && typeof (JSON) === 'object' && typeof (JSON.parse) === 'function')
-		    ? msg = JSON.parse(js)
-		    : msg = eval('(' + js + ')');
+		msg = ($.jgrid.useJSON===true && typeof (JSON) === 'object' && typeof (JSON.parse) === 'function')
+		    ? JSON.parse(js)
+		    : eval('(' + js + ')');
 		return  msg.hasOwnProperty('d') ? msg.d : msg;
-	},
-	empty : function () {
-		while ( this.firstChild ) this.removeChild( this.firstChild );
 	},
 	jqID : function(sid){
 		sid = sid + "";
@@ -151,7 +147,7 @@ $.fn.jqGrid = function( pin ) {
 			treeANode : -1,
 			ExpandColumn: null,
 			tree_root_level : 0,
-			prmNames: {page:"page",rows:"rows", sort: "sidx",order: "sord", search:"_search", nd:"nd"},
+			prmNames: {page:"page",rows:"rows", sort: "sidx",order: "sord", search:"_search", nd:"nd", id:"id",oper:"oper",editoper:"edit",addoper:"add",deloper:"del", subgridid:"id"},
 			forceFit : false,
 			gridstate : "visible",
 			cellEdit: false,
@@ -182,9 +178,12 @@ $.fn.jqGrid = function( pin ) {
 			autoencode : false,
 			remapColumns : [],
 			ajaxGridOptions :{},
-			direction : "ltr"
+			direction : "ltr",
+			toppager: false,
+			headertitles: false,
+			scrollTimeout: 200
 		}, $.jgrid.defaults, pin || {});
-		var grid={         
+		var grid={
 			headers:[],
 			cols:[],
 			footers: [],
@@ -222,7 +221,7 @@ $.fn.jqGrid = function( pin ) {
 				if(this.resizing) {
 					var idx = this.resizing.idx,
 					nw = this.headers[idx].newWidth || this.headers[idx].width;
-					nw = parseInt(nw);
+					nw = parseInt(nw,10);
 					this.resizing = false;
 					$("#rs_m"+p.id).css("display","none");
 					p.colModel[idx].width = nw;
@@ -264,30 +263,25 @@ $.fn.jqGrid = function( pin ) {
 				if (!rh) return;
 				grid.prevRowHeight = rh;
 				var rn = p.rowNum;
-				if (rn < 10) {
-					rn = parseInt(dh / rh) + 1 << 1;
-					if (rn < 10) rn = 10;
-					p.rowNum = rn;
-				}
 				var scrollTop = grid.scrollTop = grid.bDiv.scrollTop;
 				var ttop = Math.round(table.position().top) - scrollTop;
 				var tbot = ttop + table.height();
 				var div = rh * rn;
 				var page, npage, empty;
 			    if (ttop <= 0 && tbot < dh && 
-                    (p.lastpage==null||parseInt((tbot + scrollTop + div - 1) / div) < p.lastpage))
+                    (p.lastpage==null||parseInt((tbot + scrollTop + div - 1) / div,10) < p.lastpage))
                 {
-					npage = parseInt((dh - tbot + div - 1) / div);
+					npage = parseInt((dh - tbot + div - 1) / div,10);
 					if (tbot >= 0 || npage < 2 || p.scroll === true) {
-						page = parseInt((tbot + scrollTop) / div) + 1;
+						page = Math.round((tbot + scrollTop) / div) + 1;
 						ttop = -1;
 					} else {
 						ttop = 1;
 					}
 				}
 				if (ttop > 0) {
-					page = parseInt(scrollTop / div) + 1;
-					npage = parseInt((scrollTop + dh) / div) + 2 - page;
+					page = parseInt(scrollTop / div,10) + 1;
+					npage = parseInt((scrollTop + dh) / div,10) + 2 - page;
 					empty = true;
 				}
 
@@ -296,7 +290,7 @@ $.fn.jqGrid = function( pin ) {
 						return;
 					}
 					if (grid.hDiv.loading) {
-						grid.timer = setTimeout(grid.populateVisible, 200);
+						grid.timer = setTimeout(grid.populateVisible, p.scrollTimeout);
 					} else {
 						p.page = page;
 						if (empty) {
@@ -381,27 +375,30 @@ $.fn.jqGrid = function( pin ) {
 			if (isNaN(val)) { return defval ? defval : 0;}
 			else {return val;}
 		},
-		formatCol = function (pos, rowInd){
-			var ral = ts.p.colModel[pos].align, result="style=\"", clas = ts.p.colModel[pos].classes;
+		formatCol = function (pos, rowInd, tv){
+			var cm = ts.p.colModel[pos],
+			ral = cm.align, result="style=\"", clas = cm.classes, nm = cm.name;
 			if(ral) result += "text-align:"+ral+";";
-			if(ts.p.colModel[pos].hidden===true) result += "display:none;";
-			//if(rowInd===0) {
+			if(cm.hidden===true) result += "display:none;";
+			if(rowInd===0) {
 				result += "width: "+grid.headers[pos].width+"px;"
-			//}
-			return result+"\"" + (clas !== undefined ? (" class=\""+clas+"\"") :"");
+			}
+			result += "\"" + (clas !== undefined ? (" class=\""+clas+"\"") :"") + ((cm.title && tv) ? (" title=\""+$.jgrid.stripHtml(tv)+"\"") :"");
+			result += " aria-describedby=\""+ts.p.id+"_"+nm+"\"";
+			return result;
 		},
 		addCell = function(rowId,cell,pos,irow, srvr) {
 			var v,prp;
 			v = formatter(rowId,cell,pos,srvr,'add');
-			prp = formatCol( pos,irow);
-			return "<td role=\"gridcell\" "+prp+" title=\""+$.jgrid.stripHtml(v)+"\">"+v+"</td>";
+			prp = formatCol( pos,irow, v);
+			return "<td role=\"gridcell\" "+prp+">"+v+"</td>";
 		},
 		formatter = function (rowId, cellval , colpos, rwdat, _act){
 			var cm = ts.p.colModel[colpos],v;
 			if(typeof cm.formatter !== 'undefined') {
-				var opts= {rowId: rowId, colModel:cm };
+				var opts= {rowId: rowId, colModel:cm, gid:ts.p.id };
 				if($.isFunction( cm.formatter ) ) {
-					v = cm.formatter(cellval,opts,rwdat,_act);
+					v = cm.formatter.call(ts,cellval,opts,rwdat,_act);
 				} else if($.fmatter){
 					v = $.fn.fmatter(cm.formatter, cellval,opts, rwdat, _act);
 				} else {
@@ -413,17 +410,17 @@ $.fn.jqGrid = function( pin ) {
 			return v;
 		},
 		cellVal =  function (val) {
-			return val === undefined || val === null || val === "" ? "&#160;" : ts.p.autoencode ? $.jgrid.htmlEncode(val+"") : val+"";
+			return val === undefined || val === null || val === "" ? "&#160;" : (ts.p.autoencode ? $.jgrid.htmlEncode(val) : val+"");
 		},
 		addMulti = function(rowid,pos,irow){
-			var	v = "<input type=\"checkbox\""+" id=\"jqg_"+rowid+"\" class=\"cbox\" name=\"jqg_"+rowid+"\"/>",
-			prp = formatCol(pos,irow);
-			return "<td role='gridcell' "+prp+">"+v+"</td>";
+			var	v = "<input role=\"checkbox\" type=\"checkbox\""+" id=\"jqg_"+rowid+"\" class=\"cbox\" name=\"jqg_"+rowid+"\"/>",
+			prp = formatCol(pos,irow,'');
+			return "<td role=\"gridcell\" aria-describedby=\""+ts.p.id+"_cb\" "+prp+">"+v+"</td>";
 		},
 		addRowNum = function (pos,irow,pG,rN) {
-			var v =  (parseInt(pG)-1)*parseInt(rN)+1+irow,
-			prp = formatCol(pos,irow);
-			return "<td role=\"gridcell\" class=\"ui-state-default jqgrid-rownum\" "+prp+">"+v+"</td>";
+			var v =  (parseInt(pG,10)-1)*parseInt(rN,10)+1+irow,
+			prp = formatCol(pos,irow,'');
+			return "<td role=\"gridcell\" aria-describedby=\""+ts.p.id+"_rn\" class=\"ui-state-default jqgrid-rownum\" "+prp+">"+v+"</td>";
 		},
 		reader = function (datatype) {
 			var field, f=[], j=0, i;
@@ -445,22 +442,39 @@ $.fn.jqGrid = function( pin ) {
 			return order;
 		},
 		emptyRows = function (parent, scroll) {
-			var tBody = $("tbody:first", parent);
-			if(!ts.p.gridview || ts.p.jqgdnd) $("*",tBody).children().unbind();
-			if(isMSIE) $.jgrid.empty.apply(tBody[0]);
-			else tBody[0].innerHTML="";
+			if(ts.p.deepempty) $("tbody:first tr", parent).remove();
+			else $("tbody:first", parent).empty();
 			if (scroll && ts.p.scroll) {
 				$(">div:first", parent).css({height:"auto"}).children("div:first").css({height:0,display:"none"});
 				parent.scrollTop = 0;
 			}
-			tBody = null;
+		},
+		getAccessor = function(obj, expr) {
+			var ret,p,prm;
+			if( typeof expr === 'function') return expr(obj);
+			ret = obj[expr];
+			if(ret===undefined) {
+			    if ( typeof expr === 'string' ) {
+					prm = expr.split('.');
+				}
+				try {
+					if(prm.length) {
+						ret = obj;
+					    while (ret && prm.length) {
+							p = prm.shift();
+							ret = ret[p];
+						}
+					}
+				} catch (e) {}
+			}
+			return ret;
 		},
 		addXmlData = function (xml,t, rcnt, more, adjust) {
 			var startReq = new Date();
 			ts.p.reccount = 0;
 			if($.isXMLDoc(xml)) {
 				if(ts.p.treeANode===-1 && !ts.p.scroll) {
-					emptyRows(t);
+					emptyRows(t,false);
 					rcnt=0;
 				} else { rcnt = rcnt > 0 ? rcnt :0; }
 			} else { return; }
@@ -487,19 +501,21 @@ $.fn.jqGrid = function( pin ) {
 			else {
 				getId = function( trow, k) {return trow.getAttribute(idn.replace(/[\[\]]/g,"")) || k;};
 			}
-			$(ts.p.xmlReader.page,xml).each(function() {ts.p.page = this.textContent  || this.text || 1; });
-			$(ts.p.xmlReader.total,xml).each(function() {ts.p.lastpage = this.textContent  || this.text || 1; }  );
+			ts.p.userData = {};
+			$(ts.p.xmlReader.page,xml).each(function() {ts.p.page = this.textContent  || this.text || 0; });
+			$(ts.p.xmlReader.total,xml).each(function() {ts.p.lastpage = this.textContent  || this.text; if(ts.p.lastpage===undefined) ts.p.lastpage=1; }  );
 			$(ts.p.xmlReader.records,xml).each(function() {ts.p.records = this.textContent  || this.text  || 0; }  );
 			$(ts.p.xmlReader.userdata,xml).each(function() {ts.p.userData[this.getAttribute("name")]=this.textContent || this.text;});
 			var gxml = $(ts.p.xmlReader.root+" "+ts.p.xmlReader.row,xml),gl = gxml.length, j=0;
 			if(gxml && gl){
-			var rn = parseInt(ts.p.rowNum),br=ts.p.scroll?(parseInt(ts.p.page)-1)*rn+1:1;
+			var rn = parseInt(ts.p.rowNum,10),br=ts.p.scroll?(parseInt(ts.p.page,10)-1)*rn+1:1,altr;
 			if (adjust) rn *= adjust+1;
 			var afterInsRow = $.isFunction(ts.p.afterInsertRow);
 			while (j<gl) {
 				xmlr = gxml[j];
 				rid = getId(xmlr,br+j);
-				cn1 = j%2 == 1 ? cn : '';
+				altr = rcnt == 0 ? 0 : rcnt+1;
+				cn1 = (altr+j)%2 == 1 ? cn : '';
 				rowData[ari++] = "<tr id=\""+rid+"\" role=\"row\" class =\"ui-widget-content jqgrow ui-row-"+ts.p.direction+""+cn1+"\">";
 				if(ts.p.rownumbers===true) {
 					rowData[ari++] = addRowNum(0,j,ts.p.page,ts.p.rowNum);
@@ -569,19 +585,19 @@ $.fn.jqGrid = function( pin ) {
 			ts.p.reccount = 0;
 			if(data) {
 				if(ts.p.treeANode === -1 && !ts.p.scroll) {
-					emptyRows(t);
+					emptyRows(t,false);
 					rcnt=0;
 				} else { rcnt = rcnt > 0 ? rcnt :0; }
 			} else { return; }
-			var ir=0,v,i,j,row,f=[],F,cur,gi=0,si=0,ni=0,len,drows,idn,rd={}, fpos,rl = ts.rows.length,idr,rowData=[],ari=0,cn=(ts.p.altRows === true) ? " "+ts.p.altclass:"",cn1;
-			ts.p.page = data[ts.p.jsonReader.page] || 1;
-			ts.p.lastpage= data[ts.p.jsonReader.total] || 1;
-			ts.p.records= data[ts.p.jsonReader.records] || 0;
-			ts.p.userData = data[ts.p.jsonReader.userdata] || {};
+			var ir=0,v,i,j,row,f=[],F,cur,gi=0,si=0,ni=0,len,drows,idn,rd={}, fpos,rl = ts.rows.length,idr,rowData=[],ari=0,cn=(ts.p.altRows === true) ? " "+ts.p.altclass:"",cn1,lp;
+			ts.p.page = getAccessor(data,ts.p.jsonReader.page) || 0;
+			lp = getAccessor(data,ts.p.jsonReader.total);
+			ts.p.lastpage= lp === undefined ? 1 : lp;
+			ts.p.records= getAccessor(data,ts.p.jsonReader.records) || 0;
+			ts.p.userData = getAccessor(data,ts.p.jsonReader.userdata) || {};
 			if(!ts.p.jsonReader.repeatitems) {
 				F = f = reader("json");
 			}
-
 			if( ts.p.keyIndex===false ) {
 				idn = ts.p.jsonReader.id;
 			} else {
@@ -593,15 +609,15 @@ $.fn.jqGrid = function( pin ) {
 				}
 				idn=f[idn];
 			}
-			drows = data[ts.p.jsonReader.root];
+			drows = getAccessor(data,ts.p.jsonReader.root);
 			if (drows) {
 			len = drows.length, i=0;
-			var rn = parseInt(ts.p.rowNum),br=ts.p.scroll?(parseInt(ts.p.page)-1)*rn+1:1;
+			var rn = parseInt(ts.p.rowNum,10),br=ts.p.scroll?(parseInt(ts.p.page,10)-1)*rn+1:1, altr;
 			if (adjust) rn *= adjust+1;
 			var afterInsRow = $.isFunction(ts.p.afterInsertRow);
 			while (i<len) {
 				cur = drows[i];
-				idr = cur[idn];
+				idr = getAccessor(cur,idn);
 				if(idr === undefined) {
 					idr = br+i;
 					if(f.length===0){
@@ -612,7 +628,8 @@ $.fn.jqGrid = function( pin ) {
 						}
 					}
 				}
-				cn1 = i%2 == 1 ? cn : '';
+				altr = rcnt == 0 ? 0 : rcnt+1;
+				cn1 = (altr+i)%2 == 1 ? cn : '';
 				rowData[ari++] = "<tr id=\""+ idr +"\" role=\"row\" class= \"ui-widget-content jqgrow ui-row-"+ts.p.direction+""+cn1+"\">";
 				if(ts.p.rownumbers===true) {
 					rowData[ari++] = addRowNum(0,i,ts.p.page,ts.p.rowNum);
@@ -627,33 +644,28 @@ $.fn.jqGrid = function( pin ) {
 					si= 1;
 				}
 				if (ts.p.jsonReader.repeatitems) {
-					if(ts.p.jsonReader.cell) {cur = cur[ts.p.jsonReader.cell];}
+					if(ts.p.jsonReader.cell) {cur = getAccessor(cur,ts.p.jsonReader.cell);}
 					if (!F) F=orderedCols(gi+si+ni);
 				}
 				for (j=0;j<F.length;j++) {
-					v=cur[F[j]];
-					if(v===undefined) {
-						try { v = eval("cur."+F[j]);}
-						catch (e) {}
-					}
+					v = getAccessor(cur,F[j]);
 					rowData[ari++] = addCell(idr,v,j+gi+si+ni,i+rcnt,cur);
 					rd[ts.p.colModel[j+gi+si+ni].name] = v;
 				}
-
 				rowData[ari++] = "</tr>";
 				if(ts.p.gridview === false ) {
 					if( ts.p.treeGrid === true) {
 						fpos = ts.p.treeANode >= -1 ? ts.p.treeANode: 0;
 						row = $(rowData.join(''))[0];
 						try {$(ts).jqGrid("setTreeNode",rd,row);} catch (e) {}
-						rl ===  0 ? $("tbody:first",t).append(row) : $(ts.rows[i+fpos/*+rcnt*/]).after(row);
+						rl ===  0 ? $("tbody:first",t).append(row) : $(ts.rows[i+fpos+rcnt]).after(row);
 					} else {
 						$("tbody:first",t).append(rowData.join(''));
 					}
 					if(ts.p.subGrid === true ) {
 						try { $(ts).jqGrid("addSubGrid",ts.rows[ts.rows.length-1],gi+ni);} catch (e){}
 					}
-					if(afterInsRow) {ts.p.afterInsertRow(idr,rd,cur);}
+					if(afterInsRow) {ts.p.afterInsertRow.call(ts,idr,rd,cur);}
 					rowData=[];ari=0;
 				}
 				rd={};
@@ -674,8 +686,10 @@ $.fn.jqGrid = function( pin ) {
 			if (!more) updatepager(false,true);
 		},
 		updatepager = function(rn, dnd) {
-			var cp, last, base,bs, from,to,tot,fmt;
-			base = (parseInt(ts.p.page)-1)*parseInt(ts.p.rowNum);
+			var cp, last, base,bs, from,to,tot,fmt, pgboxes = "";
+			base = parseInt(ts.p.page,10)-1;
+			if(base < 0) base = 0;
+			base = base*parseInt(ts.p.rowNum,10);
 			to = base + ts.p.reccount;
 			if (ts.p.scroll) {
 				var rows = $("tbody:first > tr", ts.grid.bDiv);
@@ -687,25 +701,27 @@ $.fn.jqGrid = function( pin ) {
 				    $(">div:first",ts.grid.bDiv).css({height : height}).children("div:first").css({height:top,display:top?"":"none"});
 				}
 			}
-			if(ts.p.pager) {
+			pgboxes = ts.p.pager ? ts.p.pager : "";
+			pgboxes += ts.p.toppager ?  (pgboxes ? "," + ts.p.toppager : ts.p.toppager) : "";
+			if(pgboxes) {
 				fmt = $.jgrid.formatter.integer || {};
 				if (ts.p.loadonce) {
 					cp = last = 1;
 					ts.p.lastpage = ts.page =1;
-					$(".selbox",ts.p.pager).attr("disabled",true);
+					$(".selbox",pgboxes).attr("disabled",true);
 				} else {
 					cp = IntNum(ts.p.page);
 					last = IntNum(ts.p.lastpage);
-					$(".selbox",ts.p.pager).attr("disabled",false);
+					$(".selbox",pgboxes).attr("disabled",false);
 				}
 				if(ts.p.pginput===true) {
-					$('.ui-pg-input',ts.p.pager).val(ts.p.page);
-					$('#sp_1',ts.p.pager).html($.fmatter ? $.fmatter.util.NumberFormat(ts.p.lastpage,fmt):ts.p.lastpage).width();
+					$('.ui-pg-input',pgboxes).val(ts.p.page);
+					$('#sp_1',pgboxes).html($.fmatter ? $.fmatter.util.NumberFormat(ts.p.lastpage,fmt):ts.p.lastpage);
 					
 				}
 				if (ts.p.viewrecords){
 					if(ts.p.reccount === 0) 
-						$(".ui-paging-info",ts.p.pager).html(ts.p.emptyrecords);
+						$(".ui-paging-info",pgboxes).html(ts.p.emptyrecords);
 					else {
 						from = base+1;
 						tot=ts.p.records;
@@ -714,13 +730,25 @@ $.fn.jqGrid = function( pin ) {
 							to = $.fmatter.util.NumberFormat(to,fmt);
 							tot = $.fmatter.util.NumberFormat(tot,fmt);
 						}
-						$(".ui-paging-info",ts.p.pager).html($.jgrid.format(ts.p.recordtext,from,to,tot));
+						$(".ui-paging-info",pgboxes).html($.jgrid.format(ts.p.recordtext,from,to,tot));
 					}
 				}
 				if(ts.p.pgbuttons===true) {
-					if(cp<=0) {cp = last = 1;}
-					if(cp==1) {$("#first, #prev",ts.p.pager).addClass('ui-state-disabled').removeClass('ui-state-hover');} else {$("#first, #prev",ts.p.pager).removeClass('ui-state-disabled');}
-					if(cp==last) {$("#next, #last",ts.p.pager).addClass('ui-state-disabled').removeClass('ui-state-hover');} else {$("#next, #last",ts.p.pager).removeClass('ui-state-disabled');}
+					if(cp<=0) {cp = last = 0;}
+					if(cp==1 || cp == 0) {
+						$("#first, #prev",ts.p.pager).addClass('ui-state-disabled').removeClass('ui-state-hover');
+						if(ts.p.toppager) $("#first_t, #prev_t",ts.p.toppager).addClass('ui-state-disabled').removeClass('ui-state-hover');
+					} else {
+						$("#first, #prev",ts.p.pager).removeClass('ui-state-disabled');
+						if(ts.p.toppager) $("#first_t, #prev_t",ts.p.toppager).removeClass('ui-state-disabled');
+					}
+					if(cp==last || cp == 0) {
+						$("#next, #last",ts.p.pager).addClass('ui-state-disabled').removeClass('ui-state-hover');
+						if(ts.p.toppager) $("#next_t, #last_t",ts.p.toppager).addClass('ui-state-disabled').removeClass('ui-state-hover');
+					} else {
+						$("#next, #last",ts.p.pager).removeClass('ui-state-disabled');
+						if(ts.p.toppager) $("#next_t, #last_t",ts.p.toppager).removeClass('ui-state-disabled');
+					}
 				}
 			}
 			if(rn===true && ts.p.rownumbers === true) {
@@ -729,12 +757,13 @@ $.fn.jqGrid = function( pin ) {
 				});
 			}
 			if(dnd && ts.p.jqgdnd) { $(ts).jqGrid('gridDnD','updateDnD');}
-			if($.isFunction(ts.p.gridComplete)) {ts.p.gridComplete();}
+			if($.isFunction(ts.p.gridComplete)) {ts.p.gridComplete.call(ts);}
 		},
 		populate = function (npage) {
 			if(!ts.grid.hDiv.loading) {
 				var pvis = ts.p.scroll && npage == false;
-				var prm = {}, dt, dstr, pN=ts.p.prmNames;;
+				var prm = {}, dt, dstr, pN=ts.p.prmNames;
+				if(ts.p.page <=0) ts.p.page = 1;
 				if(pN.search !== null) prm[pN.search] = ts.p.search; if(pN.nd != null) prm[pN.nd] = new Date().getTime();
 				if(pN.rows !== null) prm[pN.rows]= ts.p.rowNum; if(pN.page !== null) prm[pN.page]= ts.p.page;
 				if(pN.sort !== null) prm[pN.sort]= ts.p.sortname; if(pN.order !== null) prm[pN.order]= ts.p.sortorder;
@@ -763,7 +792,7 @@ $.fn.jqGrid = function( pin ) {
 				}
 				$.extend(ts.p.postData,prm);
 				var rcnt = !ts.p.scroll ? 0 : ts.rows.length-1; 
-				if ($.isFunction(ts.p.datatype)) { ts.p.datatype(ts.p.postData,"load_"+ts.p.id); return;}
+				if ($.isFunction(ts.p.datatype)) { ts.p.datatype.call(ts,ts.p.postData,"load_"+ts.p.id); return;}
 				else if($.isFunction(ts.p.beforeRequest)) {ts.p.beforeRequest.call(ts);}
 				dt = ts.p.datatype.toLowerCase();
 				switch(dt)
@@ -776,7 +805,7 @@ $.fn.jqGrid = function( pin ) {
 						url:ts.p.url,
 						type:ts.p.mtype,
 						dataType: dt ,
-						data: $.isFunction(ts.p.serializeGridData)? ts.p.serializeGridData(ts.p.postData) : ts.p.postData,
+						data: $.isFunction(ts.p.serializeGridData)? ts.p.serializeGridData.call(ts,ts.p.postData) : ts.p.postData,
 						complete:function(req,st) {
 							if(st=="success" || (req.statusText == "OK" && req.status == "200")) {
 								if(dt === "xml") addXmlData(req.responseXML,ts.grid.bDiv,rcnt,npage>1,adjust);
@@ -794,16 +823,17 @@ $.fn.jqGrid = function( pin ) {
 						},
 						beforeSend: function(xhr){
 							beginReq();
-							if($.isFunction(ts.p.loadBeforeSend)) ts.p.loadBeforeSend.call(this,xhr);
+							if($.isFunction(ts.p.loadBeforeSend)) ts.p.loadBeforeSend.call(ts,xhr);
 						}
 					},$.jgrid.ajaxOptions, ts.p.ajaxGridOptions));
 					if( ts.p.loadonce || ts.p.treeGrid) {ts.p.datatype = "local";}
 				break;
 				case "xmlstring":
 					beginReq();
-					addXmlData(dstr = $.jgrid.stringToDoc(ts.p.datastr),ts.grid.bDiv);
-					ts.p.datatype = "local";
+					dstr = $.jgrid.stringToDoc(ts.p.datastr)
 					if(lcf) {ts.p.loadComplete.call(ts,dstr);}
+					addXmlData(dstr,ts.grid.bDiv);
+					ts.p.datatype = "local";
 					ts.p.datastr = null;
 					endReq();
 				break;
@@ -811,9 +841,9 @@ $.fn.jqGrid = function( pin ) {
 					beginReq();
 					if(typeof ts.p.datastr == 'string') dstr = $.jgrid.parse(ts.p.datastr);
 					else dstr = ts.p.datastr;
+					if(lcf) {ts.p.loadComplete.call(ts,dstr);}
 					addJSONData(dstr,ts.grid.bDiv);
 					ts.p.datatype = "local";
-					if(lcf) {ts.p.loadComplete.call(ts,dstr);}
 					ts.p.datastr = null;
 					endReq();
 				break;
@@ -821,7 +851,9 @@ $.fn.jqGrid = function( pin ) {
 				case "clientside":
 					beginReq();
 					ts.p.datatype = "local";
+					if(lcf) {ts.p.loadComplete.call(ts,"");}
 					sortArrayData();
+					updatepager(true,true);
 					endReq();
 				break;
 				}
@@ -858,10 +890,11 @@ $.fn.jqGrid = function( pin ) {
 		},
 		sortArrayData = function() {
 			var stripNum = /[\$,%]/g;
-			var rows=[], col=0, st, sv, findSortKey,newDir = (ts.p.sortorder == "asc") ? 1 :-1;
+			var rows=[], col=0, st, sv, findSortKey,newDir = (ts.p.sortorder == "asc") ? 1 :-1, reverse=false;
 			$.each(ts.p.colModel,function(i,v){
 				if(this.index == ts.p.sortname || this.name == ts.p.sortname){
-					col = ts.p.lastsort= i;
+					if(ts.p.lastsort == i) reverse = true;
+					col = i;
 					st = this.sorttype;
 					return false;
 				}
@@ -873,9 +906,9 @@ $.fn.jqGrid = function( pin ) {
 				};
 			} else if (st=='int' || st=='integer') {
 				findSortKey = function($cell) {
-					return IntNum($cell.replace(stripNum, ''));
+					return IntNum($cell.replace(stripNum, ''),0);
 				};
-			} else if(st == 'date') {
+			} else if(st == 'date' || st == 'datetime') {
 				findSortKey = function($cell) {
 					var fd = ts.p.colModel[col].datefmt || "Y-m-d";
 					return parseDate(fd,$cell).getTime();
@@ -886,7 +919,7 @@ $.fn.jqGrid = function( pin ) {
 				};
 			}
 			$.each(ts.rows, function(index, row) {
-				try { sv = $.unformat($(row).children('td').eq(col),{colModel:ts.p.colModel[col]},col,true);}
+				try { sv = $.unformat($(row).children('td').eq(col),{rowId:row.id, colModel:ts.p.colModel[col]},col,true);}
 				catch (_) { sv = $(row).children('td').eq(col).text(); }
 				row.sortKey = findSortKey(sv);
 				rows[index] = this;
@@ -894,11 +927,14 @@ $.fn.jqGrid = function( pin ) {
 			if(ts.p.treeGrid) {
 				$(ts).jqGrid("SortTree",newDir);
 			} else {
-				rows.sort(function(a, b) {
-					if (a.sortKey < b.sortKey) {return -newDir;}
-					if (a.sortKey > b.sortKey) {return newDir;}
-					return 0;
-				});
+				if(reverse)
+					rows.reverse();
+				else 
+					rows.sort(function(a, b) {
+						if (a.sortKey < b.sortKey) {return -newDir;}
+						if (a.sortKey > b.sortKey) {return newDir;}
+						return 0;
+					});
 				if(rows[0]){
 					$("td",rows[0]).each( function( k ) {
 						$(this).css("width",grid.headers[k].width+"px");
@@ -920,44 +956,72 @@ $.fn.jqGrid = function( pin ) {
 		},
 		parseDate = function(format, date) {
 			var tsp = {m : 1, d : 1, y : 1970, h : 0, i : 0, s : 0},k,hl,dM;
-			date = date.split(/[\\\/:_;.\t\T\s-]/);
-			format = format.split(/[\\\/:_;.\t\T\s-]/);
-			var dfmt  = $.jgrid.formatter.date.monthNames;
-			for(k=0,hl=format.length;k<hl;k++){
-				if(format[k] == 'M') {
-					dM = $.inArray(date[k],dfmt);
-					if(dM !== -1 && dM < 12){date[k] = dM+1;}
+			date = $.trim(date);
+			if(date){
+				date = date.split(/[\\\/:_;.\t\T\s-]/);
+				format = format.split(/[\\\/:_;.\t\T\s-]/);
+				var dfmt  = $.jgrid.formatter.date.monthNames;
+				var afmt  = $.jgrid.formatter.date.AmPm;
+				var h12to24 = function(ampm, h){
+					if (ampm === 0){ h = (h == 12) ? 0       : h; }
+					          else { h = (h != 12) ? h += 12 : h; }                
+					return h;
+				}; 
+				for(k=0,hl=format.length;k<hl;k++){
+					if(format[k] == 'M') {
+						dM = $.inArray(date[k],dfmt);
+						if(dM !== -1 && dM < 12){date[k] = dM+1;}
+					}
+					if(format[k] == 'F') {
+						dM = $.inArray(date[k],dfmt);
+						if(dM !== -1 && dM > 11){date[k] = dM+1-12;}
+					}
+					if(format[k] == 'a') {
+						dM = $.inArray(date[k],afmt);
+						if(dM !== -1 && dM < 2 && date[k] == afmt[dM]){
+							date[k] = dM;
+							tsp.h = h12to24(date[k], tsp.h);
+						}
+					}
+					if(format[k] == 'A') {
+						dM = $.inArray(date[k],afmt);
+						if(dM !== -1 && dM > 1 && date[k] == afmt[dM]){
+							date[k] = dM-2;
+							tsp.h = h12to24(date[k], tsp.h);
+						}
+					}
+					tsp[format[k].toLowerCase()] = parseInt(date[k],10);
 				}
-				if(format[k] == 'F') {
-					dM = $.inArray(date[k],dfmt);
-					if(dM !== -1 && dM > 11){date[k] = dM+1-12;}
-				}
-				tsp[format[k].toLowerCase()] = parseInt(date[k],10);
+				tsp.m = parseInt(tsp.m,10)-1;
+				var ty = tsp.y;
+				if (ty >= 70 && ty <= 99) {tsp.y = 1900+tsp.y;}
+				else if (ty >=0 && ty <=69) {tsp.y= 2000+tsp.y;}
 			}
-			tsp.m = parseInt(tsp.m,10)-1;
-			var ty = tsp.y;
-			if (ty >= 70 && ty <= 99) {tsp.y = 1900+tsp.y;}
-			else if (ty >=0 && ty <=69) {tsp.y= 2000+tsp.y;}
 			return new Date(tsp.y, tsp.m, tsp.d, tsp.h, tsp.i, tsp.s,0);
 		},
-		setPager = function (){
+		setPager = function (pgid, tp){
 			var sep = "<td class='ui-pg-button ui-state-disabled' style='width:4px;'><span class='ui-separator'></span></td>",
-			pgid= $(ts.p.pager).attr("id") || 'pager',pginp = "",
+			pginp = "",
 			pgl="<table cellspacing='0' cellpadding='0' border='0' style='table-layout:auto;' class='ui-pg-table'><tbody><tr>",
 			str="", pgcnt, lft, cent, rgt, twd, tdw, i,
 			clearVals = function(onpaging){
-				if ($.isFunction(ts.p.onPaging) ) {ts.p.onPaging(onpaging);}
+				var ret;
+				if ($.isFunction(ts.p.onPaging) ) ret = ts.p.onPaging.call(ts,onpaging);
 				ts.p.selrow = null;
 				if(ts.p.multiselect) {ts.p.selarrrow =[];$('#cb_'+$.jgrid.jqID(ts.p.id),ts.grid.hDiv).attr("checked",false);}
 				ts.p.savedRow = [];
+				if(ret=='stop') {return false;}
+				return true;
 			};
+			//pgid= $(ts.p.pager).attr("id") || 'pager',
+			pgid = pgid.substr(1);
 			pgcnt = "pg_"+pgid;
 			lft = pgid+"_left"; cent = pgid+"_center"; rgt = pgid+"_right";
-			$(ts.p.pager).addClass('ui-jqgrid-pager ui-corner-bottom')
+			$("#"+pgid)
 			.append("<div id='"+pgcnt+"' class='ui-pager-control' role='group'><table cellspacing='0' cellpadding='0' border='0' class='ui-pg-table' style='width:100%;table-layout:fixed;' role='row'><tbody><tr><td id='"+lft+"' align='left'></td><td id='"+cent+"' align='center' style='white-space:pre;'></td><td id='"+rgt+"' align='right'></td></tr></tbody></table></div>")
 			.attr("dir","ltr"); //explicit setting
 			if(ts.p.rowList.length >0){
-				str = "<td dir='"+dir+"'>"
+				str = "<td dir='"+dir+"'>";
 				str +="<select class='ui-pg-selbox' role='listbox'>";
 				for(i=0;i<ts.p.rowList.length;i++){
 					str +="<option role='option' value='"+ts.p.rowList[i]+"'"+((ts.p.rowNum == ts.p.rowList[i])?' selected':'')+">"+ts.p.rowList[i]+"</option>";
@@ -967,7 +1031,7 @@ $.fn.jqGrid = function( pin ) {
 			if(dir=="rtl") pgl += str;
 			if(ts.p.pginput===true) pginp= "<td dir='"+dir+"'>"+$.jgrid.format(ts.p.pgtext || "","<input class='ui-pg-input' type='text' size='2' maxlength='7' value='0' role='textbox'/>","<span id='sp_1'></span>")+"</td>";
 			if(ts.p.pgbuttons===true) {
-				var po=["first","prev", "next","last"]; if(dir=="rtl") po.reverse();
+				var po=["first"+tp,"prev"+tp, "next"+tp,"last"+tp]; if(dir=="rtl") po.reverse();
 				pgl += "<td id='"+po[0]+"' class='ui-pg-button ui-corner-all'><span class='ui-icon ui-icon-seek-first'></span></td>";
 				pgl += "<td id='"+po[1]+"' class='ui-pg-button ui-corner-all'><span class='ui-icon ui-icon-seek-prev'></span></td>";
 				pgl += pginp !="" ? sep+pginp+sep:"";
@@ -993,7 +1057,9 @@ $.fn.jqGrid = function( pin ) {
 			$('.ui-pg-selbox',"#"+pgcnt).bind('change',function() { 
 				ts.p.page = Math.round(ts.p.rowNum*(ts.p.page-1)/this.value-0.5)+1;
 				ts.p.rowNum = this.value;
-				clearVals('records');
+				if(tp) $('.ui-pg-selbox',ts.p.pager).val(this.value);
+				else if(ts.p.toppager) $('.ui-pg-selbox',ts.p.toppager).val(this.value);
+				if(!clearVals('records')) return false;
 				populate();
 				return false;
 			});
@@ -1012,9 +1078,9 @@ $.fn.jqGrid = function( pin ) {
 					this.style.cursor= "default";
 				}
 			});
-			$("#first, #prev, #next, #last",ts.p.pager).click( function(e) {
-				var cp = IntNum(ts.p.page),
-				last = IntNum(ts.p.lastpage), selclick = false,
+			$("#first"+tp+", #prev"+tp+", #next"+tp+", #last"+tp,"#"+pgid).click( function(e) {
+				var cp = IntNum(ts.p.page,1),
+				last = IntNum(ts.p.lastpage,1), selclick = false,
 				fp=true, pp=true, np=true,lp=true;
 				if(last ===0 || last===1) {fp=false;pp=false;np=false;lp=false; }
 				else if( last>1 && cp >=1) {
@@ -1022,12 +1088,12 @@ $.fn.jqGrid = function( pin ) {
 					else if( cp>1 && cp <last){ }
 					else if( cp===last){ np=false;lp=false; }
 				} else if( last>1 && cp===0 ) { np=false;lp=false; cp=last-1;}
-				if( this.id === 'first' && fp ) { ts.p.page=1; selclick=true;} 
-				if( this.id === 'prev' && pp) { ts.p.page=(cp-1); selclick=true;} 
-				if( this.id === 'next' && np) { ts.p.page=(cp+1); selclick=true;} 
-				if( this.id === 'last' && lp) { ts.p.page=last; selclick=true;}
+				if( this.id === 'first'+tp && fp ) { ts.p.page=1; selclick=true;} 
+				if( this.id === 'prev'+tp && pp) { ts.p.page=(cp-1); selclick=true;} 
+				if( this.id === 'next'+tp && np) { ts.p.page=(cp+1); selclick=true;} 
+				if( this.id === 'last'+tp && lp) { ts.p.page=last; selclick=true;}
 				if(selclick) {
-					clearVals(this.id);
+					if(!clearVals(this.id)) return false;
 					populate();
 				}
 				return false;
@@ -1038,7 +1104,7 @@ $.fn.jqGrid = function( pin ) {
 				var key = e.charCode ? e.charCode : e.keyCode ? e.keyCode : 0;
 				if(key == 13) {
 					ts.p.page = ($(this).val()>0) ? $(this).val():ts.p.page;
-					clearVals('user');
+					if(!clearVals('user')) return false;
 					populate();
 					return false;
 				}
@@ -1059,7 +1125,7 @@ $.fn.jqGrid = function( pin ) {
 				ts.p.page = 1;
 			}
 			if(sor) {
-				if(ts.p.lastsort == idxcol && ts.p.sortorder == sor) return;
+				if(ts.p.lastsort == idxcol && ts.p.sortorder == sor && !reload) return;
 				else ts.p.sortorder = sor;
 			}
 			var thd= $("thead:first",ts.grid.hDiv).get(0);
@@ -1073,11 +1139,10 @@ $.fn.jqGrid = function( pin ) {
 					$("tr th:eq("+idxcol+") span.s-ico",thd).show();
 				}
 			}
-			ts.p.lastsort = idxcol;
 			index = index.substring(5);
 			ts.p.sortname = ts.p.colModel[idxcol].index || index;
 			so = ts.p.sortorder;
-			if($.isFunction(ts.p.onSortCol)) {ts.p.onSortCol.call(ts,index,idxcol,so);}
+			if($.isFunction(ts.p.onSortCol)) {if (ts.p.onSortCol.call(ts,index,idxcol,so)=='stop') {ts.p.lastsort = idxcol; return;}}
 			if(ts.p.datatype == "local") {
 				if(ts.p.deselectAfterSort) {$(ts).jqGrid("resetSelection");}
 			} else {
@@ -1093,6 +1158,7 @@ $.fn.jqGrid = function( pin ) {
 				});
 			}
 			populate();
+			ts.p.lastsort = idxcol;
 			if(ts.p.sortname != index && idxcol) {ts.p.lastsort = idxcol;}
 		},
 		setColWidth = function () {
@@ -1102,7 +1168,7 @@ $.fn.jqGrid = function( pin ) {
 			$.each(ts.p.colModel, function(i) {
 				if(typeof this.hidden === 'undefined') {this.hidden=false;}
 				if(this.hidden===false){
-					initwidth += IntNum(this.width);
+					initwidth += IntNum(this.width,0);
 					if(this.fixed) {
 						tw += this.width;
 						gw += this.width+brd;
@@ -1126,7 +1192,7 @@ $.fn.jqGrid = function( pin ) {
 				initwidth =0;
 				$.each(ts.p.colModel, function(i) {
 					if(this.hidden === false && !this.fixed){
-						cw = Math.floor(aw/(ts.p.tblwidth-tw)*this.width);
+						cw = Math.round(aw*this.width/(ts.p.tblwidth-tw));
 						this.width =cw;
 						initwidth += cw;
 						lvc = i;
@@ -1141,6 +1207,10 @@ $.fn.jqGrid = function( pin ) {
 				}
 				ts.p.colModel[lvc].width += cr;
 				ts.p.tblwidth = initwidth+cr+tw+cl*brd;
+				if(ts.p.tblwidth > ts.p.width) {
+					ts.p.colModel[lvc].width -= (ts.p.tblwidth - parseInt(ts.p.width,10));
+					ts.p.tblwidth = ts.p.width;
+				}
 			}
 		},
 		nextVisible= function(iCol) {
@@ -1162,8 +1232,9 @@ $.fn.jqGrid = function( pin ) {
 			}
 			if(ts.p.direction=="rtl") ret[0] = ts.p.width - ret[0];
 			ret[0] = ret[0] - ts.grid.bDiv.scrollLeft;
-			if($(ts.grid.cDiv).is(":visible")) {ret[1] += $(ts.grid.cDiv).height() +parseInt($(ts.grid.cDiv).css("padding-top"))+parseInt($(ts.grid.cDiv).css("padding-bottom"));}
-			if(ts.p.toolbar[0]==true && (ts.p.toolbar[1]=='top' || ts.p.toolbar[1]=='both')) {ret[1] += $(ts.grid.uDiv).height()+parseInt($(ts.grid.uDiv).css("border-top-width"))+parseInt($(ts.grid.uDiv).css("border-bottom-width"));}
+			if($(ts.grid.cDiv).is(":visible")) {ret[1] += $(ts.grid.cDiv).height() +parseInt($(ts.grid.cDiv).css("padding-top"),10)+parseInt($(ts.grid.cDiv).css("padding-bottom"),10);}
+			if(ts.p.toolbar[0]==true && (ts.p.toolbar[1]=='top' || ts.p.toolbar[1]=='both')) {ret[1] += $(ts.grid.uDiv).height()+parseInt($(ts.grid.uDiv).css("border-top-width"),10)+parseInt($(ts.grid.uDiv).css("border-bottom-width"),10);}
+			if(ts.p.toppager) {ret[1] += $(ts.grid.topDiv).height()+parseInt($(ts.grid.topDiv).css("border-bottom-width"),10);}
 			ret[2] += $(ts.grid.bDiv).height() + $(ts.grid.hDiv).height();
 			return ret;
 		};
@@ -1184,14 +1255,14 @@ $.fn.jqGrid = function( pin ) {
 			try { $(ts).jqGrid("setSubGrid");} catch (_){}
 		}
 		if(this.p.multiselect) {
-			this.p.colNames.unshift("<input id='cb_"+this.p.id+"' class='cbox' type='checkbox'/>");
+			this.p.colNames.unshift("<input role='checkbox' id='cb_"+this.p.id+"' class='cbox' type='checkbox'/>");
 			this.p.colModel.unshift({name:'cb',width:isSafari ? ts.p.multiselectWidth+ts.p.cellLayout : ts.p.multiselectWidth,sortable:false,resizable:false,hidedlg:true,search:false,align:'center',fixed:true});
 		}
 		if(this.p.rownumbers) {
 			this.p.colNames.unshift("");
 			this.p.colModel.unshift({name:'rn',width:ts.p.rownumWidth,sortable:false,resizable:false,hidedlg:true,search:false,align:'center',fixed:true});
 		}
-		ts.p.xmlReader = $.extend({
+		ts.p.xmlReader = $.extend(true,{
 			root: "rows",
 			row: "row",
 			page: "rows>page",
@@ -1203,7 +1274,7 @@ $.fn.jqGrid = function( pin ) {
 			userdata: "userdata",
 			subgrid: {root:"rows", row: "row", repeatitems: true, cell:"cell"}
 		}, ts.p.xmlReader);
-		ts.p.jsonReader = $.extend({
+		ts.p.jsonReader = $.extend(true,{
 			root: "rows",
 			page: "page",
 			total: "total",
@@ -1233,9 +1304,13 @@ $.fn.jqGrid = function( pin ) {
 		imgs = "<span class='s-ico' style='display:none'><span sort='asc' class='ui-grid-ico-sort ui-icon-asc"+iac+" ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-"+dir+"'></span>";
 		imgs += "<span sort='desc' class='ui-grid-ico-sort ui-icon-desc"+idc+" ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-"+dir+"'></span></span>";
 		for(i=0;i<this.p.colNames.length;i++){
-			thead += "<th role='columnheader' class='ui-state-default ui-th-column ui-th-"+dir+"'>";
+			var tooltip = ts.p.headertitles ? (" title=\""+$.jgrid.stripHtml(ts.p.colNames[i])+"\"") :"";
+			thead += "<th id='"+ts.p.id+"_"+ts.p.colModel[i].name+"' role='columnheader' class='ui-state-default ui-th-column ui-th-"+dir+"'"+ tooltip+">";
 			idn = ts.p.colModel[i].index || ts.p.colModel[i].name;
 			thead += "<div id='jqgh_"+ts.p.colModel[i].name+"' "+tdc+">"+ts.p.colNames[i];
+			if(!ts.p.colModel[i].width)  ts.p.colModel[i].width = 150;
+			else ts.p.colModel[i].width = parseInt(ts.p.colModel[i].width,10);
+			if(typeof(ts.p.colModel[i].title) !== "boolean") ts.p.colModel[i].title = true;
 			if (idn == ts.p.sortname) {
 				ts.p.lastsort = i;
 			} 
@@ -1270,11 +1345,10 @@ $.fn.jqGrid = function( pin ) {
 					ts.p.selarrrow = []; ts.p.selrow = null;
 					chk=false;
 				}
-				if(onSA) {ts.p.onSelectAll(chk ? ts.p.selarrrow : emp,chk);}
+				if(onSA) {ts.p.onSelectAll.call(ts, chk ? ts.p.selarrrow : emp,chk);}
 			});
 		}
 		
-		$.each(ts.p.colModel, function(i){if(!this.width) {this.width=150;} this.width = parseInt(this.width);});
 		if(ts.p.autowidth===true) {
 			var pw = $(eg).innerWidth();
 			ts.p.width = pw > 0?  pw: 'nw';
@@ -1312,7 +1386,7 @@ $.fn.jqGrid = function( pin ) {
 				if(ts.p.viewsortcols[0]) {$("div span.s-ico",this).show(); if(j==ts.p.lastsort){ $("div span.ui-icon-"+ts.p.sortorder,this).removeClass("ui-state-disabled");}}
 				else if( j == ts.p.lastsort) {$("div span.s-ico",this).show();$("div span.ui-icon-"+ts.p.sortorder,this).removeClass("ui-state-disabled");}
 			}
-			tfoot += "<td role='gridcell' "+formatCol(j,0)+">&#160;</td>";
+			tfoot += "<td role='gridcell' "+formatCol(j,0,'')+">&#160;</td>";
 		}).mousedown(function(e) {
 			if ($(e.target).closest("th>span.ui-jqgrid-resize").length != 1) return;
 			var ci = $.jgrid.getCellIndex(this);
@@ -1353,13 +1427,12 @@ $.fn.jqGrid = function( pin ) {
 			.append(hb);
 		$(hb).append(hTable);
 		if(hg) $(grid.hDiv).hide();
-		ts.p._height =0;
 		if(ts.p.pager){
 			if(typeof ts.p.pager == "string") {if(ts.p.pager.substr(0,1) !="#") ts.p.pager = "#"+ts.p.pager;}
-			$(ts.p.pager).css({width: grid.width+"px"}).appendTo(eg).addClass('ui-state-default ui-jqgrid-pager');
-			ts.p._height += parseInt($(ts.p.pager).height(),10);
+			else { ts.p.pager = "#"+ $(ts.p.pager).attr("id");}
+			$(ts.p.pager).css({width: grid.width+"px"}).appendTo(eg).addClass('ui-state-default ui-jqgrid-pager ui-corner-bottom');
 			if(hg) {$(ts.p.pager).hide();}
-			setPager();
+			setPager(ts.p.pager,'');
 		}
 		if( ts.p.cellEdit === false && ts.p.hoverrows === true) {
 		$(ts).bind('mouseover',function(e) {
@@ -1384,7 +1457,7 @@ $.fn.jqGrid = function( pin ) {
 			}
 			var cSel = true;
 			if($.isFunction(ts.p.beforeSelectRow)) cSel = ts.p.beforeSelectRow.call(ts,ptr[0].id, e);
-			if (td.tagName == 'A' || ((td.tagName == 'INPUT' || td.tagName == 'TEXTAREA' || td.tagName == 'OPTION' || td.tagName == 'SELECT' ) && !scb) ) { return true; }
+			if (td.tagName == 'A' || ((td.tagName == 'INPUT' || td.tagName == 'TEXTAREA' || td.tagName == 'OPTION' || td.tagName == 'SELECT' ) && !scb) ) { return this; }
 			if(cSel === true) {
 				if(ts.p.cellEdit === true) {
 					if(ts.p.multiselect && scb){
@@ -1423,8 +1496,10 @@ $.fn.jqGrid = function( pin ) {
 					ci = $.jgrid.getCellIndex(td);
 					ts.p.onCellSelect.call(ts,ri,ci,$(td).html(),e);
 				}
+				e.stopPropagation();
+			} else {
+				return this;
 			}
-			e.stopPropagation();
 		}).bind('reloadGrid', function(e,opts) {
 			if(ts.p.treeGrid ===true) {	ts.p.datatype = ts.p.treedatatype;}
 			if (opts && opts.current) {
@@ -1435,7 +1510,7 @@ $.fn.jqGrid = function( pin ) {
 				ts.p.selrow=null;
 				if(ts.p.multiselect) {ts.p.selarrrow =[];$('#cb_'+$.jgrid.jqID(ts.p.id),ts.grid.hDiv).attr("checked",false);}
 				ts.p.savedRow = [];
-				if(ts.p.scroll) {emptyRows(ts.grid.bDiv);}
+				if(ts.p.scroll) {emptyRows(ts.grid.bDiv,true);}
 			}
 			if (opts && opts.page) {
 				var page = opts.page;
@@ -1451,9 +1526,8 @@ $.fn.jqGrid = function( pin ) {
 			if (ts.grid.prevRowHeight && ts.p.scroll) {
                 delete ts.p.lastpage;
 				ts.grid.populateVisible();
-			} else {
+			} else
 				ts.grid.populate();
-			}
 			return false;
 		});
 		if( $.isFunction(this.p.ondblClickRow) ) {
@@ -1481,7 +1555,7 @@ $.fn.jqGrid = function( pin ) {
 		}
 		grid.bDiv = document.createElement("div");
 		$(grid.bDiv)
-			.append($('<div style="position:relative;>'+(isMSIE && $.browser.version < 8 ? "height:0.01%;" : "")+'"</div>').append('<div></div>').append(this))
+			.append($('<div style="position:relative;'+(isMSIE && $.browser.version < 8 ? "height:0.01%;" : "")+'"></div>').append('<div></div>').append(this))
 			.addClass("ui-jqgrid-bdiv")
 			.css({ height: ts.p.height+(isNaN(ts.p.height)?"":"px"), width: (grid.width)+"px"})
 			.scroll(grid.scrollGrid);
@@ -1499,7 +1573,7 @@ $.fn.jqGrid = function( pin ) {
 			function() {arf.removeClass('ui-state-hover');})
 		.append("<span class='ui-icon ui-icon-circle-triangle-n'></span>").css((dir=="rtl"?"left":"right"),"0px") : "";
 		$(grid.cDiv).append(arf).append("<span class='ui-jqgrid-title"+(dir=="rtl" ? "-rtl" :"" )+"'>"+ts.p.caption+"</span>")
-		.addClass("ui-jqgrid-titlebar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
+		.addClass("ui-jqgrid-titlebar ui-widget-header ui-corner-top ui-helper-clearfix");
 		$(grid.cDiv).insertBefore(grid.hDiv);
 		if( ts.p.toolbar[0] ) {
 			grid.uDiv = document.createElement("div");
@@ -1509,13 +1583,18 @@ $.fn.jqGrid = function( pin ) {
 				grid.ubDiv = document.createElement("div");
 				$(grid.uDiv).insertBefore(grid.hDiv).addClass("ui-userdata ui-state-default").attr("id","t_"+this.id);
 				$(grid.ubDiv).insertAfter(grid.hDiv).addClass("ui-userdata ui-state-default").attr("id","tb_"+this.id);
-				ts.p._height += IntNum($(grid.ubDiv).height());
 				if(hg)  {$(grid.ubDiv).hide();}
 			} else {
 				$(grid.uDiv).width(grid.width).addClass("ui-userdata ui-state-default").attr("id","t_"+this.id);
 			}
-			ts.p._height += IntNum($(grid.uDiv).height());
 			if(hg) {$(grid.uDiv).hide();}
+		}
+		if(ts.p.toppager) {
+			ts.p.toppager = ts.p.id+"_toppager";
+			grid.topDiv = $("<div id='"+ts.p.toppager+"'></div>")[0];
+			ts.p.toppager = "#"+ts.p.toppager;
+			$(grid.topDiv).insertBefore(grid.hDiv).addClass('ui-state-default ui-jqgrid-toppager').width(grid.width);
+			setPager(ts.p.toppager,'_t');
 		}
 		if(ts.p.footerrow) {
 			grid.sDiv = $("<div class='ui-jqgrid-sdiv'></div>")[0];
@@ -1527,7 +1606,6 @@ $.fn.jqGrid = function( pin ) {
 			if(hg) {$(grid.sDiv).hide();}
 		}
 		if(ts.p.caption) {
-			ts.p._height += parseInt($(grid.cDiv,ts).height(),10);
 			var tdt = ts.p.datatype;
 			if(ts.p.hidegrid===true) {
 				$(".ui-jqgrid-titlebar-close",grid.cDiv).click( function(e){
@@ -1535,6 +1613,7 @@ $.fn.jqGrid = function( pin ) {
 					if(ts.p.gridstate == 'visible') {
 						$(".ui-jqgrid-bdiv, .ui-jqgrid-hdiv","#gview_"+ts.p.id).slideUp("fast");
 						if(ts.p.pager) {$(ts.p.pager).slideUp("fast");}
+						if(ts.p.toppager) {$(ts.p.toppager).slideUp("fast");}
 						if(ts.p.toolbar[0]===true) {
 							if( ts.p.toolbar[1]=='both') {
 								$(grid.ubDiv).slideUp("fast");
@@ -1544,10 +1623,12 @@ $.fn.jqGrid = function( pin ) {
 						if(ts.p.footerrow) $(".ui-jqgrid-sdiv","#gbox_"+ts.p.id).slideUp("fast");
 						$("span",this).removeClass("ui-icon-circle-triangle-n").addClass("ui-icon-circle-triangle-s");
 						ts.p.gridstate = 'hidden';
+						if($("#gbox_"+ts.p.id).hasClass("ui-resizable")) $(".ui-resizable-handle","#gbox_"+ts.p.id).hide();
 						if(onHdCl) {if(!hg) {ts.p.onHeaderClick.call(ts,ts.p.gridstate,e);}}
 					} else if(ts.p.gridstate == 'hidden'){
 						$(".ui-jqgrid-hdiv, .ui-jqgrid-bdiv","#gview_"+ts.p.id).slideDown("fast");
 						if(ts.p.pager) {$(ts.p.pager).slideDown("fast");}
+						if(ts.p.toppager) {$(ts.p.toppager).slideDown("fast");}
 						if(ts.p.toolbar[0]===true) {
 							if( ts.p.toolbar[1]=='both') {
 								$(grid.ubDiv).slideDown("fast");
@@ -1558,6 +1639,7 @@ $.fn.jqGrid = function( pin ) {
 						$("span",this).removeClass("ui-icon-circle-triangle-s").addClass("ui-icon-circle-triangle-n");
 						if(hg) {ts.p.datatype = tdt;populate();hg=false;}
 						ts.p.gridstate = 'visible';
+						if($("#gbox_"+ts.p.id).hasClass("ui-resizable")) $(".ui-resizable-handle","#gbox_"+ts.p.id).show();
 						if(onHdCl) {ts.p.onHeaderClick.call(ts,ts.p.gridstate,e)}
 					}
 					return false;
@@ -1570,7 +1652,6 @@ $.fn.jqGrid = function( pin ) {
 			if(grid.resizing){grid.dragMove(e);return false;}
 		});
 		$(".ui-jqgrid-labels",grid.hDiv).bind("selectstart", function () { return false; });
-		ts.p._height += parseInt($(grid.hDiv).height(),10);
 		$(document).mouseup(function (e) {
 			if(grid.resizing) {	grid.dragEnd(); return false;}
 			return true;
@@ -1593,12 +1674,9 @@ $.fn.jqGrid = function( pin ) {
 		this.grid = grid;
 		ts.addXmlData = function(d) {addXmlData(d,ts.grid.bDiv);};
 		ts.addJSONData = function(d) {addJSONData(d,ts.grid.bDiv);};
-		ts.setColWidth = function(d) {setColWidth();};
 		populate();ts.p.hiddengrid=false;
 		$(window).unload(function () {
-			$(this).empty();
-			this.grid = null;
-			this.p = null;
+			ts = null;
 		});
 	});
 };
@@ -1629,61 +1707,53 @@ $.jgrid.extend({
 	},
 	setSelection : function(selection,onsr) {
 		return this.each(function(){
-			var $t = this, stat,pt, olr, ner, ia, tpsr;
+			var $t = this, stat,pt, ner, ia, tpsr;
 			if(selection === undefined) return;
 			onsr = onsr === false ? false : true;
-			pt=$t.rows.namedItem(selection);
-			if(pt==null) return;
-			if($t.p.selrow && $t.p.scrollrows===true) {
-				olr = $t.rows.namedItem($t.p.selrow).rowIndex;
+			pt=$t.rows.namedItem(selection+"");
+			if(!pt) return;
+			if($t.p.scrollrows===true) {
 				ner = $t.rows.namedItem(selection).rowIndex;
 				if(ner >=0 ){
-					if(ner > olr ) {
-						scrGrid(ner,'d');
-					} else {
-						scrGrid(ner,'u');
-					}
+					scrGrid(ner);
 				}
 			}
 			if(!$t.p.multiselect) {
-				if($(pt).attr("class") !== "subgrid") {
-					if( $t.p.selrow ) {$("tr#"+$.jgrid.jqID($t.p.selrow),$t.grid.bDiv).removeClass("ui-state-highlight").attr("aria-selected","false") ;}
-					if ($t.p.selrow != pt.id) {
-						$t.p.selrow = pt.id;
-						$(pt).addClass("ui-state-highlight").attr("aria-selected","true");
-						if( $t.p.onSelectRow && onsr) { $t.p.onSelectRow($t.p.selrow, true); }
-					}
-					else $t.p.selrow = 0;
+				if(pt.className !== "ui-subgrid") {
+				if( $t.p.selrow ) { $($t.rows.namedItem($t.p.selrow)).removeClass("ui-state-highlight").attr("aria-selected","false"); }
+				$t.p.selrow = pt.id;
+				$(pt).addClass("ui-state-highlight").attr("aria-selected","true");
+				if( $t.p.onSelectRow && onsr) { $t.p.onSelectRow.call($t,$t.p.selrow, true); }
 				}
 			} else {
 				$t.p.selrow = pt.id;
 				ia = $.inArray($t.p.selrow,$t.p.selarrrow);
 				if (  ia === -1 ){ 
-					if($(pt).attr("class") !== "subgrid") { $(pt).addClass("ui-state-highlight").attr("aria-selected","true");}
+					if(pt.className !== "ui-subgrid") { $(pt).addClass("ui-state-highlight").attr("aria-selected","true");}
 					stat = true;
-					$("#jqg_"+$.jgrid.jqID($t.p.selrow),$t.rows).attr("checked",stat);
+					$("#jqg_"+$.jgrid.jqID($t.p.selrow),$t.rows[pt.rowIndex]).attr("checked",stat);
 					$t.p.selarrrow.push($t.p.selrow);
-					if( $t.p.onSelectRow && onsr) { $t.p.onSelectRow($t.p.selrow, stat); }
+					if( $t.p.onSelectRow && onsr) { $t.p.onSelectRow.call($t,$t.p.selrow, stat); }
 				} else {
-					if($(pt).attr("class") !== "subgrid") { $(pt).removeClass("ui-state-highlight").attr("aria-selected","false");}
+					if(pt.className !== "ui-subgrid") { $(pt).removeClass("ui-state-highlight").attr("aria-selected","false");}
 					stat = false;
-					$("#jqg_"+$.jgrid.jqID($t.p.selrow),$t.rows).attr("checked",stat);
+					$("#jqg_"+$.jgrid.jqID($t.p.selrow),$t.rows[pt.rowIndex]).attr("checked",stat);
 					$t.p.selarrrow.splice(ia,1);
-					if( $t.p.onSelectRow && onsr) { $t.p.onSelectRow($t.p.selrow, stat); }
+					if( $t.p.onSelectRow && onsr) { $t.p.onSelectRow.call($t,$t.p.selrow, stat); }
 					tpsr = $t.p.selarrrow[0];
 					$t.p.selrow = (tpsr === undefined) ? null : tpsr;
 				}
 			}
-			function scrGrid(iR,tp){
+			function scrGrid(iR){
 				var ch = $($t.grid.bDiv)[0].clientHeight,
 				st = $($t.grid.bDiv)[0].scrollTop,
-				nROT = $t.rows[iR].offsetTop+$t.rows[iR].clientHeight,
-				pROT = $t.rows[iR].offsetTop;
-				if(tp == 'd') {
-					if(nROT >= ch) { $($t.grid.bDiv)[0].scrollTop = st + nROT-pROT; }
-				}
-				if(tp == 'u'){
-					if (pROT < st) { $($t.grid.bDiv)[0].scrollTop = st - nROT+pROT; }
+				rpos = $t.rows[iR].offsetTop,
+				rh = $t.rows[iR].clientHeight;
+				if(rpos+rh >= ch+st) { $($t.grid.bDiv)[0].scrollTop = rpos-(ch+st)+rh+st; }
+				else if(rpos < ch+st) {
+					if(rpos < st) {
+						$($t.grid.bDiv)[0].scrollTop = rpos;
+					}
 				}
 			}
 		});
@@ -1730,7 +1800,7 @@ $.jgrid.extend({
 							res[nm] = $.jgrid.htmlDecode($("span:first",this).html());
 						} else {
 							try {
-								res[nm] = $.unformat(this,{colModel:$t.p.colModel[i]},i);
+								res[nm] = $.unformat(this,{rowId:ind.id, colModel:$t.p.colModel[i]},i);
 							} catch (e){
 								res[nm] = $.jgrid.htmlDecode($(this).html());
 							}
@@ -1756,9 +1826,11 @@ $.jgrid.extend({
 				$t.p.reccount--;
 				$t.updatepager(true,false);
 				success=true;
+				if($t.p.multiselect) {
+					ia = $.inArray(rowid,$t.p.selarrrow);
+					if(ia != -1) { $t.p.selarrrow.splice(ia,1);}
+				}  
 				if(rowid == $t.p.selrow) {$t.p.selrow=null;}
-				ia = $.inArray(rowid,$t.p.selarrrow);
-				if(ia != -1) {$t.p.selarrrow.splice(ia,1);}
 			}
 			if( ri == 0 && success ) {
 				$t.updateColumns();
@@ -1774,7 +1846,7 @@ $.jgrid.extend({
 		return success;
 	},
 	setRowData : function(rowid, data, cssp) {
-		var nm, success=false;
+		var nm, success=false, title;
 		this.each(function(){
 			var t = this, vl, ind, cp = typeof cssp;;
 			if(!t.grid) {return false;}
@@ -1785,10 +1857,11 @@ $.jgrid.extend({
 					nm = this.name;
 					if( data[nm] != undefined) {
 						vl = t.formatter( rowid, data[nm], i, data, 'edit');
+						title = this.title ? {"title":$.jgrid.stripHtml(vl)} : {};
 						if(t.p.treeGrid===true && nm == t.p.ExpandColumn) {
-							$("td:eq("+i+") > span:first",ind).html(vl).attr("title",$.jgrid.stripHtml(vl));
+							$("td:eq("+i+") > span:first",ind).html(vl).attr(title);
 						} else {
-							$("td:eq("+i+")",ind).html(vl).attr("title",$.jgrid.stripHtml(vl)); 
+							$("td:eq("+i+")",ind).html(vl).attr(title); 
 						}
 						success = true;
 					}
@@ -1798,74 +1871,97 @@ $.jgrid.extend({
 		});
 		return success;
 	},
-	addRowData : function(rowid,data,pos,src) {
+	addRowData : function(rowid,rdata,pos,src) {
 		if(!pos) {pos = "last";}
-		var success = false, nm, row="", gi=0, si=0, ni=0,sind, i, v, prp="";
-		if(data) {
+		var success = false, nm, row, gi, si, ni,sind, i, v, prp="", aradd, cnm, cn;
+		if(rdata) {
+			if($.isArray(rdata)) {
+				aradd=true;
+				pos = "last";
+				cnm = rowid;
+			} else {
+				rdata = [rdata];
+				aradd = false;
+			}
 			this.each(function() {
-				var t = this;
-				if(t.p.rownumbers===true){
-					prp = t.formatCol(ni,1);
-					row += "<td role=\"gridcell\" class=\"ui-state-default jqgrid-rownum\" "+prp+">0</td>";
-					ni=1;
-				}
-				if(t.p.multiselect) {
-					v = "<input type=\"checkbox\""+" id=\"jqg_"+rowid+"\" class=\"cbox\"/>";
-					prp = t.formatCol(ni,1);
-					row += "<td role=\"gridcell\" "+prp+">"+v+"</td>";
-					gi = 1;
-				}
-				if(t.p.subGrid===true) {
-					row += $(t).jqGrid("addSubGridCell",gi+ni,1);
-					si=1;
-				}
-				if(typeof(rowid) != 'undefined') rowid = rowid+"";
-				else {
-					rowid = (t.p.records+1)+"";
-					if(t.p.keyIndex !== false) {
-						var cmn = t.p.colModel[t.p.keyIndex+gi+si+ni].name;
-						if(typeof data[cmn] != "undefined") rowid = data[cmn];
+				var t = this, rowslen = t.rows.length || 0, datalen = rdata.length;
+				ni = t.p.rownumbers===true ? 1 :0;
+				gi = t.p.multiselect ===true ? 1 :0;
+				si = t.p.subGrid===true ? 1 :0;
+				if(!aradd) {
+					if(typeof(rowid) != 'undefined') rowid = rowid+"";
+					else {
+						rowid = (t.p.records+1)+"";
+						if(t.p.keyIndex !== false) {
+							cmn = t.p.colModel[t.p.keyIndex+gi+si+ni].name;
+							if(typeof rdata[0][cmn] != "undefined") rowid = rdata[0][cmn];
+						}
 					}
 				}
-				for(i = gi+si+ni; i < this.p.colModel.length;i++){
-					nm = this.p.colModel[i].name;
-					v = t.formatter( rowid, data[nm], i, data, 'add');
-					prp = t.formatCol(i,1);
-					row += "<td role=\"gridcell\" "+prp+" title=\""+$.jgrid.stripHtml(v)+"\">"+v+"</td>";
+				cn = t.p.altclass;
+				var k = 0, cna ="",
+				air = $.isFunction(t.p.afterInsertRow) ? true : false;
+				while(k < datalen) {
+					data = rdata[k];
+					row="";
+					if(aradd) {
+						try {rowid = data[cnm];}
+						catch (e) {rowid = t.p.records+1;}
+						cna = t.p.altRows === true ?  (t.rows.length-1)%2 == 0 ? cn : "" : "";
+					}
+					if(ni){
+						prp = t.formatCol(ni,1,'');
+						row += "<td role=\"gridcell\" aria-describedby=\""+t.p.id+"_rn\" class=\"ui-state-default jqgrid-rownum\" "+prp+">0</td>";
+					}
+					if(gi) {
+						v = "<input role=\"checkbox\" type=\"checkbox\""+" id=\"jqg_"+rowid+"\" class=\"cbox\"/>";
+						prp = t.formatCol(ni,1,'');
+						row += "<td role=\"gridcell\" aria-describedby=\""+t.p.id+"_cb\" "+prp+">"+v+"</td>";
+					}
+					if(si) {
+						row += $(t).jqGrid("addSubGridCell",gi+ni,1);
+					}
+					for(i = gi+si+ni; i < this.p.colModel.length;i++){
+						nm = this.p.colModel[i].name;
+						v = t.formatter( rowid, data[nm], i, data, 'add');
+						prp = t.formatCol(i,1,v);
+						row += "<td role=\"gridcell\" aria-describedby=\""+t.p.id+"_"+nm+"\" "+prp+">"+v+"</td>";
+					}
+					row = "<tr id=\""+rowid+"\" role=\"row\" class=\"ui-widget-content jqgrow ui-row-"+t.p.direction+" "+cna+"\">" + row+"</tr>";
+					if(t.p.subGrid===true) {
+						row = $(row)[0]; 
+						$(t).jqGrid("addSubGrid",row,gi+ni);
+					}
+					if(t.rows.length === 0){
+						$("table:first",t.grid.bDiv).append(row);
+					} else {
+					switch (pos) {
+						case 'last':
+							$(t.rows[t.rows.length-1]).after(row);
+							break;
+						case 'first':
+							$(t.rows[0]).before(row);
+							break;
+						case 'after':
+							sind = t.rows.namedItem(src);
+							if (sind) {$(t.rows[sind.rowIndex+1]).hasClass("ui-subgrid") ? $(t.rows[sind.rowIndex+1]).after(row) : $(sind).after(row);}
+							break;
+						case 'before':
+							sind = t.rows.namedItem(src);
+							if(sind) {$(sind).before(row);sind=sind.rowIndex;}
+							break;
+					}
+					}
+					t.p.records++;
+					t.p.reccount++;
+					if(!t.grid.cols || !t.grid.cols.length) t.grid.cols = t.rows[0].cells;
+					if(pos==='first' || (pos==='before' && sind <= 1) ||  t.rows.length === 1 ){
+						t.updateColumns();
+					}
+					if(air) t.p.afterInsertRow.call(t,rowid,data,data);
+					k++;
 				}
-				row = "<tr id=\""+rowid+"\" role=\"row\" class=\"ui-widget-content jqgrow ui-row-"+t.p.direction+"\">" + row+"</tr>";
-				if(t.p.subGrid===true) {
-					row = $(row)[0]; 
-					$(t).jqGrid("addSubGrid",row,gi+ni);
-				}
-				if(t.rows.length === 0){
-					$("table:first",t.grid.bDiv).append(row);
-				} else {
-				switch (pos) {
-					case 'last':
-						$(t.rows[t.rows.length-1]).after(row);
-						break;
-					case 'first':
-						$(t.rows[0]).before(row);
-						break;
-					case 'after':
-						sind = t.rows.namedItem(src);
-						if (sind) {$(t.rows[sind.rowIndex+1]).hasClass("ui-subgrid") ? $(t.rows[sind.rowIndex+1]).after(row) : $(sind).after(row);}
-						break;
-					case 'before':
-						sind = t.rows.namedItem(src);
-						if(sind) {$(sind).before(row);sind=sind.rowIndex;}
-						break;
-				}
-				}
-				t.p.records++;
-				t.p.reccount++;
-				if(!t.grid.cols || !t.grid.cols.length) t.grid.cols = t.rows[0].cells;
-				if(pos==='first' || (pos==='before' && sind <= 1) ||  t.rows.length === 1 ){
-					t.updateColumns();
-				}
-				if( t.p.altRows === true ) {
-					var cn = t.p.altclass;
+				if( t.p.altRows === true && !aradd) {
 					if (pos == "last") {
 						if ((t.rows.length-1)%2 == 1)  {$(t.rows[t.rows.length-1]).addClass(cn);}
 					} else {
@@ -1875,7 +1971,6 @@ $.jgrid.extend({
 						});
 					}
 				}
-				try {t.p.afterInsertRow(rowid,data); } catch(e){}
 				t.updatepager(true,true);
 				success = true;
 			});
@@ -1883,7 +1978,7 @@ $.jgrid.extend({
 		return success;
 	},
 	footerData : function(action,data, format) {
-		var nm, success=false, res={};
+		var nm, success=false, res={}, title;
 		function isEmpty(obj) { for(var i in obj) { return false; } return true; }
 		if(typeof(action) == "undefined") action = "get";
 		if(typeof(format) != "boolean") format  = true;
@@ -1898,7 +1993,8 @@ $.jgrid.extend({
 				if(action == "set") {
 					if( data[nm] != undefined) {
 						vl = format ? t.formatter( "", data[nm], i, data, 'edit') : data[nm];
-						$("tr.footrow td:eq("+i+")",t.grid.sDiv).html(vl).attr("title",$.jgrid.stripHtml(vl)); 
+						title = this.title ? {"title":$.jgrid.stripHtml(vl)} : {};
+						$("tr.footrow td:eq("+i+")",t.grid.sDiv).html(vl).attr(title); 
 						success = true;
 					}
 				} else if(action == "get") {
@@ -1993,85 +2089,91 @@ $.jgrid.extend({
 	},
 	setGridWidth : function(nwidth, shrink) {
 		return this.each(function(){
-			var $t = this;
-			if (typeof $t.p != 'undefined') {
-				var cw, initwidth = 0, brd=$t.p.cellLayout, lvc, vc=0, hs=false, scw=$t.p.scrollOffset, aw, gw=0, tw=0,
-				cl = 0,cr;
-				if (!$t.grid ) {return;}
-				if(typeof shrink != 'boolean') {
-					shrink=$t.p.shrinkToFit;
-				}
-				if(isNaN(nwidth)) {return;}
-				else { nwidth = parseInt(nwidth); $t.grid.width = $t.p.width = nwidth;}
-				$("#gbox_"+$t.p.id).css("width",nwidth+"px");
-				$("#gview_"+$t.p.id).css("width",nwidth+"px");
-				$($t.grid.bDiv).css("width",nwidth+"px");
-				$($t.grid.hDiv).css("width",nwidth+"px");
-				if($t.p.pager ) {$($t.p.pager).css("width",nwidth+"px");}
-				if($t.p.toolbar[0] === true){
-					$($t.grid.uDiv).css("width",nwidth+"px");
-					if($t.p.toolbar[1]=="both") {$($t.grid.ubDiv).css("width",nwidth+"px");}
-				}
-				if($t.p.footerrow) $($t.grid.sDiv).css("width",nwidth+"px");
-				if(shrink ===false && $t.p.forceFit == true) {$t.p.forceFit=false;}			
-				if(shrink===true) {
-					if ($.browser.safari) { brd=0;}
-					$.each($t.p.colModel, function(i) {
-						if(this.hidden===false){
-							initwidth += parseInt(this.width,10);
-							if(this.fixed) {
-								tw += this.width;
-								gw += this.width+brd;
-							} else {
-								vc++;
-							}
-							cl++;
+			var $t = this, cw,
+			initwidth = 0, brd=$t.p.cellLayout, lvc, vc=0, hs=false, scw=$t.p.scrollOffset, aw, gw=0, tw=0,
+			cl = 0,cr;
+			if (!$t.grid ) {return;}
+			if(typeof shrink != 'boolean') {
+				shrink=$t.p.shrinkToFit;
+			}
+			if(isNaN(nwidth)) {return;}
+			else { nwidth = parseInt(nwidth,10); $t.grid.width = $t.p.width = nwidth;}
+			$("#gbox_"+$t.p.id).css("width",nwidth+"px");
+			$("#gview_"+$t.p.id).css("width",nwidth+"px");
+			$($t.grid.bDiv).css("width",nwidth+"px");
+			$($t.grid.hDiv).css("width",nwidth+"px");
+			if($t.p.pager ) {$($t.p.pager).css("width",nwidth+"px");}
+			if($t.p.toppager ) {$($t.p.toppager).css("width",nwidth+"px");}
+			if($t.p.toolbar[0] === true){
+				$($t.grid.uDiv).css("width",nwidth+"px");
+				if($t.p.toolbar[1]=="both") {$($t.grid.ubDiv).css("width",nwidth+"px");}
+			}
+			if($t.p.footerrow) $($t.grid.sDiv).css("width",nwidth+"px");
+			if(shrink ===false && $t.p.forceFit == true) {$t.p.forceFit=false;}			
+			if(shrink===true) {
+				if ($.browser.safari) { brd=0;}
+				$.each($t.p.colModel, function(i) {
+					if(this.hidden===false){
+						initwidth += parseInt(this.width,10);
+						if(this.fixed) {
+							tw += this.width;
+							gw += this.width+brd;
+						} else {
+							vc++;
 						}
-					});
-					if(vc  == 0) return; 
-					$t.p.tblwidth = initwidth;
-					aw = nwidth-brd*vc-gw;
-					if(!isNaN($t.p.height)) {
-						if($($t.grid.bDiv)[0].clientHeight < $($t.grid.bDiv)[0].scrollHeight){
-							hs = true;
-							aw -= scw;
-						}
+						cl++;
 					}
-					initwidth =0;
-					var cle = $t.grid.cols.length >0;
-					$.each($t.p.colModel, function(i) {
-						var tn = this.name;
-						if(this.hidden === false && !this.fixed){
-							cw = Math.floor((aw)/($t.p.tblwidth-tw)*this.width);
-							this.width =cw;
-							initwidth += cw;
-							$t.grid.headers[i].width=cw;
-							$t.grid.headers[i].el.style.width=cw+"px";
-							if($t.p.footerrow) $t.grid.footers[i].style.width = cw+"px";
-							if(cle) $t.grid.cols[i].style.width = cw+"px";
-							lvc = i;
-						}
-					});
-					cr =0;
-					if (hs) {
-						if(nwidth-gw-(initwidth+brd*vc) !== scw)
-							cr = nwidth-gw-(initwidth+brd*vc)-scw;
-					} else if( Math.abs(nwidth-gw-(initwidth+brd*vc)) !== 1) {
-						cr = nwidth-gw-(initwidth+brd*vc);
+				});
+				if(vc  == 0) return; 
+				$t.p.tblwidth = initwidth;
+				aw = nwidth-brd*vc-gw;
+				if(!isNaN($t.p.height)) {
+					if($($t.grid.bDiv)[0].clientHeight < $($t.grid.bDiv)[0].scrollHeight){
+						hs = true;
+						aw -= scw;
 					}
-					$t.p.colModel[lvc].width += cr;
+				}
+				initwidth =0;
+				var cle = $t.grid.cols.length >0;
+				$.each($t.p.colModel, function(i) {
+					var tn = this.name;
+					if(this.hidden === false && !this.fixed){
+						cw = Math.round(aw*this.width/($t.p.tblwidth-tw));
+						if (cw < 0) return;
+						this.width =cw;
+						initwidth += cw;
+						$t.grid.headers[i].width=cw;
+						$t.grid.headers[i].el.style.width=cw+"px";
+						if($t.p.footerrow) $t.grid.footers[i].style.width = cw+"px";
+						if(cle) $t.grid.cols[i].style.width = cw+"px";
+						lvc = i;
+					}
+				});
+				cr =0;
+				if (hs) {
+					if(nwidth-gw-(initwidth+brd*vc) !== scw)
+						cr = nwidth-gw-(initwidth+brd*vc)-scw;
+				} else if( Math.abs(nwidth-gw-(initwidth+brd*vc)) !== 1) {
+					cr = nwidth-gw-(initwidth+brd*vc);
+				}
+				$t.p.colModel[lvc].width += cr;
+				$t.p.tblwidth = initwidth+cr+tw+brd*cl;
+				if($t.p.tblwidth > nwidth) {
+					var delta = $t.p.tblwidth - parseInt(nwidth);
+					$t.p.tblwidth = nwidth;
+					cw = $t.p.colModel[lvc].width = $t.p.colModel[lvc].width-delta;
+				} else {
 					cw= $t.p.colModel[lvc].width;
-					$t.grid.headers[lvc].width = cw;
-					$t.grid.headers[lvc].el.style.width=cw+"px";
-					if(cle) $t.grid.cols[lvc].style.width = cw+"px";
-					$t.p.tblwidth = initwidth+cr+tw+brd*cl;
-					$('table:first',$t.grid.bDiv).css("width",$t.p.tblwidth+"px");
-					$('table:first',$t.grid.hDiv).css("width",$t.p.tblwidth+"px");
-					$t.grid.hDiv.scrollLeft = $t.grid.bDiv.scrollLeft;
-					if($t.p.footerrow) {
-						$t.grid.footers[lvc].style.width = cw+"px";
-						$('table:first',$t.grid.sDiv).css("width",$t.p.tblwidth+"px");
-					}
+				}
+				$t.grid.headers[lvc].width = cw;
+				$t.grid.headers[lvc].el.style.width=cw+"px";
+				if(cle) $t.grid.cols[lvc].style.width = cw+"px";
+				$('table:first',$t.grid.bDiv).css("width",$t.p.tblwidth+"px");
+				$('table:first',$t.grid.hDiv).css("width",$t.p.tblwidth+"px");
+				$t.grid.hDiv.scrollLeft = $t.grid.bDiv.scrollLeft;
+				if($t.p.footerrow) {
+					$t.grid.footers[lvc].style.width = cw+"px";
+					$('table:first',$t.grid.sDiv).css("width",$t.p.tblwidth+"px");
 				}
 			}
 		});
@@ -2117,9 +2219,9 @@ $.jgrid.extend({
 			}
 		});
 	},
-	setCell : function(rowid,colname,nData,cssp,attrp) {
+	setCell : function(rowid,colname,nData,cssp,attrp, forceupd) {
 		return this.each(function(){
-			var $t = this, pos =-1,v;
+			var $t = this, pos =-1,v, title;
 			if(!$t.grid) {return;}
 			if(isNaN(colname)) {
 				$($t.p.colModel).each(function(i){
@@ -2132,16 +2234,16 @@ $.jgrid.extend({
 				var ind = $t.rows.namedItem(rowid);
 				if (ind){
 					var tcell = $("td:eq("+pos+")",ind);
-					if(nData !== "") {
+					if(nData !== "" || forceupd === true) {
 						v = $t.formatter(rowid, nData, pos,ind,'edit');
+						title = $t.p.colModel[pos].title ? {"title":$.jgrid.stripHtml(v)} : {};
 						if($t.p.treeGrid && $(".tree-wrap",$(tcell)).length>0)
-							$("span",$(tcell)).html(v).attr("title",$.jgrid.stripHtml(v));
+							$("span",$(tcell)).html(v).attr(title);
 						else 
-							$(tcell).html(v).attr("title",$.jgrid.stripHtml(v));
+							$(tcell).html(v).attr(title);
 					}
 					if(typeof cssp === 'string'){
-						if(cssp) {$(tcell).addClass(cssp);}
-						else {$(tcell).removeClass();}
+						$(tcell).addClass(cssp);
 					} else if(cssp) {
 						$(tcell).css(cssp);
 					}
@@ -2166,7 +2268,7 @@ $.jgrid.extend({
 				var ind = $t.rows.namedItem(rowid);
 				if(ind) {
 					try {
-						ret = $.unformat($("td:eq("+pos+")",ind),{colModel:$t.p.colModel[pos]},pos);
+						ret = $.unformat($("td:eq("+pos+")",ind),{rowId:ind.id, colModel:$t.p.colModel[pos]},pos);
 					} catch (e){
 						ret = $.jgrid.htmlDecode($("td:eq("+pos+")",ind).html());
 					}
@@ -2194,11 +2296,11 @@ $.jgrid.extend({
 				if (ln && ln>0){
 					while(i<ln){
 						try {
-							val = $.unformat($($t.rows[i].cells[pos]),{colModel:$t.p.colModel[pos]},pos);
+							val = $.unformat($($t.rows[i].cells[pos]),{rowId:$t.rows[i].id, colModel:$t.p.colModel[pos]},pos);
 						} catch (e) {
 							val = $.jgrid.htmlDecode($t.rows[i].cells[pos].innerHTML);
 						}
-						mathopr ? sum += parseFloat(val,10) :
+						mathopr ? sum += parseFloat(val) :
 							obj ? ret.push({id:$t.rows[i].id,value:val}) : ret[i]=val;
 						i++;
 					}

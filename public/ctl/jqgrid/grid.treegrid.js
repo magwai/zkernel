@@ -59,17 +59,6 @@ $.jgrid.extend({
 					$(row).css("display","none");
 				}
 			}
-
-			var nw = ident*18 + 22;
-			if (nw > $t.grid.headers[0].width) {
-				var d = nw - $t.grid.headers[0].width;
-				$t.grid.headers[0].width = nw;
-				$t.grid.headers[1].width -= d;
-				$t.updateColumns();
-				$t.grid.headers[0].el.style.width = $t.grid.headers[0].width + 'px';
-				$t.grid.headers[1].el.style.width = $t.grid.headers[1].width + 'px';
-			}
-
 			$("td:eq("+expCol+")",row).wrapInner("<span></span>").prepend(twrap);
 			$(".treeclick",row).bind("click",function(e){
 				var target = e.target || e.srcElement;
@@ -191,7 +180,7 @@ $.jgrid.extend({
 					break;
 				case 'adjacency' :
 					$($t.rows).each(function(i){
-						if(this.parent_id == null || this.parent_id.toLowerCase() == "null") {
+						if(this.parent_id == null || String(this.parent_id).toLowerCase() == "null") {
 							result.push(this);
 						}
 					});

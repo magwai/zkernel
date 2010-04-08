@@ -152,7 +152,7 @@ $.include([
 		beforeStop: function(event, ui) {
 			var p = ui.item.get(0);
 			var r = ui.item.prev("tr").get(0);
-			if ((r && p.parent_id == r.parent_id && $(r).find(".tree-minus").length == 0) || (r && p.parent_id == r.id) || (!p.parent_id && !r)) return true;
+			if ((r && p.parent_id == r.parent_id && $(r).find(".tree-minus").length == 0) || (r && p.parent_id == r.id) || ((!p.parent_id || p.parent_id == 0) && (!r || typeof r == "undefined"))) return true;
 			return false;
 		},
 		stop: function(event, ui) {

@@ -164,6 +164,7 @@ function info_dialog(caption, content,c_b, modalopt) {
 		top:170,
 		zIndex : 1000,
 		jqModal : true,
+		modal : false,
 		closeOnEscape : true,
 		align: 'center',
 		buttonalign : 'center',
@@ -186,7 +187,8 @@ function info_dialog(caption, content,c_b, modalopt) {
 	cn = "text-align:"+mopt.align+";";
 	var cnt = "<div id='info_id'>";
 	cnt += "<div id='infocnt' style='margin:0px;padding-bottom:1em;width:100%;overflow:auto;position:relative;height:"+dh+";"+cn+"'>"+content+"</div>";
-	cnt += c_b ? "<div class='ui-widget-content ui-helper-clearfix' style='text-align:"+mopt.buttonalign+";padding-bottom:0.8em;padding-top:0.5em;background-image: none;border-width: 1px 0 0 0;'><a href='javascript:void(0)' id='closedialog' class='fm-button ui-state-default ui-corner-all'>"+c_b+"</a>"+buttstr+"</div>" : "";
+	cnt += c_b ? "<div class='ui-widget-content ui-helper-clearfix' style='text-align:"+mopt.buttonalign+";padding-bottom:0.8em;padding-top:0.5em;background-image: none;border-width: 1px 0 0 0;'><a href='javascript:void(0)' id='closedialog' class='fm-button ui-state-default ui-corner-all'>"+c_b+"</a>"+buttstr+"</div>" :
+		buttstr != ""  ? "<div class='ui-widget-content ui-helper-clearfix' style='text-align:"+mopt.buttonalign+";padding-bottom:0.8em;padding-top:0.5em;background-image: none;border-width: 1px 0 0 0;'>"+buttstr+"</div>" : "";
 	cnt += "</div>";
 
 	try {
@@ -222,9 +224,10 @@ function info_dialog(caption, content,c_b, modalopt) {
 			h.w.hide().remove();
 			if(h.o) { h.o.remove(); }
 		},
-		modal :true,
+		modal :mopt.modal,
 		jqm:jm
 	});
+	try{$("#info_dialog").focus();} catch (e){}
 }
 //Helper functions
 function findPos(obj) {
@@ -279,7 +282,7 @@ function createEl(eltype,options,vl,autowidth, ajaxso) {
 				if(vl=='&nbsp;' || vl=='&#160;' || (vl.length==1 && vl.charCodeAt(0)==160)) {vl="";}
 				elem.value = vl;
 				options = bindEv(elem,options);
-				jQuery(elem).attr(options);
+				jQuery(elem).attr(options).attr({"role":"textbox","multiline":"true"});
 				break;
 		case "checkbox" : //what code for simple checkbox
 			elem = document.createElement("input");
@@ -305,14 +308,16 @@ function createEl(eltype,options,vl,autowidth, ajaxso) {
 				try {delete options['value'];} catch (e){}
 			}
 			options = bindEv(elem,options);
-			jQuery(elem).attr(options);
+			jQuery(elem).attr(options).attr("role","checkbox");
 			break;
 		case "select" :
 			elem = document.createElement("select");
+			elem.setAttribute("role","select");
 			var msl, ovm = [];
 			if(options.multiple===true) {
 				msl = true;
 				elem.multiple="multiple";
+				$(elem).attr("aria-multiselectable","true");
 			} else msl = false;
 			if(options.dataUrl != null) {
 				jQuery.ajax(jQuery.extend({
@@ -335,13 +340,14 @@ function createEl(eltype,options,vl,autowidth, ajaxso) {
 								ovm = vl.split(",");
 								ovm = jQuery.map(ovm,function(n){return jQuery.trim(n)});
 							} else {
-								ovm[0] = vl;
+								ovm[0] = jQuery.trim(vl);
 							}
 							jQuery(elem).attr(options);
 							setTimeout(function(){
 								jQuery("option",elem).each(function(i){
 									if(i==0) this.selected = "";
-									if(jQuery.inArray(jQuery(this).text(),ovm) > -1 || jQuery.inArray(jQuery(this).val(),ovm)>-1) {
+									$(this).attr("role","option");
+									if(jQuery.inArray(jQuery.trim(jQuery(this).text()),ovm) > -1 || jQuery.inArray(jQuery.trim(jQuery(this).val()),ovm) > -1 ) {
 										this.selected= "selected";
 										if(!msl) return false;
 									}
@@ -368,18 +374,20 @@ function createEl(eltype,options,vl,autowidth, ajaxso) {
 							sv[1] = jQuery.map(sv,function(n,i){if(i>0)return n;}).join(":");
 						}
 						ov = document.createElement("option");
+						ov.setAttribute("role","option");
 						ov.value = sv[0]; ov.innerHTML = sv[1];
-						if (!msl &&  (sv[0] == vl || sv[1]==vl)) ov.selected ="selected";
-						if (msl && (jQuery.inArray(sv[1], ovm)>-1 || jQuery.inArray(sv[0], ovm)>-1)) {ov.selected ="selected";}
+						if (!msl &&  (jQuery.trim(sv[0]) == jQuery.trim(vl) || jQuery.trim(sv[1]) == jQuery.trim(vl))) ov.selected ="selected";
+						if (msl && (jQuery.inArray(jQuery.trim(sv[1]), ovm)>-1 || jQuery.inArray(jQuery.trim(sv[0]), ovm)>-1)) {ov.selected ="selected";}
 						elem.appendChild(ov);
 					}
 				} else if (typeof options.value === 'object') {
 					var oSv = options.value;
 					for ( var key in oSv) {
 						ov = document.createElement("option");
+						ov.setAttribute("role","option");
 						ov.value = key; ov.innerHTML = oSv[key];
-						if (!msl &&  (key == vl ||oSv[key]==vl) ) ov.selected ="selected";
-						if (msl && (jQuery.inArray(oSv[key],ovm)>-1 || jQuery.inArray(key,ovm)>-1)) ov.selected ="selected";
+						if (!msl &&  ( jQuery.trim(key) == jQuery.trim(vl) || jQuery.trim(oSv[key]) == jQuery.trim(vl)) ) ov.selected ="selected";
+						if (msl && (jQuery.inArray(jQuery.trim(oSv[key]),ovm)>-1 || jQuery.inArray(jQuery.trim(key),ovm)>-1)) ov.selected ="selected";
 						elem.appendChild(ov);
 					}
 				}
@@ -391,16 +399,19 @@ function createEl(eltype,options,vl,autowidth, ajaxso) {
 		case "text" :
 		case "password" :
 		case "button" :
+			var role;
+			if(eltype=="button") role = "button";
+			else role = "textbox";
 			elem = document.createElement("input");
 			elem.type = eltype;
-			elem.value = jQuery.jgrid.htmlDecode(vl);
+			elem.value = vl;
 			options = bindEv(elem,options);
 			if(eltype != "button"){
 				if(autowidth) {
 					if(!options.size) jQuery(elem).css({width:"98%"});
 				} else if (!options.size) options.size = 20;
 			}
-			jQuery(elem).attr(options);
+			jQuery(elem).attr(options).attr("role",role);
 			break;
 		case "image" :
 		case "file" :
@@ -549,7 +560,7 @@ function checkDate (format, date) {
 	} else {
 		strDate = tsp[format[j]].toString();
 		if(yln == 2 && strDate.length == 1) {yln = 1;}
-		if (strDate.length != yln || tsp[format[j]]==0 ){
+		if (strDate.length != yln || (tsp[format[j]]==0 && date[j]!="00")){
 			return false;
 		}
 	}

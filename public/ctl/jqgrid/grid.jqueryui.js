@@ -14,20 +14,33 @@ if ($.browser.msie && $.browser.version==8) {
 			elem.style.display == "none";
 	}
 }
-
-if ($.ui && $.ui.multiselect && $.ui.multiselect.prototype._setSelected) {
-    var setSelected = $.ui.multiselect.prototype._setSelected;
-    $.ui.multiselect.prototype._setSelected = function(item,selected) {
-        var ret = setSelected.call(this,item,selected);
-        if (selected && this.selectedList) {
-            var elt = this.element;
-		    this.selectedList.find('li').each(function() {
-			    if ($(this).data('optionLink'))
-				    $(this).data('optionLink').remove().appendTo(elt);
-		    });
-        }
-        return ret;
-    }
+// requiere load multiselect before grid
+if ($.ui && $.ui.multiselect ) {
+	if($.ui.multiselect.prototype._setSelected) {
+		var setSelected = $.ui.multiselect.prototype._setSelected;
+	    $.ui.multiselect.prototype._setSelected = function(item,selected) {
+	        var ret = setSelected.call(this,item,selected);
+	        if (selected && this.selectedList) {
+	            var elt = this.element;
+			    this.selectedList.find('li').each(function() {
+				    if ($(this).data('optionLink'))
+					    $(this).data('optionLink').remove().appendTo(elt);
+			    });
+	        }
+	        return ret;
+		}
+	}
+	if($.ui.multiselect.prototype.destroy) {
+		$.ui.multiselect.prototype.destroy = function() {
+			this.element.show();
+			this.container.remove();
+			if ($.Widget === undefined)
+				$.widget.prototype.destroy.apply(this, arguments);
+			else {
+				$.Widget.prototype.destroy.apply(this, arguments);
+            }
+		}
+	}
 }
         
 $.jgrid.extend({
@@ -39,6 +52,7 @@ $.jgrid.extend({
 			var sortable_opts = {
 				"tolerance" : "pointer",
 				"axis" : "x",
+				"scrollSensitivity": "1",
 				"items": '>th:not(:has(#jqgh_cb,#jqgh_rn,#jqgh_subgrid),:hidden)',
 				"placeholder": {
 					element: function(item) {
@@ -95,7 +109,8 @@ $.jgrid.extend({
 	},
     columnChooser : function(opts) {
         var self = this;
-        var selector = $('<div style="position:relative;overflow:hidden"><div><select multiple="multiple"></select></div></div>');
+		if($("#colchooser_"+self[0].p.id).length ) return;
+        var selector = $('<div id="colchooser_'+self[0].p.id+'" style="position:relative;overflow:hidden"><div><select multiple="multiple"></select></div></div>');
         var select = $('select', selector);
 
         opts = $.extend({
@@ -154,10 +169,14 @@ $.jgrid.extend({
                     }
                 });
                 
-                var perm = fixedCols.slice(0);
+                var perm = [];
+				//fixedCols.slice(0);
                 $('option[selected]',select).each(function() { perm.push(parseInt(this.value)) });
-                $.each(perm, function() { delete colMap[colModel[this].name] });
-                $.each(colMap, function() { perm.push(parseInt(this)) });
+                $.each(perm, function() { delete colMap[colModel[parseInt(this)].name] });
+                $.each(colMap, function() {
+					var ti = parseInt(this);
+					perm = insert(perm,ti,ti);
+				});
                 if (opts.done) {
                     opts.done.call(self, perm);
                 }
@@ -172,9 +191,10 @@ $.jgrid.extend({
                 if (calldone && opts.done) {
                     opts.done.call(self);
                 }
-            }
+            },
+			"msel_opts" : {}
         }, $.jgrid.col, opts || {});
-
+		opts.msel_opts = $.extend($.ui.multiselect.defaults,opts.msel_opts);
         if (opts.caption) {
             selector.attr("title", opts.caption);
         }
@@ -207,6 +227,15 @@ $.jgrid.extend({
             select.append("<option value='"+i+"' "+
                           (this.hidden?"":"selected='selected'")+">"+colNames[i]+"</option>");
         });
+		function insert(perm,i,v) {
+			if(i>=0){
+				var a = perm.slice();
+				var b = a.splice(i,Math.max(perm.length-i,i));
+				if(i>perm.length) i = perm.length;
+				a[i] = v;
+				return a.concat(b);
+			}
+		}
         function call(fn, obj) {
             if (!fn) return;
             if (typeof fn == 'string') {
@@ -221,7 +250,7 @@ $.jgrid.extend({
         var dopts = $.isFunction(opts.dlog_opts) ? opts.dlog_opts.call(self, opts) : opts.dlog_opts;
         call(opts.dlog, selector, dopts);
         var mopts = $.isFunction(opts.msel_opts) ? opts.msel_opts.call(self, opts) : opts.msel_opts;
-        call(opts.msel, select, opts.msel_opts);
+        call(opts.msel, select, mopts);
     },
 	sortableRows : function (opts) {
 		// Can accept all sortable options and events
@@ -319,9 +348,9 @@ $.jgrid.extend({
 						// hack
 						// drag and drop does not insert tr in table, when the table has no rows
 						// we try to insert new empty row on the target(s)
-						for (var i=0;i<opts.connectWith.length;i++){
-							if($(opts.connectWith[i]).jqGrid('getGridParam','reccount') == "0" ){
-								$(opts.connectWith[i]).jqGrid('addRowData','jqg_empty_row',{});
+						for (var i=0;i<$.data($t,"dnd").connectWith.length;i++){
+							if($($.data($t,"dnd").connectWith[i]).jqGrid('getGridParam','reccount') == "0" ){
+								$($.data($t,"dnd").connectWith[i]).jqGrid('addRowData','jqg_empty_row',{});
 							}
 						}
 						ui.helper.addClass("ui-state-highlight");
@@ -335,9 +364,9 @@ $.jgrid.extend({
 							var ids = $(ui.helper).attr("id");
 							$($t).jqGrid('delRowData',ids );
 						}
-						// if we have a empty row inserted from start event try to delete it 
-						for (var i=0;i<opts.connectWith.length;i++){
-							$(opts.connectWith[i]).jqGrid('delRowData','jqg_empty_row');
+						// if we have a empty row inserted from start event try to delete it
+						for (var i=0;i<$.data($t,"dnd").connectWith.length;i++){
+							$($.data($t,"dnd").connectWith[i]).jqGrid('delRowData','jqg_empty_row');
 						}
 						if(opts.onstop && $.isFunction(opts.onstop) ) opts.onstop.call($($t),ev,ui);
 					}
@@ -347,8 +376,11 @@ $.jgrid.extend({
 				return $.extend({
 					accept: function(d) {
 						var tid = $(d).closest("table.ui-jqgrid-btable");
-						var cn = $.data(tid[0],"dnd").connectWith;
-						return $.inArray('#'+this.id,cn) != -1 ? true : false;
+						if($.data(tid[0],"dnd") != undefined) {
+						    var cn = $.data(tid[0],"dnd").connectWith;
+						    return $.inArray('#'+this.id,cn) != -1 ? true : false;
+						}
+						return d;
 					},
 					drop: function(ev, ui) {
 						var accept = $(ui.draggable).attr("id");

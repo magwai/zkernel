@@ -36,7 +36,7 @@ $.jgrid.extend({
 			}
 		});
 	},
-	sortGrid : function(colname,reload){
+	sortGrid : function(colname,reload, sor){
 		return this.each(function(){
 			var $t=this,idx=-1;
 			if ( !$t.grid ) { return;}
@@ -51,7 +51,7 @@ $.jgrid.extend({
 				var sort = $t.p.colModel[idx].sortable;
 				if ( typeof sort !== 'boolean' ) { sort =  true; }
 				if ( typeof reload !=='boolean' ) { reload = false; }
-				if ( sort ) { $t.sortData("jqgh_"+colname, idx, reload); }
+				if ( sort ) { $t.sortData("jqgh_"+colname, idx, reload, sor); }
 			}
 		});
 	},
@@ -96,6 +96,7 @@ $.jgrid.extend({
             if(state == 'hidden'){
 				$(".ui-jqgrid-bdiv, .ui-jqgrid-hdiv","#gview_"+$t.p.id).slideUp("fast");
 				if($t.p.pager) {$($t.p.pager).slideUp("fast");}
+				if($t.p.toppager) {$($t.p.toppager).slideUp("fast");}
 				if($t.p.toolbar[0]===true) {
 					if( $t.p.toolbar[1]=='both') {
 						$($t.grid.ubDiv).slideUp("fast");
@@ -108,6 +109,7 @@ $.jgrid.extend({
             } else if(state=='visible') {
 				$(".ui-jqgrid-hdiv, .ui-jqgrid-bdiv","#gview_"+$t.p.id).slideDown("fast");
 				if($t.p.pager) {$($t.p.pager).slideDown("fast");}
+				if(ts.p.toppager) {$(ts.p.toppager).slideDown("fast");}
 				if($t.p.toolbar[0]===true) {
 					if( $t.p.toolbar[1]=='both') {
 						$($t.grid.ubDiv).slideDown("fast");
@@ -122,7 +124,7 @@ $.jgrid.extend({
         });
     },
 	updateGridRows : function (data, rowidname, jsonreader) {
-		var nm, success=false;
+		var nm, success=false, title;
 		this.each(function(){
 			var t = this, vl, ind, srow, sid;
 			if(!t.grid) {return false;}
@@ -138,10 +140,11 @@ $.jgrid.extend({
 								if(t.p.jsonReader.cell) {srow = srow[t.p.jsonReader.cell];}
 								for (var k=0;k<srow.length;k++) {
 									vl = t.formatter( sid, srow[k], k, srow, 'edit');
+									title = t.p.colModel[k].title ? {"title":$.jgrid.stripHtml(vl)} : {};
 									if(t.p.treeGrid===true && nm == t.p.ExpandColumn) {
-										$("td:eq("+k+") > span:first",ind).html(vl).attr("title",$.jgrid.stripHtml(vl));
+										$("td:eq("+k+") > span:first",ind).html(vl).attr(title);
 									} else {
-										$("td:eq("+k+")",ind).html(vl).attr("title",$.jgrid.stripHtml(vl)); 
+										$("td:eq("+k+")",ind).html(vl).attr(title); 
 									}
 								}
 								success = true;
@@ -152,10 +155,11 @@ $.jgrid.extend({
 							nm = jsonreader===true ? this.jsonmap || this.name :this.name;
 							if( srow[nm] != undefined) {
 								vl = t.formatter( sid, srow[nm], i, srow, 'edit');
+								title = this.title ? {"title":$.jgrid.stripHtml(vl)} : {};
 								if(t.p.treeGrid===true && nm == t.p.ExpandColumn) {
-									$("td:eq("+i+") > span:first",ind).html(vl).attr("title",$.jgrid.stripHtml(vl));
+									$("td:eq("+i+") > span:first",ind).html(vl).attr(title);
 								} else {
-									$("td:eq("+i+")",ind).html(vl).attr("title",$.jgrid.stripHtml(vl)); 
+									$("td:eq("+i+")",ind).html(vl).attr(title); 
 								}
 								success = true;
 							}
@@ -310,7 +314,7 @@ $.jgrid.extend({
 				$.each(self.p.filterModel,function(i,n){
                     nm = this.index;
 					v = (this.defval) ? this.defval : "";
-					if(!this.stype){this.stype=='text';}
+					if(!this.stype){this.stype='text';}
 					switch (this.stype) {
 						case 'select' :
 							var v1;
@@ -511,14 +515,14 @@ $.jgrid.extend({
 	filterToolbar : function(p){
 		p = $.extend({
 			autosearch: true,
-            searchOnEnter : false,
+			searchOnEnter : true,
 			beforeSearch: null,
 			afterSearch: null,
 			beforeClear: null,
 			afterClear: null,
 			searchurl : '',
-            stringResult: false,
-            groupOp: 'AND'
+			stringResult: false,
+			groupOp: 'AND'
 		},p  || {});
 		return this.each(function(){
 			var $t = this;
@@ -526,7 +530,7 @@ $.jgrid.extend({
 				var sdata={}, j=0, v, nm, sopt={};
 				$.each($t.p.colModel,function(i,n){
                     nm = this.index || this.name;
-                    var so = (this.searchoptions && this.searchoptions.sopt) ? this.searchoptions.sopt[0] : "eq";
+                    var so = (this.searchoptions && this.searchoptions.sopt) ? this.searchoptions.sopt[0] : "bw";
 					switch (this.stype) {
 						case 'select' :
 							v = $("select[name="+nm+"]",$t.grid.hDiv).val();
@@ -668,10 +672,10 @@ $.jgrid.extend({
 				    });
 				}
 			}
-			var tr = $("<tr class='ui-search-toolbar' role='rowheader'></tr>"), th,thd, soptions;
+			var tr = $("<tr class='ui-search-toolbar' role='rowheader'></tr>");
             var timeoutHnd;
 			$.each($t.p.colModel,function(i,n){
-				var cm=this;
+				var cm=this, thd , th, soptions,surl,self;
 				th = $("<th role='columnheader' class='ui-state-default ui-th-column ui-th-"+$t.p.direction+"'></th>");
 				thd = $("<div style='width:100%;position:relative;height:100%;padding-right:0.3em;'></div>");
 				if(this.hidden===true) { $(th).css("display","none");}
@@ -682,21 +686,21 @@ $.jgrid.extend({
 					switch (this.stype)
 					{
 					case "select":
-						var surl = this.surl || soptions.dataUrl;
+						surl = this.surl || soptions.dataUrl;
 						if(surl) {
 							// data returned should have already constructed html select
 							// primitive jQuery load
-							var self = thd;
+							self = thd;
 							$.ajax($.extend({
 								url: surl,
 								dataType: "html",
 								complete: function(res,status) {
 									if(soptions.buildSelect != null) {
 										var d = soptions.buildSelect(res);
-										if (d)
-											$(self).append(d);
-									} else 
+										if (d) $(self).append(d);
+									} else {
 										$(self).append(res.responseText);
+									}
 									if(soptions.defaultValue) $("select",self).val(soptions.defaultValue);
 									$("select",self).attr({name:cm.index || cm.name, id: "gs_"+cm.name});
 									if(soptions.attr) {$("select",self).attr(soptions.attr);}
@@ -710,6 +714,7 @@ $.jgrid.extend({
 											return false;
 										});
 									}
+									res=null;
 								}
 							}, $.jgrid.ajaxOptions, $t.p.ajaxSelectOptions || {} ));
 						} else {
@@ -771,10 +776,19 @@ $.jgrid.extend({
                             } else {
                                 $("input",thd).keydown(function(e){
                                     var key = e.which;
-                                    if(key != 9 && key != 16) {
-                                        if(timeoutHnd) clearTimeout(timeoutHnd);
-                                        timeoutHnd = setTimeout(function(){triggerToolbar();},500);
-                                    }
+									switch (key) {
+										case 9 :
+										case 16:
+										case 37:
+										case 38:
+										case 39:
+										case 40:
+										case 27:
+											break;
+										default :
+	                                        if(timeoutHnd) clearTimeout(timeoutHnd);
+	                                        timeoutHnd = setTimeout(function(){triggerToolbar();},500);
+									}
                                 });
                             }
 						}
