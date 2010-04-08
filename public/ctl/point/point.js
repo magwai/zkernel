@@ -26,7 +26,7 @@ point.init = function(id, value, opt) {
 				? document.scrollLeft
 				: document.documentElement.scrollLeft
 			)
-			: window.pageYOffset;
+			: window.pageXOffset;
 
 		var f = $(this).offset();
 		var x = e.clientX - f.left + sl;
@@ -78,8 +78,8 @@ point.set_point = function(id, x, y) {
 		var xx = x - po.offsetWidth / 2;
 		var yy = y - po.offsetHeight / 2;
 		p.css({
-			marginLeft: xx,
-			marginTop: yy
+			left: xx,
+			top: yy
 		});
 		d.val(x + "|" + y);
 	}
@@ -114,8 +114,8 @@ point.set_rect = function(id, x, y) {
 			var xx = x - p.get(0).offsetWidth / 2;
 			var yy = y - p.get(0).offsetHeight / 2;
 			p.css({
-				marginLeft: xx,
-				marginTop: yy
+				left: xx,
+				top: yy
 			});
 			p.data('x', x).data('y', y);
 		}
@@ -125,8 +125,8 @@ point.set_rect = function(id, x, y) {
 			var mx = Math.max(x, ox);
 			var my = Math.max(y, oy);
 			p.css({
-				marginLeft: xx,
-				marginTop: yy
+				left: xx,
+				top: yy
 			}).width(mx - xx).height(my - yy).data('x', -1).data('y', -1);
 			d.val(xx + "|" + yy + "|" + mx + "|" + my);
 		}
@@ -172,12 +172,12 @@ point.set_poly = function(id, x, y) {
 			var yy = y - p.get(0).offsetHeight / 2;
 			if (nvis) {
 				p.css({
-					marginLeft: xx,
-					marginTop: yy
+					left: xx,
+					top: yy
 				});
 				pa.hide();
 			}
-			else o.prepend($('<div title="Удалить отметку" class="point_' + id + '" style="overflow:hidden;width:6px;height:6px;position:absolute;cursor:pointer;background-color:' + p.attr('color_original') + ';margin-left:' + xx + 'px;margin-top:' + yy + 'px;" />').click(function() {
+			else o.prepend($('<div title="Удалить отметку" class="point_' + id + '" style="overflow:hidden;width:6px;height:6px;position:absolute;cursor:pointer;background-color:' + p.attr('color_original') + ';left:' + xx + 'px;top:' + yy + 'px;" />').click(function() {
 				$(this).remove();
 			}));
 		}
@@ -195,10 +195,10 @@ point.set_poly_finish = function(id) {
 			
 			var w = p.get(0).offsetWidth / 2;
 			var h = p.get(0).offsetHeight / 2;
-			var v = (parseInt(p.css('margin-left')) + w) + '|' + (parseInt(p.css('margin-top')) + h);
+			var v = (parseInt(p.css('left')) + w) + '|' + (parseInt(p.css('top')) + h);
 			pts.each(function() {
 				var t = $(this);
-				v += ';' + (parseInt(t.css('margin-left')) + w) + '|' + (parseInt(t.css('margin-top')) + h);
+				v += ';' + (parseInt(t.css('left')) + w) + '|' + (parseInt(t.css('top')) + h);
 			});
 			d.val(v);
 			p.hide();
