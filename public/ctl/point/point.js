@@ -15,7 +15,7 @@ point.init = function(id, value, opt) {
 	var type = opt.type ? opt.type : 'point';
 
 	var i = $('<img id="point_' + id + '_i" alt="" style="cursor:crosshair;" />').click(function(e) {
-		var st = typeof window.pageYOffset == 'undefined'
+		/*var st = typeof window.pageYOffset == 'undefined'
 			? (typeof document.documentElement.scrollTop == 'undefined'
 				? document.scrollTop
 				: document.documentElement.scrollTop
@@ -26,12 +26,12 @@ point.init = function(id, value, opt) {
 				? document.scrollLeft
 				: document.documentElement.scrollLeft
 			)
-			: window.pageXOffset;
+			: window.pageXOffset;*/
 
-		var f = $(this).offset();
-		var x = e.clientX - f.left + sl;
-		var y = e.clientY - f.top + st;
-
+		var f = o.offset();
+		
+		var x = e.pageX - f.left/* + sl*/;
+		var y = e.pageY - f.top/* + st*/;
 		if (type == 'point') point.set_point(id, x, y);
 		else if (type == 'rect') point.set_rect(id, x, y);
 		else if (type == 'poly') point.set_poly(id, x, y);
@@ -72,8 +72,8 @@ point.set_point = function(id, x, y) {
 	}
 	else {
 		p.show();
-		x = document.body.scrollLeft + x;
-		y = document.body.scrollTop + y;
+		//x = document.body.scrollLeft + x;
+		//y = document.body.scrollTop + y;
 		var po = p.get(0);
 		var xx = x - po.offsetWidth / 2;
 		var yy = y - po.offsetHeight / 2;
@@ -106,8 +106,8 @@ point.set_rect = function(id, x, y) {
 	else {
 		var ox = p.data('x');
 		var oy = p.data('y');
-		x = document.body.scrollLeft + x;
-		y = document.body.scrollTop + y;
+		//x = document.body.scrollLeft + x;
+		//y = document.body.scrollTop + y;
 		p.show();
 		if (ox == -1 || oy == -1) {
 			p.width(6).height(6);
@@ -166,8 +166,8 @@ point.set_poly = function(id, x, y) {
 			var o = $('#point_' + id);
 			var nvis = p.css('display') == 'none';
 			p.show();
-			x = document.body.scrollLeft + x;
-			y = document.body.scrollTop + y;
+			//x = document.body.scrollLeft + x;
+			//y = document.body.scrollTop + y;
 			var xx = x - p.get(0).offsetWidth / 2;
 			var yy = y - p.get(0).offsetHeight / 2;
 			if (nvis) {
