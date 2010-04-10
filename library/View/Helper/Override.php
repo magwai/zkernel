@@ -26,6 +26,7 @@ class Zkernel_View_Helper_Override extends Zend_View_Helper_Abstract  {
 					? $r->{'ml_'.$f[1].'_'.$reg->_default->id}
 					: $v;
 			}
+
 		}
 		if (isset($r->title)) $r->title_valid = htmlspecialchars($r->title);
 		if (isset($r->date)) $r->date_valid = Zkernel_Common::getDate($r->date);

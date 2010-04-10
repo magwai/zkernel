@@ -1,0 +1,36 @@
+<?php
+
+$this->control(array(
+	'field' => array(
+		'title' => array(
+			'title' => 'Название',
+			'unique' => true,
+			'required' => true,
+			'order' => 1
+		),
+		'stitle' => array(
+			'title' => 'Ключ',
+			'description' => 'Ключ языка. Используется в адресах. Только латиница',
+			'unique' => true,
+			'required' => true,
+			'validators' => array(array(
+				'validator' => 'Regex',
+				'options' => array('/^[a-z]*$/i')
+			)),
+			'order' => 2
+		),
+		'default' => array(
+			'align' => 'center',
+			'title' => 'По-умолчанию',
+			'description' => 'Если в каком-то языке отсутствует перевод, то будет использовано значение языка по-умолчанию',
+			'type' => 'select',
+			'formatter' => 'function',
+			'formatoptions' => 'return Number(value) ? "Да" : "Нет";',
+			'param' => array(
+				'multioptions' => array('1' => 'Да', '0' => 'Нет')
+			),
+			'order' => 3
+		)
+	),
+	'func_override' => 'php_function:if ((int)$control->config->data->default) $control->config->model->update(array("default" => 0));'
+));
