@@ -517,7 +517,9 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 
 			if (@(int)$this->config->post['cposted']) {
 				if ($this->config->form->isValid($this->config->post->toArray())) {
-					if ($this->config->type == 'add') $id = $this->config->model->fetchNextId();
+					if ($this->config->type == 'add') $id = $this->config->use_db
+						? $this->config->model->fetchNextId()
+						: 0;
 
 					$this->config->data = $this->config->form->getValues();
 

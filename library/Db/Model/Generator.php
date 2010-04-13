@@ -16,11 +16,23 @@ class Zkernel_Db_Model_Generator {
 			'name' => array(
 				'COLUMN_NAME' => 'name'
 			),
-			'title' => array(
-				'COLUMN_NAME' => 'title'
+			'zk_title' => array(
+				'COLUMN_NAME' => 'zk_title'
 			),
-			'model' => array(
-				'COLUMN_NAME' => 'model'
+			'parent' => array(
+				'COLUMN_NAME' => 'parent'
+			),
+			'action' => array(
+				'COLUMN_NAME' => 'action'
+			),
+			'zk_routable' => array(
+				'COLUMN_NAME' => 'zk_routable'
+			),
+			'zk_config' => array(
+				'COLUMN_NAME' => 'zk_config'
+			),
+			'zk_routes' => array(
+				'COLUMN_NAME' => 'zk_routes'
 			)
 		);
 	}
@@ -42,8 +54,8 @@ class Zkernel_Db_Model_Generator {
 				$data[] = array(
 					'id' => $n,
 					'name' => $n,
-					'title' => $nn,
-					'model' => (int)$model
+					'zk_title' => $nn/*,
+					'model' => (int)$model*/
 				);
 			}
 		}
@@ -54,4 +66,55 @@ class Zkernel_Db_Model_Generator {
 	function fetchCount() {
 		return 0;
 	}
+
+    public function insertControl($data) {
+		$ok = true;
+
+		$name = ucfirst(strtolower($data['name']));
+
+		$controller = new Zend_CodeGenerator_Php_Class();
+		$controller->setName($name.'Controller');
+		if ($data['parent']) $controller->setExtendedClass($data['parent']);
+
+		if ($data['action']) {
+			$ml = explode(',', str_replace(array(' '), array(''), trim($data['action'])));
+			$act = array();
+			foreach ($ml as $el) {
+				$el = strtolower($el);
+				$act[] = array(
+					'name' => $el.'Action'
+				);
+			}
+			if ($act) $controller->setMethods($act);
+		}
+
+		$doc['tags'] = array();
+		if ($data['zk_title']) $doc['tags'][] = array(
+			'name' => 'zk_title',
+			'description' => $data['zk_title']
+		);
+		if (!$data['zk_routable']) $doc['tags'][] = array(
+			'name' => 'zk_routable',
+			'description' => 0
+		);
+		if (!$data['zk_config']) $doc['tags'][] = array(
+			'name' => 'zk_config',
+			'description' => 0
+		);
+		if ($data['zk_routes']) $doc['tags'][] = array(
+			'name' => 'zk_routes',
+			'description' => $data['zk_routes']
+		);
+		if ($doc['tags']) $controller->setDocblock(new Zend_CodeGenerator_Php_Docblock($doc));
+
+		$c = '<?php'."\n\n".$controller->generate();
+
+		$ok = file_put_contents(APPLICATION_PATH.'/controllers/'.$name.'Controller.php', $c);
+
+		return $ok;
+    }
+
+    public function fetchNextId() {
+    	return 0;
+    }
 }

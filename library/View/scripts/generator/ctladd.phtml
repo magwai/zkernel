@@ -1,0 +1,57 @@
+<?php
+
+$this->render('generator/ctl.phtml');
+
+$yn = array('1' => 'Да', '0' => 'Нет');
+
+$this->control(array(
+	'field' => array(
+		'parent' => array(
+			'title' => 'Унаследовать от',
+			'description' => 'Имя класса-родителя',
+			'order' => 2,
+			'param' => array(
+				'value' => 'Zkernel_Controller_Action'
+			)
+		),
+		'action' => array(
+			'title' => 'Действия',
+			'description' => 'Через запятую. Будут созданы действия-пустышки',
+			'order' => 3
+		),
+		'zk_title' => array(
+			'title' => 'Заголовок',
+			'description' => 'Параметр: zk_title. Заголовок контроллера для меню',
+			'order' => 4
+		),
+		'zk_routable' => array(
+			'type' => 'select',
+			'title' => 'Участвует в навигации?',
+			'description' => 'Параметр: zk_routable. Будет ли отображаться в меню',
+			'order' => 5,
+			'param' => array(
+				'multioptions' => $yn
+			)
+		),
+		'zk_config' => array(
+			'type' => 'select',
+			'title' => 'Настраиваемый?',
+			'description' => 'Параметр: zk_config. Можно ли его настраивать через настройки админки',
+			'order' => 6,
+			'param' => array(
+				'multioptions' => $yn
+			)
+		),
+		'zk_routes' => array(
+			'title' => 'Маршруты',
+			'description' => 'Параметр: zk_routes. Формат: route1|param11,paramN1 route2|param21,paramN2',
+			'order' => 7
+		),
+		'model' => array(
+			'active' => false
+		)
+	)
+));
+
+
+

@@ -1,0 +1,34 @@
+<?php
+
+$model = new Default_Model_Generatormodel();
+$cnt = $model->fetchExist($this->control()->config->param->cid);
+
+$this->control(array(
+	'field' => array(
+		'name' => array(
+			'title' => 'Название'
+		)
+	),
+	'action_config' => array(
+		'ctlshow' => array(
+			'button_top' => array($cnt ? '' : 'add', '', ''),
+			'field' => array(
+				'table' => array(
+					'active' => false
+				),
+				'table_create' => array(
+					'active' => false
+				),
+				'multilang' => array(
+					'active' => false
+				),
+				'parent' => array(
+					'active' => false
+				),
+				'method' => array(
+					'active' => false
+				)
+			)
+		)
+	)
+));

@@ -2,129 +2,45 @@
 
 $this->control(array(
 	'field' => array(
-		'title' => array(
+		'zk_title' => array(
 			'title' => 'Название',
 			'order' => 1,
 			'formatter' => 'function',
-			'formatoptions' => 'return "<span style=\'float:right;margin:0 0 0 10px;\'>" + data.name + "</span>" + data.title;'
+			'formatoptions' => 'return "<span class=\'gg_span\'>" + data.name + "</span>" + data.zk_title;'
 		),
 		'name' => array(
+			'title' => 'Название',
+			'description' => 'Просто название. Без Controller...',
+			'order' => 1,
+			'required' => true,
 			'hidden' => true
-		),
-		'model' => array(
-			'title' => 'Модель',
-			'order' => 2,
-			'formatter' => 'function',
-			'formatoptions' => 'return Number(data.model) ? "Да" : "<a title=\'Создать модель\' href=\'#\' onclick=\'return c.go(\"generator\", \"ctlmodeladd\", {id: this.parentNode.parentNode.id})\'>Нет</a>"'
-			//"<span style=\'float:right;margin:0 0 0 10px;\'>" + data.name + "</span>" + data.title;'
-		)
-	)
-	/*'static_field' => true,
-	'field' => array(
-		'title' => array(
-			'title' => 'Заголовок',
-			'required' => true,
-			'sortable' => true,
-			'order' => 1
-		),
-		'stitle' => array(
-			'title' => 'Псевдоним',
-			'unique' => true,
-			'required' => true,
-			'formatter' => 'function',
-			'formatoptions' => 'return Number(data.cedit) || '.(int)$this->user()->isAllowed(
-				$this->user('role'),
-				Zkernel_Common::getById(array(
-					'model' => new Default_Model_Cresource(),
-					'field' => 'id',
-					'key' => 'key',
-					'id' => 'admin'
-				))
-			).' ? "/page/<strong>" + data.stitle + "</strong>" : "";',
-			'sortable' => true,
-			'validators' => array(array(
-				'validator' => 'Regex',
-				'options' => array('/^[a-z0-9\_\-]*$/i')
-			)),
-			'order' => 2
-		),
-		'message' => array(
-			'title' => 'Текст',
-			'type' => 'mce',
-			'required' => true,
-			'order' => 3
-		),
-		'cedit' => array(
-			'title' => 'Можно редактировать',
-			'type' => 'select',
-			'param' => array(
-				'multioptions' => array('1' => 'Да', '0' => 'Нет')
-			),
-			'order' => 4
 		)
 	),
 	'action_config' => array(
 		'ctlshow' => array(
+			'button_top' => array('add', '', ''),
+			'text' =>
+'<style>
+.gg_span{float:right;}
+.gg_span .ui-icon{float:right;margin:0 0 0 10px;}
+</style>',
 			'field' => array(
-				'message' => array(
+				'action' => array(
 					'active' => false
 				),
-				'cedit' => array(
-					'hidden' => true
-				)
-			)
-		),
-		'ctladd' => array(
-			'field' => array(
-				'stitle' => array(
-					'active' => $this->user()->isAllowed(
-						$this->user('role'),
-						Zkernel_Common::getById(array(
-							'model' => new Default_Model_Cresource(),
-							'field' => 'id',
-							'key' => 'key',
-							'id' => 'admin'
-						))
-					)
+				'zk_routable' => array(
+					'active' => false
 				),
-				'cedit' => array(
-					'active' => $this->user()->isAllowed(
-						$this->user('role'),
-						Zkernel_Common::getById(array(
-							'model' => new Default_Model_Cresource(),
-							'field' => 'id',
-							'key' => 'key',
-							'id' => 'admin'
-						))
-					)
-				)
-			)
-		),
-		'ctledit' => array(
-			'field' => array(
-				'stitle' => array(
-					'active' => $this->user()->isAllowed(
-						$this->user('role'),
-						Zkernel_Common::getById(array(
-							'model' => new Default_Model_Cresource(),
-							'field' => 'id',
-							'key' => 'key',
-							'id' => 'admin'
-						))
-					) || (int)$this->control()->config->model->fetchOne('cedit', array('`id` = ?' => @(int)$this->control()->config->param['id']))
+				'zk_routes' => array(
+					'active' => false
 				),
-				'cedit' => array(
-					'active' => $this->user()->isAllowed(
-						$this->user('role'),
-						Zkernel_Common::getById(array(
-							'model' => new Default_Model_Cresource(),
-							'field' => 'id',
-							'key' => 'key',
-							'id' => 'admin'
-						))
-					)
+				'zk_config' => array(
+					'active' => false
+				),
+				'parent' => array(
+					'active' => false
 				)
 			)
 		)
-	)*/
+	)
 ));

@@ -1,0 +1,81 @@
+<?php
+
+$this->render('generatormodel/ctl.phtml');
+
+$template = array();
+
+$dir = APPLICATION_PATH.'/../library/Zkernel/Other/Template/Db';
+$handle = @opendir($dir);
+while ($path = @readdir($handle)) {
+	if (is_file($dir.'/'.$path)) {
+		$c = file($dir.'/'.$path);
+		$title = trim($c[0], '- ');
+		if ($title) $template['_t_'.$path] = $title;
+	}
+}
+
+$table = array(
+	'' => '[ не создавать ]'
+);
+if ($template) $table['[ создать по шаблону ]'] = $template;
+
+$model = new Default_Model_Page();
+$t = $model->getAdapter()->listTables();
+if ($t) {
+	$tb = array();
+	foreach ($t as $el) $tb['_e_'.$el] = $el;
+	$table['[ копия таблицы ]'] = $tb;
+}
+
+$this->control(array(
+	'field' => array(
+		'parent' => array(
+			'title' => 'Унаследовать от',
+			'description' => 'Имя класса-родителя',
+			'order' => 1,
+			'param' => array(
+				'value' => 'Zkernel_Db_Table'
+			)
+		),
+		'table' => array(
+			'title' => 'Базовая таблица',
+			'description' => 'Эта таблица будет просто указана как базовая в файле модели',
+			'order' => 2,
+			'param' => array(
+				'value' => strtolower($this->control()->config->param->cid)
+			)
+		),
+		'table_create' => array(
+			'type' => 'select',
+			'title' => 'Создать таблицу в БД',
+			'description' => 'Таблица будет создана в БД',
+			'order' => 3,
+			'param' => array(
+				'multioptions' => $table
+			)
+		),
+		'method' => array(
+			'type' => 'multiCheckbox',
+			'title' => 'Создать методы в модели',
+			'description' => 'Будут созданы методы-пустышки',
+			'order' => 4,
+			'param' => array(
+				'multioptions' => array(
+					'list' => 'fetchList',
+					'list_join' => 'fetchList с join',
+					'card' => 'fetchCard',
+					'card_join' => 'fetchCard с join',
+					'idtitle' => 'fetchIdTitle'
+				)
+			)
+		),
+		'multilang' => array(
+			'title' => 'Поля для многоязычности',
+			'description' => 'Через запятую. Поля, которые будут переводимыми',
+			'order' => 5
+		),
+		'name' => array(
+			'active' => false
+		)
+	)
+));
