@@ -1,20 +1,40 @@
 /*
- * jQuery UI Resizable 1.7.2
+ * jQuery UI Resizable 1.8
  *
- * Copyright (c) 2009 AUTHORS.txt (http://jqueryui.com/about)
+ * Copyright (c) 2010 AUTHORS.txt (http://jqueryui.com/about)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
  * and GPL (GPL-LICENSE.txt) licenses.
  *
  * http://docs.jquery.com/UI/Resizables
  *
  * Depends:
- *	ui.core.js
+ *	jquery.ui.core.js
+ *	jquery.ui.mouse.js
+ *	jquery.ui.widget.js
  */
 (function($) {
 
-$.widget("ui.resizable", $.extend({}, $.ui.mouse, {
-
-	_init: function() {
+$.widget("ui.resizable", $.ui.mouse, {
+	widgetEventPrefix: "resize",
+	options: {
+		alsoResize: false,
+		animate: false,
+		animateDuration: "slow",
+		animateEasing: "swing",
+		aspectRatio: false,
+		autoHide: false,
+		containment: false,
+		ghost: false,
+		grid: false,
+		handles: "e,s,se",
+		helper: false,
+		maxHeight: null,
+		maxWidth: null,
+		minHeight: 10,
+		minWidth: 10,
+		zIndex: 1000
+	},
+	_create: function() {
 
 		var self = this, o = this.options;
 		this.element.addClass("ui-resizable");
@@ -185,7 +205,7 @@ $.widget("ui.resizable", $.extend({}, $.ui.mouse, {
 		if (this.elementIsWrapper) {
 			_destroy(this.element);
 			var wrapper = this.element;
-			wrapper.parent().append(
+			wrapper.after(
 				this.originalElement.css({
 					position: wrapper.css('position'),
 					width: wrapper.outerWidth(),
@@ -193,23 +213,24 @@ $.widget("ui.resizable", $.extend({}, $.ui.mouse, {
 					top: wrapper.css('top'),
 					left: wrapper.css('left')
 				})
-			).end().remove();
+			).remove();
 		}
 
 		this.originalElement.css('resize', this.originalResizeStyle);
 		_destroy(this.originalElement);
 
+		return this;
 	},
 
 	_mouseCapture: function(event) {
-
 		var handle = false;
-		for(var i in this.handles) {
-			if($(this.handles[i])[0] == event.target) handle = true;
+		for (var i in this.handles) {
+			if ($(this.handles[i])[0] == event.target) {
+				handle = true;
+			}
 		}
 
-		return this.options.disabled || !!handle;
-
+		return !this.options.disabled && handle;
 	},
 
 	_mouseStart: function(event) {
@@ -495,32 +516,10 @@ $.widget("ui.resizable", $.extend({}, $.ui.mouse, {
 		};
 	}
 
-}));
+});
 
 $.extend($.ui.resizable, {
-	version: "1.7.2",
-	eventPrefix: "resize",
-	defaults: {
-		alsoResize: false,
-		animate: false,
-		animateDuration: "slow",
-		animateEasing: "swing",
-		aspectRatio: false,
-		autoHide: false,
-		cancel: ":input,option",
-		containment: false,
-		delay: 0,
-		distance: 1,
-		ghost: false,
-		grid: false,
-		handles: "e,s,se",
-		helper: false,
-		maxHeight: null,
-		maxWidth: null,
-		minHeight: 10,
-		minWidth: 10,
-		zIndex: 1000
-	}
+	version: "1.8"
 });
 
 /*
@@ -533,7 +532,7 @@ $.ui.plugin.add("resizable", "alsoResize", {
 
 		var self = $(this).data("resizable"), o = self.options;
 
-		_store = function(exp) {
+		var _store = function(exp) {
 			$(exp).each(function() {
 				$(this).data("resizable-alsoresize", {
 					width: parseInt($(this).width(), 10), height: parseInt($(this).height(), 10),

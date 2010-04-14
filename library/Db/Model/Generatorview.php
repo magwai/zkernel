@@ -13,6 +13,12 @@ class Zkernel_Db_Model_Generatorview {
 			'id' => array(
 				'COLUMN_NAME' => 'id'
 			),
+			'parentid' => array(
+				'COLUMN_NAME' => 'parentid'
+			),
+			'template' => array(
+				'COLUMN_NAME' => 'template'
+			),
 			'name' => array(
 				'COLUMN_NAME' => 'name'
 			)
@@ -21,27 +27,27 @@ class Zkernel_Db_Model_Generatorview {
 
 	function fetchControlList() {
 		$data = array();
-		/*$dir = Zend_Controller_Front::getInstance()->getControllerDirectory();
-		$dir = @$dir['default'];
+		$n = $where['`parentid` = ?'];
+		$dir = Zend_Controller_Front::getInstance()->getControllerDirectory();
+		$dir = @$dir['default'].'/../views/scripts/'.$n;
 		$handle = @opendir($dir);
 		while ($path = @readdir($handle)) {
 			if (is_file($dir.'/'.$path)) {
-				$n = $nn = strtolower(str_ireplace('Controller.php', '', $path));
-				$c = ucfirst($n).'Controller';
+				$n = strtolower(str_ireplace('.phtml', '', $path));
+
+				/*$c = ucfirst($n).'Controller';
 				if (!class_exists($c)) include $dir.'/'.$path;
 				$db = Zkernel_Common::getDocblock($c);
 				if (isset($db['zk_title'])) $nn = $db['zk_title'];
 				$model = file_exists($dir.'/../models/'.ucfirst($n).'.php');
-
+				*/
 				$data[] = array(
 					'id' => $n,
-					'name' => $n,
-					'title' => $nn,
-					'model' => (int)$model
+					'name' => $n
 				);
 			}
 		}
-		@closedir($handle);*/
+		@closedir($handle);
 		return new Zkernel_View_Data($data);
 	}
 

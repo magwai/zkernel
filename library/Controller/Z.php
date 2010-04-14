@@ -18,4 +18,9 @@ class Zkernel_Controller_Z extends Zkernel_Controller_Action {
 			foreach ($this->view->coord as $k => $el) $this->view->coord[$k] = explode('|', $el);
 		}
 	}
+
+	function suggestAction() {
+		$this->view->name = $this->getRequest()->getParam('name');
+		$this->view->term = $this->getRequest()->getParam('term');
+	}
 }

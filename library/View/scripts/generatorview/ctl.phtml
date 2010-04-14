@@ -1,12 +1,19 @@
 <?php
 
 $this->control(array(
-	'button_top' => array('add', '', ''),
 	'field' => array(
 		'name' => array(
-			'title' => 'Имя',
-			'order' => 1,
-			'required' => true
+			'title' => 'Название'
+		)
+	),
+	'action_config' => array(
+		'ctlshow' => array(
+			'button_top' => array('add', '', ''),
+			'field' => array(
+				'template' => array(
+					'active' => false
+				)
+			)
 		)
 	)
 ));

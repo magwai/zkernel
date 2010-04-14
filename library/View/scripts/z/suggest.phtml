@@ -1,0 +1,21 @@
+<?php
+
+$this->layout()->disableLayout(true);
+
+$data = array();
+
+$s = new Zend_Session_Namespace();
+
+$m = $s->form[$this->name]['model'];
+
+$model = new $m();
+$mm = 'fetchSuggest'.ucfirst($this->name);
+
+$list = $model->$mm($this->term);
+if (count($list) > 0) {
+	$ov = strtolower(str_replace(array('Default', '_'), array('', ''), $this->name));
+	$list_valid = $this->override($list, $ov);
+	foreach ($list_valid as $el) $data[] = $el->suggest_valid;
+}
+
+echo $this->json($data);
