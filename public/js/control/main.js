@@ -334,7 +334,7 @@ c.implode = function(glue, pieces) {
 };
 
 c.submit = function(apply) {
-	if (typeof tinyMCE != 'undefined') tinyMCE.triggerSave();
+	//if (typeof tinyMCE != 'undefined') tinyMCE.triggerSave();
 	c.loading_start(true);
 	var i = $('#c_form .uploadifyQueueItem').not('#c_form .uploadifyQueueLoaded');
 	if (i.length == 0) c.sumbit_full(apply);
