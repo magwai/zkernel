@@ -83,6 +83,15 @@ $this->control(array(
 			)
 		),
 		'ctledit' => array(
+			'static_field' => $this->user()->isAllowed(
+				$this->user('role'),
+				Zkernel_Common::getById(array(
+					'model' => new Default_Model_Cresource(),
+					'field' => 'id',
+					'key' => 'key',
+					'id' => 'admin'
+				))
+			) || (int)$this->control()->config->model->fetchOne('cedit', array('`id` = ?' => @(int)$this->control()->config->param['id'])),
 			'field' => array(
 				'stitle' => array(
 					'active' => $this->user()->isAllowed(
