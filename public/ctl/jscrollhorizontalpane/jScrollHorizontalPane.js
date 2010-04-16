@@ -2,7 +2,6 @@
  * Copyright (c) 2008 Threeformed Media (http://www.threeformed.com)
  * This is licensed under GPL (http://www.opensource.org/licenses/gpl-license.php) licenses.
  * 
- * 
  * *******
  * 
  * This plugin is derived in part from JScrollPane created by Kevin Luck(http://www.kelvinluck.com)
