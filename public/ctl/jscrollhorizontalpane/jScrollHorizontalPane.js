@@ -19,8 +19,8 @@
  * elements with a CSS styled veresion.  Very similar to the JScrollPane 
  * which does vertical scrolling, 2 features in particular have been added. 
  * 
- * 1) Intervals
- * 2) Resizing
+ * 1) Intervals1
+ * 2) Resizing1
  * 
  * 1) Intervals can be added by attaching a class type of "scroll-interval" to any 
  * element wrapped within the jscrollhorizontalpane context.  This provides
