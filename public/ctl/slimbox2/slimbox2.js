@@ -107,7 +107,7 @@
 			initialHeight: 250,			// Initial height of the box (in pixels)
 			imageFadeDuration: 400,			// Duration of the image fade-in animation (in milliseconds)
 			captionAnimationDuration: 400,		// Duration of the caption animation (in milliseconds)
-			counterText: "Image {x} of {y}",	// Translate or change as you wish, or set it to false to disable counter text for image groups
+			counterText: "Картинка {x} из {y}",	// Translate or change as you wish, or set it to false to disable counter text for image groups
 			closeKeys: [27, 88, 67],		// Array of keycodes to close Slimbox, default: Esc (27), 'x' (88), 'c' (67)
 			previousKeys: [37, 80],			// Array of keycodes to navigate to the previous image, default: Left arrow (37), 'p' (80)
 			nextKeys: [39, 78]			// Array of keycodes to navigate to the next image, default: Right arrow (39), 'n' (78)
