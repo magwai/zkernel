@@ -1,6 +1,6 @@
 /* Copyright (c) 2006 Kelvin Luck (kelvin AT kelvinluck DOT com || http://www.kelvinluck.com)
  * Dual licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) 
- * and GPL (http://www.opensource.org/licenses/gpl-license.php) licenses.
+ * and GPL (http://www.opensource.org/licenses/gpl-license.php) licenses. r
  * 
  * See http://kelvinluck.com/assets/jquery/jScrollPane/
  * $Id: jScrollPane.js 33 2008-12-10 22:55:28Z kelvin.luck $
