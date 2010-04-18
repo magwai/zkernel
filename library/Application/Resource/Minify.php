@@ -16,8 +16,8 @@ class Zkernel_Application_Resource_Minify extends Zend_Application_Resource_Reso
 			$route = new Zend_Controller_Router_Route_Regex(
 				'(.*)\.(js|css)$',
 				array(
-					'controller' => 'minify',
-					'action'     => 'index'
+					'controller' => 'z',
+					'action'     => 'minify'
 				),
 				array('', 'path', 'ext')
 			);

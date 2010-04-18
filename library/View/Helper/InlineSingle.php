@@ -19,7 +19,7 @@ class Zkernel_View_Helper_InlineSingle extends Zend_View_Helper_InlineScript  {
         }
         $c = trim(implode("\n", $items));
         if ($c) {
-			if ($type == 'file') {
+			if ($type == 'file' || $type == 'filename' ) {
 				$md5 = substr(md5($c), 0, 5);
 		        $nm = '/pc/js/'.$md5.'.js';
 				if (!file_exists(PUBLIC_PATH.$nm)) {
@@ -27,7 +27,7 @@ class Zkernel_View_Helper_InlineSingle extends Zend_View_Helper_InlineScript  {
 					file_put_contents(PUBLIC_PATH.$nm, $c);
 					@chmod(PUBLIC_PATH.$nm, 0755);
 				}
-				$c = '<script type="text/javascript" src="'.$nm.'"></script>';
+				$c = $type == 'file' ? '<script type="text/javascript" src="'.$nm.'"></script>' : $nm;
 			}
 			else $c = $type == 'script_clean' ? $c : '<script type="text/javascript">try { '.$c.' } catch (e) {}</script>';
         }

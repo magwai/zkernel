@@ -22,6 +22,12 @@ if ($ajax) {
 	}
 }
 else {
+	$p = array();
+	$reg = Zend_Registry::isRegistered('Zkernel_Multilang') ? Zend_Registry::get('Zkernel_Multilang') : '';
+	if ($reg) $p['lang'] = $reg->stitle;
+
+	$this	->inlineScript('script', '$(function() { c.init('.Zend_Json::encode($p).'); });');
+
 	$this	->headScript('file', '/zkernel/js/jquery/jquery.include.js')
 			->headScript('file', '/zkernel/js/jquery/jquery.php.js')
 			->headScript('file', '/zkernel/ctl/jqgrid/i18n/grid.locale-ru.js')
@@ -38,13 +44,8 @@ else {
 			->headScript('file', '/zkernel/ctl/uploadify/jquery.uploadify.js')
 			->headScript('file', '/zkernel/ctl/uploadify/zuploadify.js')
 			->headScript('file', '/zkernel/js/jquery/jquery.tinymce.js')
-			->headScript('file', '/zkernel/js/control/main.js');
-
-	$p = array();
-	$reg = Zend_Registry::isRegistered('Zkernel_Multilang') ? Zend_Registry::get('Zkernel_Multilang') : '';
-	if ($reg) $p['lang'] = $reg->stitle;
-
-	$this	->inlineScript('script', '$(function() { c.init('.Zend_Json::encode($p).'); });');
+			->headScript('file', '/zkernel/js/control/main.js')
+			->headScript('file', $this->inlineSingle('filename'));
 
 	$this	->headLink(array('rel' => 'favicon', 'href' => '/zkernel/img/favicon.ico'))
 			->appendStylesheet('/zkernel/img/jquery/ui/themes/'.$this->control()->config->theme.'/ui.all.css')
@@ -88,7 +89,6 @@ else {
 		<div id="c_loader"></div>
 		<div id="c_info" class="ui-widget ui-corner-all"></div>
 		<div id="c_content"><?php echo $this->layout()->content ?></div>
-		<?echo $this->inlineScript() ?>
 	</body>
 </html>
 <?php

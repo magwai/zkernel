@@ -30,34 +30,7 @@ if ($path && $file) {
 
 			if ($res_1) $res = $res_1;
 			else {
-				$process = popen('java -client -Xmx64m', 'r');
-				$ret = false;
-				if (is_resource($process)) {
-					$read = fread($process, 1024);
-					pclose($process);
-					if ($read) $ret = true;
-				}
-				if ($ret) {
-					$desc = array(
-					   0 => array("pipe", "r"),
-					   1 => array("pipe", "w")
-					);
-					$process = proc_open('java -client -Xmx64m -jar "'.realpath(APPLICATION_PATH.'/../library/Zkernel/Other/Jar/yuicompressor.jar').'" --charset utf-8 --type '.$this->ext, $desc, $pipes);
-					if (is_resource($process)) {
-						fwrite($pipes[0], $res);
-						fclose($pipes[0]);
-						$res_1 = stream_get_contents($pipes[1]);
-						fclose($pipes[1]);
-						if ($res_1) {
-							$res = "/* yuicompressor */\n".$res_1;
-						}
-						proc_close($process);
-					}
-				}
-				else if (stripos($file, '.css' === false)) {
-					require_once 'Zkernel/Other/Lib/JSMin/JSMin.php';
-					$res = JSMin::minify($res);
-				}
+				$res = $this->minify($res, $this->ext);
 				if ($cache) $cache->save($res, $md5);
 			}
 		}

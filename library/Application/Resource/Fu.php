@@ -16,8 +16,8 @@ class Zkernel_Application_Resource_Fu extends Zend_Application_Resource_Resource
 			$route = new Zend_Controller_Router_Route_Regex(
 				'/fu',
 				array(
-					'controller' => 'fu',
-					'action'     => 'index'
+					'controller' => 'z',
+					'action'     => 'fu'
 				)
 			);
 			$router->addRoute('fu', $route);

@@ -23,4 +23,14 @@ class Zkernel_Controller_Z extends Zkernel_Controller_Action {
 		$this->view->name = $this->getRequest()->getParam('name');
 		$this->view->term = $this->getRequest()->getParam('term');
 	}
+
+	public function minifyAction() {
+		$this->view->ext = $this->getRequest()->getParam('ext');
+		$this->view->path = $this->getRequest()->getParam('path');
+    }
+
+	function fuAction() {
+		$this->view->post = $_POST;
+		$this->view->files = $_FILES;
+	}
 }

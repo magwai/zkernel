@@ -65,7 +65,7 @@ class Zkernel_Db_Model_Generatormodel {
 		$name = ucfirst($data['parentid']);
 
 		$model = new Zend_CodeGenerator_Php_Class();
-		$model->setName($name);
+		$model->setName('Default_Model_'.$name);
 		if ($data['parent']) $model->setExtendedClass($data['parent']);
 
 		$prop = array();
