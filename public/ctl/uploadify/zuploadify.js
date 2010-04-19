@@ -21,7 +21,7 @@ zuf.init = function(o) {
 		'multi': typeof o.multi == 'undefined' ? false : true,
 		'uploader': '/zkernel/ctl/uploadify/uploadify.swf',
 		'cancelImg': '/zkernel/ctl/uploadify/cancel.png',
-		'script': '/fu/',
+		'script': '/z/fu',
 		'onComplete': function(e, queueID, fileObj, response, data) {
 			if (response && response.slice(0, 2) == "u|") {
 				var v = response.slice(2);
