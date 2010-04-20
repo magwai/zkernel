@@ -1,1 +1,9 @@
-#Zkernel_Feedback { font: 11px/1.4em Lucida Grande, Lucida Sans Unicode, sans-serif; position:fixed; bottom:1px; right:5px; color:#000; z-index: 9999;background:#E8E8E8;border: 1px solid #999;padding:5px;cursor:pointer;}
+#Zkernel_Feedback {display:none; font: 11px/1.4em Lucida Grande, Lucida Sans Unicode, sans-serif; position:fixed; bottom:1px; right:5px; color:#000; z-index: 9999;}
+#Zkernel_Feedback_Btn {background:#E8E8E8;border: 1px solid #999;cursor:pointer;padding:5px 12px;}
+#Zkernel_Feedback_Wnd{display:none;width:500px;position:fixed; bottom:1px; right:5px; color:#000; z-index: 9999;background:#E8E8E8;border: 1px solid #999;padding:5px;}
+#Zkernel_Feedback_Wnd input{margin:0;}
+#Zkernel_Feedback_Wnd textarea{width:494px;height:200px;padding:2px;margin:0;border: 1px solid #999;}
+#Zkernel_Feedback_Wnd label input{vertical-align:middle;}
+#Zkernel_Feedback_Wnd div{padding:0 0 5px 0;}
+#Zkernel_Feedback_Wnd #Zkernel_Feedback_Close{float:right;padding:0;}
+#Zkernel_Feedback_Wnd #Zkernel_Feedback_Last{padding:0;}

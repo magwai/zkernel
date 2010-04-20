@@ -33,4 +33,8 @@ class Zkernel_Controller_Z extends Zkernel_Controller_Action {
 		$this->view->post = $_POST;
 		$this->view->files = $_FILES;
 	}
+
+	function feedbackAction() {
+		$this->view->post = $_POST;
+	}
 }

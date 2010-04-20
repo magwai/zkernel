@@ -1,0 +1,18 @@
+<?php
+
+$reg = Zend_Registry::isRegistered('Zkernel_Feedback') ? Zend_Registry::get('Zkernel_Feedback') : '';
+
+$ok = $this->mail(array(
+	'subject' => 'Feedback from '.$_SERVER['HTTP_HOST'].' at '.date('d.m.Y H:i:s'),
+	'view' => 'zfeedback',
+	'to' => $reg['mail'],
+	'data' => array(
+		'browser' => $this->post['browser'],
+		'url' => $this->post['url'],
+		'message' => $this->post['message']
+	)
+));
+
+echo $this->json(array(
+	'ok' => (int)$ok
+));

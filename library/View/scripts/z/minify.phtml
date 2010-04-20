@@ -49,6 +49,7 @@ else {
 }
 
 Zend_Controller_Front::getInstance()->unregisterPlugin('Zkernel_Controller_Plugin_Debug');
+Zend_Controller_Front::getInstance()->unregisterPlugin('Zkernel_Controller_Plugin_Feedback');
 Zend_Controller_Front::getInstance()->getResponse()
 	->setHeader('Last-Modified', $modified, true)
 	->setHeader('Expires', $expires, true);
