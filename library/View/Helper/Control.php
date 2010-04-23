@@ -523,7 +523,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 
 					$this->config->data = $this->config->form->getValues();
 
-					if ($this->config->static_field && !@$this->config->data->{$this->config->static_field->field_dst}) {
+					if ($this->config->static_field && !@$this->config->data->{$this->config->static_field->field_dst} && $this->config->type == 'add') {
 						$stitle = Zkernel_Common::stitle($this->config->data[$this->config->static_field->field_src], $this->config->static_field->length);
     					$stitle = $stitle ? $stitle : '_';
     					$stitle_n = $stitle;
