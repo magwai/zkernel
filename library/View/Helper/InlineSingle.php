@@ -25,7 +25,7 @@ class Zkernel_View_Helper_InlineSingle extends Zend_View_Helper_InlineScript  {
 				if (!file_exists(PUBLIC_PATH.$nm)) {
 					if (!@file_exists(PUBLIC_PATH.'/pc/js')) mkdir(PUBLIC_PATH.'/pc/js', 0777, true);
 					file_put_contents(PUBLIC_PATH.$nm, $c);
-					@chmod(PUBLIC_PATH.$nm, 0755);
+					@chmod(PUBLIC_PATH.$nm, 0777);
 				}
 				$c = $type == 'file' ? '<script type="text/javascript" src="'.$nm.'"></script>' : $nm;
 			}

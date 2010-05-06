@@ -67,5 +67,17 @@ class Zkernel_Application_Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 			}
        	}
 	}
+
+    /**
+     * Инициализация локали и транслейта
+     */
+	/*protected function _initLocale() {
+		$model = new Default_Model_Txt();
+		$translate = new Zend_Translate(
+			'array',
+			$model->fetchPairs('key', 'value')
+		);
+		Zend_Registry::set('Zend_Translate', $translate);
+	}*/
 }
 

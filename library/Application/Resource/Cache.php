@@ -19,7 +19,6 @@ class Zkernel_Application_Resource_Cache extends Zend_Application_Resource_Resou
 				if (!isset($options['backend']['adapter'])) $options['backend']['adapter'] = 'Memcached';
 				if (!isset($options['frontend']['params'])) $options['frontend']['params'] = array();
 				if (!isset($options['backend']['params'])) $options['backend']['params'] = array();
-
 				$this->_cache = Zend_Cache::factory(
 					$options['frontend']['adapter'],
 					$options['backend']['adapter'],
