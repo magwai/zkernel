@@ -82,13 +82,14 @@ class Zkernel_Db_Model_Picasa {
 		return $res ? new Zkernel_View_Data($res) : array();
 	}
 
-	function _fetchPhoto($id) {
+	function _fetchPhoto($id, $album) {
 		$res = array();
 		if ($id) {
 			if (isset($this->_google['picasa'][$this->_name]['photo_card'][$id])) $photo = $this->_google['picasa'][$this->_name]['photo_card'][$id];
 			else {
 				$query = new Zend_Gdata_Photos_PhotoQuery();
 				$query->setPhotoId($id);
+				$query->setAlbumId($album);
 				$photo = $this->_service->getPhotoEntry($query);
 				$this->_google['picasa'][$this->_name]['photo_card'][$id] = $photo;
 				Zend_Registry::set('Zkernel_Google', $this->_google);
@@ -144,5 +145,75 @@ class Zkernel_Db_Model_Picasa {
 			'description' => (string)$el->getMediaGroup()->getDescription(),
 			'image_url' => (string)$content->getUrl()
 		), $ex);
+	}
+
+	function _insertAlbum($data) {
+		$new_access = $this->_service->newAccess();
+		$new_access->text = 'public';
+		$entry = new Zend_Gdata_Photos_AlbumEntry();
+		$entry->setGphotoAccess($new_access);
+		$entry->setGphotoTimestamp($this->_service->newTimestamp((string)strtotime($data['date']).'000'));
+		$entry->setTitle($this->_service->newTitle($data['title']));
+		$entry = $this->_service->insertAlbumEntry($entry);
+		return $entry ? $entry->getGphotoId() : false;
+	}
+
+	function _updateAlbum($data, $id) {
+		$query = new Zend_Gdata_Photos_AlbumQuery();
+		$query->setAlbumId($id);
+		$album = $this->_service->getAlbumEntry($query);
+		$album->setGphotoTimestamp($this->_service->newTimestamp((string)strtotime($data['date']).'000'));
+		$album->setTitle($this->_service->newTitle($data['title']));
+		return $album->save();
+	}
+
+	function _deleteAlbum($id) {
+		$query = new Zend_Gdata_Photos_AlbumQuery();
+		$query->setAlbumId($id);
+		$album = $this->_service->getAlbumEntry($query);
+		$this->_service->deleteAlbumEntry($album);
+		return true;
+	}
+
+	function _insertPhoto($data) {
+		$s = @getimagesize($data['image_url']);
+		$fd = $this->_service->newMediaFileSource($data['image_url']);
+		$fd->setContentType(@$s['mime']);
+
+		$entry = new Zend_Gdata_Photos_PhotoEntry();
+		$entry->setMediaSource($fd);
+		$entry->setGphotoTimestamp($this->_service->newTimestamp((string)strtotime($data['date']).'000'));
+		//$entry->setTitle($this->_service->newTitle($data['description']));
+
+		$query = new Zend_Gdata_Photos_AlbumQuery();
+		$query->setAlbumId($data['parentid']);
+		$album = $this->_service->getAlbumEntry($query);
+		$entry = $this->_service->insertPhotoEntry($entry, $album);
+		return $entry ? $entry->getGphotoId() : false;
+	}
+
+	function _updatePhoto($data, $id, $album) {
+		$query = new Zend_Gdata_Photos_PhotoQuery();
+		$query->setPhotoId($id);
+		$query->setAlbumId($album);
+		$photo = $this->_service->getPhotoEntry($query);
+		if (stripos($data['image_url'], 'http://') === false) {
+			$s = @getimagesize($data['image_url']);
+			$fd = $this->_service->newMediaFileSource($data['image_url']);
+			$fd->setContentType(@$s['mime']);
+			$photo->setMediaSource($fd);
+		}
+		$photo->setGphotoTimestamp($this->_service->newTimestamp((string)strtotime($data['date']).'000'));
+		//$photo->setTitle($this->_service->newTitle($data['description']));
+		return $photo->save();
+	}
+
+	function _deletePhoto($id, $album) {
+		$query = new Zend_Gdata_Photos_PhotoQuery();
+		$query->setPhotoId($id);
+		$query->setAlbumId($album);
+		$photo = $this->_service->getPhotoEntry($query);
+		$this->_service->deletePhotoEntry($photo);
+		return true;
 	}
 }

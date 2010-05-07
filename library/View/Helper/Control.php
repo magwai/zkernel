@@ -210,7 +210,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
     			'a' => $item->action,
     			'p' => $item->param
     		));
-    		$inner = $this->buildNavpane((int)$item->parentid);
+    		$inner = $this->buildNavpane($item->parentid);
     		if ($inner) $ret = array_merge($inner, $ret);
     	}
     	return $ret;
@@ -362,7 +362,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
     		));
     	}
 		if ($this->config->tree && $this->config->type == 'add' && $this->config->field && isset($this->config->field->{$this->config->tree_field})) $this->config->post_field_extend->set(array(
-    		$this->config->tree_field => (int)$this->config->param['id']
+    		$this->config->tree_field => $this->config->param['id']
     	));
     	if ($this->config->param['cid'] && isset($this->config->field->{$this->config->field_link})) {
     		$this->config->post_field_extend->set(array(
@@ -384,7 +384,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 				}
 			}
 			if ($this->config->tree) {
-				$parentid = (int)$this->config->post['nodeid'];
+				$parentid = (string)$this->config->post['nodeid'];
 				if ($parentid) {
 					$s = new Zend_Session_Namespace();
 					$s->control['history'][$this->config->controller]['oid'] = $parentid;
@@ -395,7 +395,6 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 				$parentid = $parentid == 0 ? null : $parentid;
 			}
 			if ($this->config->param['cid'] && isset($this->config->field->{$this->config->field_link})) $where['`'.$this->config->field_link.'` = ?'] = $this->config->param['cid'];
-
 			$rd = $this->config->model->fetchControlList(
 		    	$where,
 		    	$this->config->orderby.' '.$this->config->orderdir,
@@ -413,7 +412,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 		    	foreach ($data as &$el) {
 		    		$el['_level'] = $level;
 		    		$el['_count'] = (int)$this->config->model->fetchCount(array(
-		    			'`'.$this->config->tree_field.'` = ?' => (int)$el['id']
+		    			'`'.$this->config->tree_field.'` = ?' => (string)$el['id']
 		    		));
 		    	}
 		    }
@@ -452,7 +451,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
     }
 
 	public function buildForm() {
-    	$id = (int)$this->config->param['id'];
+    	$id = $this->config->param['id'];
     	$form = new Zkernel_Form(array(
 	    	'accept-charset' => 'utf-8',
     		'onsubmit' => 'return c.submit()',
@@ -482,7 +481,11 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 			if ($el->type == 'editarea') $p->rows = 15;
 			if ($el->type == 'uploadify') {
 				if (!isset($p->destination)) $p->destination = PUBLIC_PATH.'/upload/'.$this->config->controller.'_'.$el->name;
-				if (!isset($p->fn)) $p->fn = $this->config->model->fetchOne($el->name, array('`id` = ?' => $id));
+				if (!isset($p->fn)) {
+					$where = $this->config->where ? $this->config->where->toArray() : array();
+					$where['`id` = ?'] = $id;
+					$p->fn = $this->config->model->fetchOne($el->name, $where);
+				}
 			}
 		   $form->addElement($el->type, $el->name, $p->toArray());
 		}
@@ -594,7 +597,11 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 						foreach ($data_db as $k => $v) {
 							if (!array_key_exists($k, $this->config->model->info('metadata'))) unset($data_db[$k]);
 						}
-						if ($this->config->type == 'edit') $ok = $this->config->model->updateControl($data_db, array('`id` = ?' => $id));
+						if ($this->config->type == 'edit') {
+							$where = $this->config->where ? $this->config->where->toArray() : array();
+							$where['`id` = ?'] = $id;
+							$ok = $this->config->model->updateControl($data_db, $where);
+						}
 						else $ok = $this->config->data->id =  $this->config->model->insertControl($data_db);
 					}
 					if ($ok || $m2m_changed) {
@@ -617,7 +624,9 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 			}
 			else {
 				if ($this->config->type == 'edit') {
-					$data = $this->config->model->fetchControlCard(array('`id` = ?' => $id));
+					$where = $this->config->where ? $this->config->where->toArray() : array();
+					$where['`id` = ?'] = $id;
+					$data = $this->config->model->fetchControlCard($where);
 
 					$data = $this->view->override()->overrideSingle($data, $this->config->controller, array('multilang_nofall' => true));
 
@@ -691,19 +700,23 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
     	$ids = $ids ? explode(',', $ids) : array();
 
     	if (!$ids) {
-    		$id = (int)$this->config->param['id'];
+    		$id = $this->config->param['id'];
     		$ids = $id ? array($id) : array();
     	}
     	if ($this->config->tree && @$ids[0]) {
-    		$pid = (int)$this->config->model->fetchOne($this->config->tree_field, array('`id` = ?' => $ids[0]));
+    		$where = $this->config->where ? $this->config->where->toArray() : array();
+    		$where['`id` = ?'] = $ids[0];
+    		$pid = (string)$this->config->model->fetchOne($this->config->tree_field, $where);
     		$s = new Zend_Session_Namespace();
 			$s->control['history'][$this->config->controller]['oid'] = $pid;
 		}
     	$cnt = 0;
     	if ($ids) {
 	    	foreach ($ids as $el) {
-	    		$item = $this->config->model->fetchControlCard(array('`id` = ?' => $el));
-	    		$ok = $this->config->model->deleteControl(array('`id` = ?' => $el));
+	    		$where = $this->config->where ? $this->config->where->toArray() : array();
+				$where['`id` = ?'] = $el;
+	    		$item = $this->config->model->fetchControlCard($where);
+	    		$ok = $this->config->model->deleteControl($where);
 	    		if ($ok) {
 	    			$form = $this->buildForm();
 	    			$els = $form->getElements();
