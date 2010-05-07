@@ -283,7 +283,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 
 		// Поля из модели
     	if ($this->config->use_db && $this->config->model) {
-    		$meta = $this->config->model->info('metadata');
+    		$meta = method_exists($this->config->model, 'info') ? $this->config->model->info('metadata') : array();
     		if ($meta) {
     			foreach ($meta as $el) {
 					if (!isset($this->config->field->{$el['COLUMN_NAME']})) $this->config->field->{$el['COLUMN_NAME']} = array();

@@ -14,7 +14,7 @@ class Zkernel_Application_Resource_Cache extends Zend_Application_Resource_Resou
 	public function init () {
 		if (null === $this->_cache) {
 			$options = $this->getOptions();
-			if (!isset($options[0])) {
+			if (!isset($options[0]) && $options) {
 				if (!isset($options['frontend']['adapter'])) $options['frontend']['adapter'] = 'Core';
 				if (!isset($options['backend']['adapter'])) $options['backend']['adapter'] = 'Memcached';
 				if (!isset($options['frontend']['params'])) $options['frontend']['params'] = array();
@@ -38,6 +38,7 @@ class Zkernel_Application_Resource_Cache extends Zend_Application_Resource_Resou
 					Zend_Locale::setCache($this->_cache);
 				}
 			}
+			else $this->_cache = false;
 
 			$key = (isset($options['registry']) && !is_numeric($options['registry'])) ? $options['registry'] : self::DEFAULT_REGISTRY_KEY;
 			Zend_Registry::set($key, $this->_cache);
