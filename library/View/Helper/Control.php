@@ -419,7 +419,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 		    $this->config->data = $this->view->override($data, $this->config->controller);
 		}
 		else {
-			$menus = $menu_model->fetchAll(array('`parentid` = ?' => @(int)$menu->id, '`show_it` = 0'));
+			$menus = $menu_model->fetchAll(array('`parentid` = ?' => @(int)$menu->id, '`show_it` = 0', 'orderid'));
 			if ($menus) {
 				foreach ($menus as $el) {
 					$cl_0 = stripos($el->param, 'cl=0');
@@ -521,7 +521,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 			if (@(int)$this->config->post['cposted']) {
 				if ($this->config->form->isValid($this->config->post->toArray())) {
 					if ($this->config->type == 'add') $id = $this->config->use_db
-						? $this->config->model->fetchNextId()
+						? (method_exists($this->config->model, 'fetchNextId') ? $this->config->model->fetchNextId() : 0)
 						: 0;
 
 					$this->config->data = $this->config->form->getValues();
@@ -595,7 +595,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 					if ($this->config->use_db && count($this->config->info) == 0) {
 						$data_db = $this->config->data->toArray();
 						foreach ($data_db as $k => $v) {
-							if (!array_key_exists($k, $this->config->model->info('metadata'))) unset($data_db[$k]);
+							if (!array_key_exists($k, method_exists($this->config->model, 'info') ? $this->config->model->info('metadata') : array())) unset($data_db[$k]);
 						}
 						if ($this->config->type == 'edit') {
 							$where = $this->config->where ? $this->config->where->toArray() : array();
@@ -628,7 +628,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 					$where['`id` = ?'] = $id;
 					$data = $this->config->model->fetchControlCard($where);
 
-					$data = $this->view->override()->overrideSingle($data, $this->config->controller, array('multilang_nofall' => true));
+					$data = $this->view->override()->overrideSingle($data, $this->config->controller, array('multilang_nofall' => true, 'module_nofall' => true));
 
 					$this->config->data->set($data->toArray());
 

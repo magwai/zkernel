@@ -4,7 +4,7 @@
  *
  * @licence GPL
  * @author Moxiecode
- * @copyright Copyright © 2003-2008, Moxiecode Systems AB, All rights reserved.
+ * @copyright Copyright ï¿½ 2003-2008, Moxiecode Systems AB, All rights reserved.
  */
 
 /**
@@ -94,7 +94,7 @@ class Moxiecode_ZipFile {
 
 		$this->deleteFile($zip_path);
 
-		$entry =& new Moxiecode_ZipEntry($this);
+		$entry = new Moxiecode_ZipEntry($this);
 
 		$entry->setPath($zip_path);
 		$entry->setData($data);
@@ -116,7 +116,7 @@ class Moxiecode_ZipFile {
 
 		$this->deleteFile($zip_path);
 
-		$entry =& new Moxiecode_ZipEntry($this);
+		$entry = new Moxiecode_ZipEntry($this);
 
 		if ($path != '')
 			$entry->setLocalPath($path);
@@ -149,7 +149,7 @@ class Moxiecode_ZipFile {
 			$files = $this->_listTree($path, $recursive);
 
 			foreach ($files as $file) {
-				$entry =& new Moxiecode_ZipEntry($this);
+				$entry = new Moxiecode_ZipEntry($this);
 
 				$entry->setPath($zip_path . substr($file, strlen($path) + 1));
 				$entry->setLocalPath($file);
@@ -162,7 +162,7 @@ class Moxiecode_ZipFile {
 
 			$this->buildPath($zip_path . substr($file, strlen($path) + 1), is_dir($file));
 		} else {
-			$entry =& new Moxiecode_ZipEntry($this);
+			$entry = new Moxiecode_ZipEntry($this);
 
 			$entry->setPath($zip_path);
 			$entry->setComment($comment);
@@ -448,7 +448,7 @@ class Moxiecode_ZipFile {
 					/*echo "Local file header:\n";
 					var_dump($header);*/
 
-					$entry =& new Moxiecode_ZipEntry($this, $header);
+					$entry = new Moxiecode_ZipEntry($this, $header);
 					$this->_entries[] =& $entry;
 					$this->_entryLookup[$entry->getPath()] =& $entry;
 				}
@@ -589,7 +589,7 @@ class Moxiecode_ZipFile {
 	function _extractEntry(&$entry, $path) {
 		// Make parent dir
 		$ar = explode('/', $path);
-		array_pop($ar);	
+		array_pop($ar);
 		$this->_mkdirs(implode('/', $ar));
 
 		// Extract file contents

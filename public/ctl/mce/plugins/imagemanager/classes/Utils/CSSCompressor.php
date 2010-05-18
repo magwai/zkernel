@@ -4,7 +4,7 @@
  *
  * @author Moxiecode
  * @site http://www.moxieforge.com/
- * @copyright Copyright © 2004-2008, Moxiecode Systems AB, All rights reserved.
+ * @copyright Copyright ï¿½ 2004-2008, Moxiecode Systems AB, All rights reserved.
  * @licence LGPL
  * @ignore
  */
@@ -92,7 +92,7 @@ class Moxiecode_CSSCompressor {
 
 		// Check if it supports gzip
 		if (isset($_SERVER['HTTP_ACCEPT_ENCODING']))
-			$encodings = explode(',', strtolower(preg_replace("/\s+/", "", $_SERVER['HTTP_ACCEPT_ENCODING'])));
+			$encodings = explode(',', strtolower(preg_replace('/\s+/', "", $_SERVER['HTTP_ACCEPT_ENCODING'])));
 
 		if ($this->_settings['gzip_compress'] && (in_array('gzip', $encodings) || in_array('x-gzip', $encodings) || isset($_SERVER['---------------'])) && function_exists('gzencode') && !ini_get('zlib.output_compression')) {
 			$enc = in_array('x-gzip', $encodings) ? "x-gzip" : "gzip";

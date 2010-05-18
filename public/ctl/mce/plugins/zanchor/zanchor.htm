@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>{#zanchor.zanchor_desc}</title>
+	<script type="text/javascript" src="../../tiny_mce_popup.js"></script>
+	<script type="text/javascript" src="js/zanchor.js"></script>
+	<script type="text/javascript" src="../../utils/mctabs.js"></script>
+	<script type="text/javascript" src="../../utils/form_utils.js"></script>
+	<link href="css/zanchor.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+	<form onsubmit="ZanchorDialog.update();return false;" action="#">
+		<table border="0" cellpadding="0" cellspacing="0">
+	        <tr>
+	            <td><label for="title">{#zanchor_dlg.title}</label></td>
+	            <td class="nowrap" style="padding-left:15px;">
+	                <input id="title" name="title" type="text" value="" class="mceFocus" style="width:415px;" />
+	            </td>
+	        </tr>
+	        <tr><td style="height:10px;overflow:hidden;"></td></tr>
+	        <tr>
+	            <td><label for="controller">{#zanchor_dlg.controller}</label></td>
+	            <td class="nowrap" style="padding-left:15px;">
+	                <input id="controller" name="controller" type="text" value="" style="width:415px;" />
+	            </td>
+	        </tr>
+	        <tr><td style="height:10px;overflow:hidden;"></td></tr>
+	        <tr>
+	            <td><label for="action">{#zanchor_dlg.action}</label></td>
+	            <td class="nowrap" style="padding-left:15px;">
+	                <input id="action" name="action" type="text" value="" style="width:415px;" />
+	            </td>
+	        </tr>
+	        <tr><td style="height:10px;overflow:hidden;"></td></tr>
+	        <tr>
+	            <td><label for="param">{#zanchor_dlg.param}</label></td>
+	            <td class="nowrap" style="padding-left:15px;">
+	                <input id="param" name="param" type="text" value="" style="width:415px;" />
+	            </td>
+	        </tr>
+		</table>
+		<br />
+		<div>Выберите модуль для вставки:</div>
+		<iframe src="/z/zanchor" frameborder="0" style="border:1px solid #000;width:100%;height:230px;"></iframe>
+		<div class="mceActionPanel">
+			<input type="submit" id="insert" name="insert" value="{#insert}" />
+			<input type="button" id="cancel" name="cancel" value="{#cancel}" onclick="tinyMCEPopup.close();" />
+		</div>
+	</form>
+</body>
+</html>

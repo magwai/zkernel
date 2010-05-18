@@ -4,12 +4,12 @@
  *
  * @package MCManager.stream
  * @author Moxiecode
- * @copyright Copyright © 2007, Moxiecode Systems AB, All rights reserved.
+ * @copyright Copyright ï¿½ 2007, Moxiecode Systems AB, All rights reserved.
  */
 
 error_reporting(E_ALL ^ E_NOTICE);
 
-header("Content-type: application/json");
+header("Content-type: application/x-javascript");
 
 // Load MCManager core
 require_once("../includes/general.php");

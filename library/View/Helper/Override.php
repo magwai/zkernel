@@ -8,13 +8,34 @@
  */
 
 class Zkernel_View_Helper_Override extends Zend_View_Helper_Abstract  {
-	function overridePage(&$r) {
-		$sp = preg_split('/\<hr(\ )\/\>/si', $r->message);
+	function _overrideModule(&$r, $options) {
+		if (@$options['module_nofall']) return;
+		foreach ($options['module_field'] as $el) {
+			preg_match_all('/\<\!\-\-\ module\:\ \{controller\:\ \"([^\"]*)\"\,\ action\:\ \"([^\"]*)\"\,\ title\:\ \"([^\"]*)\"\}\ \-\-\>/si', $r->$el, $res);
+			if (@$res[0]) {
+				foreach ($res[0] as $k => $v) {
+					$c = $this->view->render($res[1][$k].'/'.$res[2][$k].'.phtml');
+					$r->{$el.'_valid'} = str_ireplace(array('<p>'.$v.'</p>', $v), array($c), $r->$el);
+				}
+			}
+		}
+	}
+
+	function overridePage(&$r, $options = array()) {
+		$options['module_field'] = isset($options['module_field']) ? $options['module_field'] : array();
+		$this->_overrideModule($r, array_merge(
+			$options['module_field'],
+			array('module_field' => array('message'))
+		));
+		$m = $r->message_valid ? $r->message_valid : $r->message;
+		$sp = preg_split('/\<\!\-\-\ pagebreak\ \-\-\>/si', $m);
+		if (count($sp) < 2) $sp = preg_split('/\<hr(\ )\/\>/si', $m);
 		if (count($sp) > 1) {
 			$r->description_valid = preg_replace(array('/\<p\>$/i', '/\<p\>(\&nbsp\;|)\<\/p\>$/i'), array('', ''), $sp[0]);
 			array_shift($sp);
 			$r->message_valid = preg_replace(array('/^\<\/p\>/i', '/^\<p\>(\&nbsp\;|)\<\/p\>/i'), array('', ''), trim(implode('<hr />', $sp)));
 		}
+		else if (!$r->message_valid) $r->message_valid = $r->message;
 	}
 
 	public function overrideSingle($data, $type = null, $options = null) {
@@ -30,7 +51,7 @@ class Zkernel_View_Helper_Override extends Zend_View_Helper_Abstract  {
 		}
 		if (isset($r->title)) $r->title_valid = htmlspecialchars($r->title);
 		if (isset($r->date)) $r->date_valid = Zkernel_Common::getDate($r->date);
-		if ($type !== null && method_exists($this, 'override'.ucfirst($type))) $this->{'override'.ucfirst($type)}($r);
+		if ($type !== null && method_exists($this, 'override'.ucfirst($type))) $this->{'override'.ucfirst($type)}($r, $options);
 		return $r;
 	}
 

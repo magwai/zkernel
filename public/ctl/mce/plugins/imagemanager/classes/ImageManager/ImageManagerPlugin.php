@@ -4,7 +4,7 @@
  *
  * @package MCImageManager
  * @author Moxiecode
- * @copyright Copyright © 2007, Moxiecode Systems AB, All rights reserved.
+ * @copyright Copyright ï¿½ 2007, Moxiecode Systems AB, All rights reserved.
  */
 
 require_once($basepath . "ImageManager/Utils/MCImageToolsGD.php");
@@ -534,7 +534,7 @@ class Moxiecode_ImageManagerPlugin extends Moxiecode_ManagerPlugin {
 			trigger_error("{#error.no_access}", FATAL);
 			die();
 		}
-		
+
 		// To file to resize
 		if (!$file->exists()) {
 			$result->add("FAILED", $man->encryptPath($file->getAbsolutePath()), "{#error.file_not_exists}");
@@ -549,7 +549,7 @@ class Moxiecode_ImageManagerPlugin extends Moxiecode_ManagerPlugin {
 
 			$tempFile =& $man->getFile(dirname($file->getAbsolutePath()) . "/" . $tmpImage);
 			$tempFile->setTriggerEvents(false);
-			
+
 			$status = $imageutils->resizeImage($file->getAbsolutePath(), $tempFile->getAbsolutePath(), $filedata["width"], $filedata["height"], $ext, $config["edit.jpeg_quality"]);
 			if ($status) {
 				$tempFile->importFile();
@@ -681,7 +681,7 @@ class Moxiecode_ImageManagerPlugin extends Moxiecode_ManagerPlugin {
 
 			$tempFile =& $man->getFile(dirname($file->getAbsolutePath()) . "/" . $tmpImage);
 			$tempFile->setTriggerEvents(false);
-			
+
 			$status = $imageutils->flipImage($file->getAbsolutePath(), $tempFile->getAbsolutePath(), $ext, $filedata["vertical"], $filedata["horizontal"]);
 			if ($status) {
 				$tempFile->importFile();
@@ -792,16 +792,16 @@ class Moxiecode_ImageManagerPlugin extends Moxiecode_ManagerPlugin {
 				$next = $curfile->getAbsolutePath();
 				break;
 			}
-			
+
 		}
-		
+
 		$ext = getFileExt($file->getName());
 
 		// Input default size?
 		$width = "425";
 		$height = "350";
 
-		// All types that getimagesize support 
+		// All types that getimagesize support
 		$imagearray = array('gif', 'jpg', 'png', 'swf', 'psd', 'bmp', 'tiff', 'jpc', 'jp2', 'jpx', 'jb2', 'swc', 'iff', 'wbmp', 'xbm');
 
 		if (in_array($ext, $imagearray)) {
@@ -875,7 +875,7 @@ class Moxiecode_ImageManagerPlugin extends Moxiecode_ManagerPlugin {
 
 		// Ok, we have a thumbnail or should generate one, now lets check some stuff about it.
 		$thumbnailFolder = $man->getFile(dirname($file->getAbsolutePath()) ."/". $config['thumbnail.folder']);
-		
+
 		if ((!$thumbnailFolder->exists()) && ($config['thumbnail.auto_generate'] == true))
 			$thumbnailFolder->mkdir();
 
@@ -928,7 +928,7 @@ class Moxiecode_ImageManagerPlugin extends Moxiecode_ManagerPlugin {
 
 			if ($thumbnailResult)
 				$thumbnail->setLastModified($file->getLastModified());
-		
+
 		} else if ((!$thumbnail->exists()) && ($config['thumbnail.auto_generate'] == true)) {
 			$thumbnailResult = $imageutils->resizeImage($file->getAbsolutePath(), $thumbnail->getAbsolutePath(), $targetWidth, $targetHeight, $ext, $thumbnailQuality);
 			if ($thumbnailResult) {

@@ -5,7 +5,11 @@
  * @version $Id$
  * @package phpMyAdmin
  */
-
+$strCalendar = isset($strCalendar) ? $strCalendar : null;
+$month = isset($month) ? $month : null;
+$day_of_week = isset($day_of_week) ? $day_of_week : null;
+$strTime = isset($strTime) ? $strTime : null;
+$strGo = isset($strGo) ? $strGo : null;
 /**
  *
  */
@@ -24,9 +28,9 @@ var day_names = new Array("<?php echo implode('","', $day_of_week); ?>");
 var submit_text = "<?php echo $strGo . ' (' . $strTime . ')'; ?>";
 //]]>
 </script>
-</head>
+<?php echo '</head>' ?>
 <body onload="initCalendar();">
 <div id="calendar_data"></div>
 <div id="clock_data"></div>
 </body>
-</html>
+<?php echo '</html>' ?>

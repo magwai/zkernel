@@ -83,8 +83,8 @@ function PMA_auth_fails()
     /* HTML header */
     $page_title = $GLOBALS['strAccessDenied'];
     require './libraries/header_meta_style.inc.php';
+    echo '</head>';
     ?>
-</head>
 
 <body>
 <br /><br />
@@ -131,7 +131,9 @@ function PMA_auth_fails()
         echo ' </td>' . "\n";
         echo '</tr>' . "\n";
     }
-    echo '</table>' . "\n";
+    ?>
+    </table>
+    <?php
     require_once './libraries/footer.inc.php';
     return TRUE;
 } // end of the 'PMA_auth_fails()' function

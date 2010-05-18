@@ -260,7 +260,7 @@ if (is_array($foreignData['disp_row'])) {
         ?></td>
         <td width="20%">
             <img src="<?php echo $GLOBALS['pmaThemeImage'] . 'spacer.png'; ?>"
-                alt="" width="1" height="1"></td>
+                alt="" width="1" height="1" /></td>
 
         <td>
         <?php

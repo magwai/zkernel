@@ -3,10 +3,10 @@
 	<header>
 		<!-- Please fill in contact information (author & email), we might contact you when we are doing updates -->
 		<!-- You will also have the chance to participate in beta releases of new versions -->
-		<author>Moxiecode Systems AB (spam@moxiecode.com)</author>
-		<version minor="2" major="1" releasedate="2006-12-05" />
+		<author>Неизвестен</author>
+		<version minor="2" major="1" releasedate="2010-05-09" />
 		<description>
-			This is the English language pack for the MCImageManager.
+			Русский пак
 		</description>
 	</header>
 
@@ -49,56 +49,56 @@
 
 		<group target="error">
 			<!-- common -->
-			<item name="demo">This action is restricted in demo mode.</item>
-			<item name="no_filesystem">No filesystem found for path: {path}.</item>
-			<item name="no_access">No access on this file/folder.</item>
-			<item name="no_write_access">Folder has no write access.</item>
-			<item name="file_not_exists">File/folder was not found.</item>
-			<item name="invalid_filename">Filename is not valid.</item>
+			<item name="demo">Запрещено.</item>
+			<item name="no_filesystem">Не найдено файловой системы для: {path}.</item>
+			<item name="no_access">Нет доступа к файлу/каталогу.</item>
+			<item name="no_write_access">Каталог не доступен на запись.</item>
+			<item name="file_not_exists">Файл/Каталог не найден.</item>
+			<item name="invalid_filename">Неверное имя файла.</item>
 
 			<!-- create dir -->
-			<item name="template_missing">The selected template is missing.</item>
-			<item name="folder_exists">A folder with the specified name already exists.</item>
-			<item name="createdir_failed">Error could not create folder.</item>
+			<item name="template_missing">Шаблон не найден.</item>
+			<item name="folder_exists">Такой каталог уже существуетs.</item>
+			<item name="createdir_failed">Не могу создать каталог.</item>
 
 			<!-- upload -->
-			<item name="upload_failed">Upload failed, check your folder write permissions.</item>
-			<item name="file_exists">A file with the specified name already exists.</item>
-			<item name="error_to_large">The file you are trying to upload is to large.</item>
+			<item name="upload_failed">Загрузка не удалась. проверьте права на запись.</item>
+			<item name="file_exists">Такой файл уже существует.</item>
+			<item name="error_to_large">Файл слишком большой.</item>
 
 			<!-- delete -->
-			<item name="delete_failed">Could not delete file(s).</item>
+			<item name="delete_failed">Не могу удалить файл(ы).</item>
 			
 			<!-- image edit -->
-			<item name="crop_failed">Could not crop image.</item>
-			<item name="resize_failed">Could not crop image.</item>
-			<item name="rotate_failed">Rotate was not successfull.</item>
-			<item name="flip_failed">Flip was not successfull.</item>
-			<item name="save_failed">Save was not successfull.</item>
+			<item name="crop_failed">Не могу обрезать катинку.</item>
+			<item name="resize_failed">Не могу изменить размер картинки.</item>
+			<item name="rotate_failed">Не могу повернуть картинку.</item>
+			<item name="flip_failed">Не могу отразить картинку.</item>
+			<item name="save_failed">Не удалось сохранить картинку.</item>
 
 			<!-- Legacy items -->
-			<item name="remove_favorite_failed">Failed to remove the favorite from your favorites list.</item>
+			<item name="remove_favorite_failed">Не могу удалить из избранного.</item>
 		</group>
 
 		<group target="message">
 			<!-- common -->
-			<item name="save_success">File has been saved.</item>
+			<item name="save_success">Файл сохранен.</item>
 			<item name="keepalive">Keepalive request.</item>
 
 			<!-- delete -->
-			<item name="delete_success">File(s) have been deleted successfully.</item>
+			<item name="delete_success">Файл(ы) удален(ы).</item>
 
 			<!-- create dir -->
-			<item name="directory_ok">Folder has been created.</item>
+			<item name="directory_ok">Каталог создан.</item>
 
 			<!-- upload -->
-			<item name="upload_ok">Upload successfull.</item>
+			<item name="upload_ok">Загрузка завершена.</item>
 
 			<!-- image edit -->
-			<item name="crop_success">Crop successfull.</item>
-			<item name="resize_success">Resize successfull.</item>
-			<item name="rotate_success">Rotate successfull.</item>
-			<item name="flip_success">Flip successfull.</item>
+			<item name="crop_success">Картинка обрезана.</item>
+			<item name="resize_success">Размер картинки изменен.</item>
+			<item name="rotate_success">Картинка повернута.</item>
+			<item name="flip_success">Картинка отражена.</item>
 		</group>
 
 		<group target="panel">
@@ -112,17 +112,17 @@
 
 		<group target="view">
 			<item name="title">View</item>
-			<item name="mode">View mode:</item>
-			<item name="thumbnail">Thumbnails</item>
-			<item name="textlist">Text list</item>
-			<item name="images_per_page">images/page</item>
-			<item name="confirm_delete">Are you sure you wish to remove this file?</item>
-			<item name="keyboard_next">Keyboard shortcut: SPACE,N,RIGHTARROW,PAGE DOWN</item>
-			<item name="keyboard_prev">Keyboard shortcut: P,LEFTARROW,PAGE UP</item>
-			<item name="dimensions">Dimensions</item>
+			<item name="mode">Режим просмотра:</item>
+			<item name="thumbnail">Иконки</item>
+			<item name="textlist">Список</item>
+			<item name="images_per_page">Картинок на странице</item>
+			<item name="confirm_delete">Удалить?</item>
+			<item name="keyboard_next">Горячие клавиши: SPACE,N,RIGHTARROW,PAGE DOWN</item>
+			<item name="keyboard_prev">Горячие клавиши: P,LEFTARROW,PAGE UP</item>
+			<item name="dimensions">Размеры</item>
 
 			<!-- Legacy items -->
-			<item name="confirm_remove_favorite">Are you sure you wish to remove this from your favorites list?</item>
+			<item name="confirm_remove_favorite">Удалить из избранного?</item>
 		</group>
 
 		<group target="createdir">
@@ -163,45 +163,45 @@
 		</group>
 
 		<group target="edit_image">
-			<item name="title">Moxiecode ImageManager Editor</item>
-			<item name="save">Save</item>
-			<item name="revert">Revert</item>
-			<item name="crop">Crop</item>
-			<item name="resize">Resize</item>
-			<item name="please_wait">Processing image, please wait...</item>
-			<item name="constrain">Constrain proportions</item>
-			<item name="left">Left</item>
-			<item name="top">Top</item>
-			<item name="width">Width</item>
-			<item name="height">Height</item>
-			<item name="save_as">Save as</item>
-			<item name="flip">Flip</item>
-			<item name="rotate">Rotate</item>
-			<item name="reload">Reload</item>
-			<item name="horizontal">Horizontal</item>
-			<item name="vertical">Vertical</item>
-			<item name="saving_wait">Saving image, please wait...</item>
-			<item name="confirm_revert">Are you sure that you want to revert to the last saved image?</item>
-			<item name="loading">Loading image, please wait...</item>
-			<item name="confirm_no_save">Are you sure that you don't want to save the changes you made to the image?</item>
+			<item name="title">Редактро изображений</item>
+			<item name="save">Сохранить</item>
+			<item name="revert">Откатить</item>
+			<item name="crop">Обрезать</item>
+			<item name="resize">Изменить размер</item>
+			<item name="please_wait">Обработка...</item>
+			<item name="constrain">Сохранить пропорции</item>
+			<item name="left">Слева</item>
+			<item name="top">Сверху</item>
+			<item name="width">Ширина</item>
+			<item name="height">Высота</item>
+			<item name="save_as">Сохранить как</item>
+			<item name="flip">Отразить</item>
+			<item name="rotate">Повернуть</item>
+			<item name="reload">Перезагрузить</item>
+			<item name="horizontal">Горизонтально</item>
+			<item name="vertical">Вертикально</item>
+			<item name="saving_wait">Сохранениеt...</item>
+			<item name="confirm_revert">Вы хотите откатить к последней сохраненной картинке?</item>
+			<item name="loading">Загрузка...</item>
+			<item name="confirm_no_save">Вы уверены, что не хотите сохранять изменения?</item>
 		</group>
 
 		<group target="tinymce">
-			<item name="insertimage_desc">Insert image</item>	
-			<item name="replaceimage_desc">Replace image</item>	
-			<item name="editimage_desc">Edit image</item>	
+			<item name="insertimage_desc">Вставить картинку</item>	
+			<item name="replaceimage_desc">Заменить картинку</item>	
+			<item name="editimage_desc">Редактировать картинку</item>	
 		</group>
 
 		<group target="favorites">
-			<item name="special_folder_title">Favorites</item>
-			<item name="addfavorites">Add favorite(s)</item>
-			<item name="removefavorites">Remove favorite(s)</item>
-			<item name="confirm_remove_favorite">Are you sure you wish to remove this from your favorites list?</item>
-			<item name="remove_favorite_failed">Failed to remove the favorite from your favorites list.</item>
+			<item name="special_folder_title">Избранное</item>
+			<item name="addfavorites">В избранное</item>
+			<item name="removefavorites">Из избранного</item>
+			<item name="confirm_remove_favorite">Удалить из избранного?</item>
+			<item name="remove_favorite_failed">Не удалось удалить из избранного.</item>
 		</group>
 
 		<group target="history">
-			<item name="special_folder_title">History</item>
+			<item name="special_folder_title">История</item>
 		</group>
 	</language>
 </language-pack>

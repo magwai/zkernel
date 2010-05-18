@@ -26,9 +26,11 @@
                                                         <td>
                                                                 <select id="template" name="template" style="width:200px"></select>
 
-                                                                <script id="template_template" type="text/moxiecode-template"><![CDATA[
+                                                                <script id="template_template" type="text/moxiecode-template">
+                                                                <![CDATA[
                                                                         <option value="{value}">{name}</option>
-                                                                ]]></script>
+                                                                ]]>
+                                                                </script>
                                                         </td>
                                                         <td>
                                                                 <a id="showpreview" href="#action" class="preview" title="{#createdoc.preview}"></a>
@@ -59,20 +61,11 @@
                                         </tr>
                                 ]]>
                         </script>
-
+<div>
                         <input type="submit" name="createdoc" value="{#button.create}" class="submit default" />
                         <input id="cancel" type="button" name="cancel" value="{#button.cancel}" class="button cancel" />
-                </form>
-                         <br clear="all">
-                                   <script type="text/javascript"><!--
-                                 google_ad_client = "pub-7944258317361202";
-
-                                 google_ad_height = 60;
-                                 google_ad_slot = "7698062052";
-                                 google_ad_width = 468;
-                                 //-->
-                                 </script><script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
-                                 </script>
+                </div></form>
+                         <br clear="all" />
         </div>
 </div>
 

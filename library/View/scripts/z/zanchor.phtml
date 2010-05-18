@@ -1,0 +1,104 @@
+<?php
+
+$list = array();
+$this->layout()->disableLayout(true);
+Zend_Controller_Front::getInstance()->unregisterPlugin('Zkernel_Controller_Plugin_Debug');
+Zend_Controller_Front::getInstance()->unregisterPlugin('Zkernel_Controller_Plugin_Feedback');
+$dir = Zend_Controller_Front::getInstance()->getControllerDirectory();
+$dir_c = @$dir['default'];
+$dir_v = $dir_c.'/../views/scripts';
+$handle = @opendir($dir_c);
+
+while ($path = @readdir($handle)) {
+	if ($path == '.' || $path == '..') continue;
+
+	$c0 = strtolower(str_replace('Controller.php', '', $path));
+	$c = ucfirst(str_replace('.php', '', $path));
+	if (!class_exists($c) && file_exists($dir_c.'/'.$path)) include $dir_c.'/'.$path;
+	if (!class_exists($c)) continue;
+	$db = Zkernel_Common::getDocblock($c);
+	if (!$db) continue;
+
+	$r = new Zend_Reflection_Class($c);
+	$met = $r->getMethods();
+	$inner = array();
+	if ($met) {
+		foreach ($met as $el) {
+			$db1 = Zkernel_Common::getDocblock($el, 'method');
+    		if (substr($el->name, -6) == 'Action') {
+    			$db1 = Zkernel_Common::getDocblock($el, 'method');
+    			if (!@$db1['zk_module']) continue;
+    			$nn = substr($el->name, 0, -6);
+    			if (!file_exists($dir_v.'/'.$c0.'/'.$nn.'.phtml')) continue;
+    			$inner[$nn] = @$db1['zk_title'] ? $db1['zk_title'] : ucfirst($nn);
+    		}
+		}
+	}
+
+	if (!isset($inner['index']) && @$db['zk_module']) $inner['index'] = 'Index';
+
+	if ($inner) $list[$c0] = array(
+		'title' => @$db['zk_title'] ? $db['zk_title'] : ucfirst($path),
+		'met' => $inner
+	);
+}
+
+echo $this->doctype('HTML5');
+
+?>
+<html>
+	<head>
+		<meta charset=utf-8>
+		<style>
+body{margin:10px;padding:0;background:#fff;font-family:verdana;font-size:12px;line-height:15px;color:#000;}
+ul{margin:0;padding:0;list-style:none;}
+ul ul{padding:0 0 0 20px;}
+li{padding:3px 0;}
+a{color:#000;}
+a:hover{text-decoration:underline;}
+		</style>
+	</head>
+	<body>
+		<ul>
+<?php
+
+if ($list) {
+	foreach ($list as $k0 => $el) {
+
+?>
+	<li>
+		<strong><?php echo $el['title'] ?></strong>
+<?php
+
+	if ($el['met']) {
+
+?>
+
+		<ul>
+<?php
+
+		foreach ($el['met'] as $k1 => $el_1) {
+
+?>
+			<li><a title="Controller: <?php echo $k0 ?>, action: <?php echo $k1 ?>" onclick="window.parent.document.getElementById('controller').value = '<?php echo $k0 ?>';window.parent.document.getElementById('action').value = '<?php echo $k1 ?>';window.parent.document.getElementById('title').value = '<?php echo $this->escape($el['title'].': '.$el_1) ?>';return false;" href="#"><?php echo $el_1 ?></a></li>
+<?php
+
+		}
+
+?>
+		</ul>
+<?php
+
+	}
+
+?>
+	</li>
+<?php
+
+	}
+}
+
+?>
+		</ul>
+	</body>
+</html>

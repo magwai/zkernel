@@ -13,6 +13,7 @@ if (! defined('PHPMYADMIN')) {
     exit;
 }
 
+$strCantLoad = isset($strCantLoad) ? $strCantLoad : null;
 /**
  * Swekey authentication functions.
  */
@@ -34,7 +35,7 @@ if (function_exists('mcrypt_encrypt')) {
     if (empty($_COOKIE['pma_mcrypt_iv'])
      || false === ($iv = base64_decode($_COOKIE['pma_mcrypt_iv'], true))) {
         srand((double) microtime() * 1000000);
-         $td = mcrypt_module_open(MCRYPT_BLOWFISH, '', MCRYPT_MODE_CBC, '');   
+         $td = mcrypt_module_open(MCRYPT_BLOWFISH, '', MCRYPT_MODE_CBC, '');
          if ($td === false) {
             trigger_error(PMA_sanitize(sprintf($strCantLoad, 'mcrypt')), E_USER_WARNING);
          }
@@ -95,7 +96,7 @@ if (function_exists('mcrypt_encrypt')) {
 function PMA_get_blowfish_secret() {
     if (empty($GLOBALS['cfg']['blowfish_secret'])) {
         if (empty($_SESSION['auto_blowfish_secret'])) {
-            // this returns 23 characters 
+            // this returns 23 characters
             $_SESSION['auto_blowfish_secret'] = uniqid('', true);
         }
         return $_SESSION['auto_blowfish_secret'];
@@ -277,8 +278,9 @@ if (top != self) {
         if ($GLOBALS['cfg']['AllowArbitraryServer']) {
             echo ' onchange="document.forms[\'login_form\'].elements[\'pma_servername\'].value = \'\'" ';
         }
-        echo '>';
-
+        ?>
+        >
+        <?php
         require_once './libraries/select_server.lib.php';
         PMA_select_server(false, false);
 
@@ -682,7 +684,7 @@ function PMA_auth_fails()
             }
         }
     } elseif (PMA_DBI_getError()) {
-        $conn_error = '#' . $GLOBALS['errno'] . ' ' . $GLOBALS['strCannotLogin']; 
+        $conn_error = '#' . $GLOBALS['errno'] . ' ' . $GLOBALS['strCannotLogin'];
     } else {
         $conn_error = $GLOBALS['strCannotLogin'];
     }

@@ -1,0 +1,55 @@
+<?php
+
+$this->control(array(
+	'use_db' => false,
+	'type' => 'add',
+	'field' => array(
+		'type' => array(
+			'title' => 'Тип соединения',
+			'type' => 'select',
+			'param' => array(
+				'multioptions' => array(
+					'ftp' => 'FTP',
+					'ssh' => 'SSH'
+				)
+			),
+			'order' => 1
+		),
+		'host' => array(
+			'title' => 'Сервер',
+			'required' => true,
+			'order' => 2
+		),
+		'login' => array(
+			'title' => 'Логин',
+			'required' => true,
+			'order' => 3
+		),
+		'password' => array(
+			'title' => 'Пароль',
+			'required' => true,
+			'order' => 4
+		)
+	),
+	'func_override' => 'php_function:
+$control->config->stop_frame = true;
+$host = $control->config->data->host;
+$port = explode(":", $host);
+if (count($port) > 1) {
+	$port = $port[count($port) - 1];
+	array_pop($port);
+	$host = implode(":", $port);
+}
+else $port = $control->config->data->type == "ftp" ? 21 : 22;
+
+if ($control->config->data->type == "ftp") {
+	$c = ftp_connect($host, $port, 10);
+	if ($c) {
+		if (ftp_login($c, $control->config->data->login, $control->config->data->password)) {
+			$control->config->info[] = "Подключение прошло успешно";
+		}
+		else $control->config->info[] = "Неверные логин / пароль";
+	}
+	else $control->config->info[] = "Не удалось подключиться к ".$host." на порт ".$port;
+}'
+));

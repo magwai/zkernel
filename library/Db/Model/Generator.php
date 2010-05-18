@@ -110,6 +110,7 @@ class Zkernel_Db_Model_Generator {
 		$c = '<?php'."\n\n".$controller->generate();
 
 		$ok = file_put_contents(APPLICATION_PATH.'/controllers/'.$name.'Controller.php', $c);
+		if ($ok) @chmod(APPLICATION_PATH.'/controllers/'.$name.'Controller.php', 0777);
 
 		return $ok;
     }

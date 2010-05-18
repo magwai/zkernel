@@ -147,6 +147,7 @@ return $this->fetchRow($s);';
 		$c = '<?php'."\n\n".$model->generate();
 
 		$ok = file_put_contents(APPLICATION_PATH.'/models/'.$name.'.php', $c);
+		if ($ok) @chmod(APPLICATION_PATH.'/models/'.$name.'.php', 0777);
 
 		if ($data['table'] && $data['table_create']) {
 			$n = substr($data['table_create'], 3);

@@ -19,13 +19,13 @@ class Zkernel_Form_Element_Mce extends Zend_Form_Element_Textarea {
 			'remove_script_host' => true,
 			'relative_urls' => false,
 			'add_form_submit_trigger' => false,
-			'plugins' => "safari,inlinepopups,table,advimage,advlink,media,print,contextmenu,paste,fullscreen,xhtmlxtras,imagemanager,filemanager",
+			'plugins' => "safari,inlinepopups,table,advimage,advlink,media,print,contextmenu,paste,fullscreen,xhtmlxtras,imagemanager,filemanager,pagebreak,zanchor,noneditable",
 			'theme_advanced_blockformats' => "blockquote,h1,h2,h3,h4,h5,h6",
 			'theme_advanced_toolbar_location' => "top",
 			'theme_advanced_toolbar_align' => "left",
 			'theme_advanced_buttons1' => "bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,formatselect,fontselect,fontsizeselect,|,sub,sup",
-			'theme_advanced_buttons2' => "cut,copy,paste,pastetext,pasteword,|,bullist,numlist,|,outdent,indent,|,undo,redo,|,link,unlink,charmap,|,image,file,media,|,forecolor,backcolor",
-			'theme_advanced_buttons3' => "tablecontrols,|,removeformat,|,print,|,newdocument,fullscreen,|,code,|,hr"
+			'theme_advanced_buttons2' => "cut,copy,paste,pastetext,pasteword,|,bullist,numlist,|,outdent,indent,|,undo,redo,|,link,unlink,charmap,hr,|,image,file,media,|,forecolor,backcolor",
+			'theme_advanced_buttons3' => "tablecontrols,|,removeformat,|,print,|,newdocument,fullscreen,|,code,|,pagebreak".(APPLICATION_ENV == 'production' ? '' : ',|,zanchor')
     	);
     	if ($a) $o = array_merge($o, $a);
     	$js =
@@ -43,10 +43,12 @@ class Zkernel_Form_Element_Mce extends Zend_Form_Element_Textarea {
 		$value = parent::getValue();
 		$value = str_ireplace(array(
 			'<p style="margin-top: 0px; margin-right: 0px; margin-bottom: 1em; margin-left: 0px;">',
-			"<p>&nbsp;</p>\n<hr />\n<p>&nbsp;</p>"
+			"<p>&nbsp;</p>\n<hr />\n<p>&nbsp;</p>",
+			'<hr />'
 		), array(
 			'<p>',
-			'<hr />'
+			'<hr />',
+			'<!-- pagebreak -->'
 		), $value);
 		return $value;
 	}

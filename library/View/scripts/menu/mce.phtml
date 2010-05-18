@@ -2,6 +2,7 @@
 
 $this->layout()->disableLayout(true);
 Zend_Controller_Front::getInstance()->unregisterPlugin('Zkernel_Controller_Plugin_Debug');
+Zend_Controller_Front::getInstance()->unregisterPlugin('Zkernel_Controller_Plugin_Feedback');
 $menu = $this->navigation()->menu()->renderMenu();
 $menu = preg_replace('/href\=\"([^\"]+)\"/si', 'onclick="return m_set_url(\'$1\')" href="#"', $menu);
 

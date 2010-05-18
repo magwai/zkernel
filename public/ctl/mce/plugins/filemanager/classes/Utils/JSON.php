@@ -4,7 +4,7 @@
  *
  * @package MCManager.utils
  * @author Moxiecode
- * @copyright Copyright © 2007, Moxiecode Systems AB, All rights reserved.
+ * @copyright Copyright ï¿½ 2007, Moxiecode Systems AB, All rights reserved.
  */
 
 define('JSON_BOOL', 1);
@@ -204,9 +204,9 @@ class Moxiecode_JSONReader {
 								$output .= "\t";
 								break;
 
-							case 'b':
+							/*case 'b':
 								$output .= "\b";
-								break;
+								break;*/
 
 							case 'f':
 								$output .= "\f";
@@ -407,7 +407,7 @@ class Moxiecode_JSON {
 						$this->addArray($key);
 					else
 						$this->addArray(null);
-
+					$obj = isset($obj) ? $obj : null;
 					$cur =& $obj;
 
 					$loc = $reader->getLocation();
@@ -488,9 +488,9 @@ class Moxiecode_JSON {
 
 			for ($i=0; $i<strlen($input); $i++) {
 				switch ($input[$i]) {
-					case "\b":
+					/*case "\b":
 						$output .= "\\b";
-						break;
+						break;*/
 
 					case "\t":
 						$output .= "\\t";

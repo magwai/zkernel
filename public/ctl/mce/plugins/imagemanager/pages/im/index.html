@@ -62,7 +62,7 @@
 			<div id="progress" class="pagenav">{#common.loading}</div>
 
 			<div class="viewmode">
-				<form action="#action" name="listOptions">
+				<form action="#action" name="listOptions"><div>
 				{#view.mode}
 					<select name="selectView" id="selectView">
 						<option value="text">{#view.textlist}</option>
@@ -72,7 +72,7 @@
 									<option value="50">50</option>
 									<option value="100">100</option>
 								</select> {#view.images_per_page}
-				</form>
+				</div></form>
 			</div>
 
 			<br style="clear:both" />

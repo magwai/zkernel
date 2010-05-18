@@ -1,4 +1,5 @@
 <?php
+		$basepath = isset($basepath) ? $basepath : '';
         require_once($basepath . "FileManager/FileManagerPlugin.php");
 
         // * * * * FileManager config

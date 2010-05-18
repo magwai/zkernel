@@ -114,7 +114,7 @@ class Zkernel_Db_Table extends Zend_Db_Table_Abstract
 
 	public function init() {
 		parent::init();
-		if ($this->_multilang_field) {
+		if (isset($this->_multilang_field)) {
 			$reg = Zend_Registry::isRegistered('Zkernel_Multilang') ? Zend_Registry::get('Zkernel_Multilang') : '';
 			if ($reg) {
 				$cols = $this->info('metadata');

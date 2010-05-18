@@ -28,9 +28,11 @@
                                                                         <option value="">{#createdir.select_template}</option>
                                                                 </select>
 
-                                                                <script id="template_template" type="text/moxiecode-template"><![CDATA[
+                                                                <script id="template_template" type="text/moxiecode-template">
+                                                                <![CDATA[
                                                                         <option value="{value}">{name}</option>
-                                                                ]]></script>
+                                                                ]]>
+                                                                </script>
                                                         </td>
                                                 </tr>
 
@@ -50,9 +52,10 @@
                         <div id="result">
                                 <!-- Will be filled by the thumbs_template template -->
                         </div>
-
+						<div>
                         <input type="submit" name="createdir" value="{#button.create}" class="submit default" />
                         <input id="cancel" type="button" name="cancel" value="{#button.cancel}" class="button cancel" />
+                        </div>
                 </form>
 
         </div>

@@ -11,6 +11,7 @@ window.onload = function(){
     if (ZfeedbackLoad) {
     	ZfeedbackLoad();
     }
+    if (typeof $ == 'undefined') return;
     $('#Zkernel_Feedback').show();
     $('#Zkernel_Feedback_Btn').click(function() {
     	var w = $('#Zkernel_Feedback_Wnd');

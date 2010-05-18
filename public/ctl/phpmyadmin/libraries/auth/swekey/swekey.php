@@ -249,7 +249,8 @@ function Swekey_HttpGet($url, &$response_code)
         // retry if one of the server is down
         for ($num=1; $num <= 3; $num++ )
         {
-            $r = new HttpRequest($url);
+        	$ccc = 'HttpRequest';
+            $r = new $ccc($url);
             $options = array('timeout' => '3');
 
             if (substr($url,0, 6) == "https:")
