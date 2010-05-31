@@ -11,12 +11,14 @@ class Zkernel_View_Helper_Zlist extends Zend_View_Helper_Abstract  {
 	public function zlist($data = array()) {
 		$res = '';
 
-		$data['fetch_model'] = class_exists($data['fetch_model']) ? $data['fetch_model'] : 'Default_Model_'.strtoupper($data['fetch_model']);
+		$reg = Zend_Registry::isRegistered('Zkernel_Multilang') ? Zend_Registry::get('Zkernel_Multilang') : '';
+
+		$data['fetch_model'] = class_exists($data['fetch_model']) ? $data['fetch_model'] : 'Default_Model_'.ucfirst($data['fetch_model']);
 
 		$data['fetch_param'] = @$data['fetch_param'] ? (is_array($data['fetch_param']) ? $data['fetch_param'] : array($data['fetch_param'])) : array();
 
 		$data['fetch_method'] = @$data['fetch_method'] ? $data['fetch_method'] : 'list';
-		if (!method_exists($data['fetch_model'], $data['fetch_method'])) $data['fetch_method'] = 'fetch'.strtoupper($data['fetch_method']);
+		if (!method_exists($data['fetch_model'], $data['fetch_method'])) $data['fetch_method'] = 'fetch'.ucfirst($data['fetch_method']);
 
 		$data['override_type'] = @$data['override_type'];
 		if (!$data['override_type']) $data['override_type'] = strtolower(str_ireplace('Default_Model_', '', $data['fetch_model']));
@@ -31,13 +33,13 @@ class Zkernel_View_Helper_Zlist extends Zend_View_Helper_Abstract  {
 		if (!@$data['pager'] && (@$data['pager_url'] || @$data['pager_page'] || @$data['pager_perpage'] || @$data['pager_style'] || @$data['pager_script'] || @$data['pager_param'])) $data['pager'] = true;
 
 		$data['pager_url'] = @$data['pager_url'];
-		if (!$data['pager_url']) $data['pager_url'] = '/'.strtolower(str_ireplace('Default_Model_', '', $data['fetch_model']));
+		if (!$data['pager_url']) $data['pager_url'] = ($reg ? '/'.$reg->stitle : '').'/'.strtolower(str_ireplace('Default_Model_', '', $data['fetch_model']));
 
 		$data['pager_page'] = @$data['pager_page'];
-		if (!$data['pager_page']) $data['pager_page'] = @$this->page ? $this->page : 1;
+		if (!$data['pager_page']) $data['pager_page'] = @$this->view->page ? $this->view->page : 1;
 
 		$data['pager_perpage'] = @$data['pager_perpage'];
-		if (!$data['pager_perpage']) $data['pager_perpage'] = @$this->perpage ? $this->perpage : 10;
+		if (!$data['pager_perpage']) $data['pager_perpage'] = @$this->view->perpage ? $this->view->perpage : 10;
 
 		$data['pager_style'] = @$data['pager_style'] ? $data['pager_style'] : 'All';
 
@@ -57,6 +59,7 @@ class Zkernel_View_Helper_Zlist extends Zend_View_Helper_Abstract  {
 			),
 			$data['fetch_param']
 		);
+
 		if (count($list)) {
 			$lv = $this->view->override($list, $data['override_type']);
 			$reindex = false;
