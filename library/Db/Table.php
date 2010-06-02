@@ -119,7 +119,7 @@ class Zkernel_Db_Table extends Zend_Db_Table_Abstract
 			if ($reg) {
 				$cols = $this->info('metadata');
 				$m = new Default_Model_Lang();
-				$ids = implode('|', $m->fetchIds());
+				$ids = implode('|', $reg->_ids);
 				$ml = implode('|', $this->_multilang_field);
 				$changed = false;
 				foreach ($this->_multilang_field as $k => $el) {

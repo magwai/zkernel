@@ -42,6 +42,7 @@ class Zkernel_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstrac
 		$this->_lang = $this->_model->fetchRow(null, '(`id` = '.(int)$this->_session->lang.') DESC, (`default` = 1) DESC', 1);
 		if ($this->_lang) $this->_lang = new Zkernel_View_Data($this->_lang);
 		$this->_lang->_default = $this->getDefault();
+		$this->_lang->_ids = $this->_model->fetchIds();
 
 		$front = Zend_Controller_Front::getInstance();
 		$router = $front->getRouter();
