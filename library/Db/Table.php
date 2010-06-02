@@ -121,14 +121,23 @@ class Zkernel_Db_Table extends Zend_Db_Table_Abstract
 				$m = new Default_Model_Lang();
 				$ids = implode('|', $m->fetchIds());
 				$ml = implode('|', $this->_multilang_field);
+				$changed = false;
 				foreach ($this->_multilang_field as $k => $el) {
-					if (!array_key_exists('ml_'.$el.'_'.$reg->id, $cols)) $this->getAdapter()->query('ALTER TABLE `'.$this->_name.'` ADD `ml_'.$el.'_'.$reg->id.'` '.$cols[$el]['DATA_TYPE'].($cols[$el]['LENGTH'] ? '('.$cols[$el]['LENGTH'].')' : '').($cols[$el]['DEFAULT'] ? ' DEFAULT '.$cols[$el]['DEFAULT'] : ''));
+					if (!array_key_exists('ml_'.$el.'_'.$reg->id, $cols)) {
+						$changed = true;
+						$this->getAdapter()->query('ALTER TABLE `'.$this->_name.'` ADD `ml_'.$el.'_'.$reg->id.'` '.$cols[$el]['DATA_TYPE'].($cols[$el]['LENGTH'] ? '('.$cols[$el]['LENGTH'].')' : '').($cols[$el]['DEFAULT'] ? ' DEFAULT '.$cols[$el]['DEFAULT'] : ''));
+					}
 				}
 				foreach ($cols as $k => $el) {
-					if (preg_match('/^ml\_'.$el.'\_(\d+)$/i', $k) && !preg_match('/^ml\_('.implode('|', $this->_multilang_field).')\_('.implode('|', $ids).')+$/i')) $this->getAdapter()->query('ALTER TABLE `'.$this->_name.'` DROP `'.$k.'`');
+					if (preg_match('/^ml\_'.$el.'\_(\d+)$/i', $k) && !preg_match('/^ml\_('.implode('|', $this->_multilang_field).')\_('.implode('|', $ids).')+$/i')) {
+						$changed = true;
+						$this->getAdapter()->query('ALTER TABLE `'.$this->_name.'` DROP `'.$k.'`');
+					}
 				}
-				$cache = $this->getMetadataCache();
-				if ($cache) $cache->clean();
+				if ($changed) {
+					$cache = $this->getMetadataCache();
+					if ($cache) $cache->clean();
+				}
 			}
 		}
     }
