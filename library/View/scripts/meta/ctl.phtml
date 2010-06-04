@@ -1,0 +1,36 @@
+<?php
+
+$t = '';//'По-умолчанию TITLE, KEYWORDS и DESCRITION заменяют все содержимое. Если вначале +, то добавит к содержимому, если -, то вставит перед содержимым';
+$this->control(array(
+	'field' => array(
+		'url' => array(
+			'title' => 'URL',
+			'unique' => true,
+			'required' => true,
+			'description' => 'Адрес должен быть внутренним. Напимер: /news/*, /page/about',
+			'order' => 1
+		),
+		'title' => array(
+			'title' => 'TITLE',
+			'order' => 2
+		),
+		'keywords' => array(
+			'title' => 'META: KEYWORDS',
+			'description' => 'Ключевые слова перечисляются через запятую',
+			'order' => 3
+		),
+		'description' => array(
+			'title' => 'META: DESCRIPTION',
+			'description' => 'Описание должно характеризовать содержимое страницы',
+			'order' => 4
+		)
+	),
+	'action_config' => array(
+		'ctladd' => array(
+			'text' => $t
+		),
+		'ctledit' => array(
+			'text' => $t
+		)
+	)
+));
