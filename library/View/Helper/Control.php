@@ -50,6 +50,8 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 				'param' => ''
 			),
 	    	'oac_apply' 			=> true,
+			'oac_cancel'			=> true,
+			'oac_ok_title'			=> 'OK',
 	    	'post_field_extend'		=> array(),
 	    	'post_field_uset'		=> array(),
 	    	'orderby' 				=> '',
@@ -355,7 +357,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
     		$this->config->tree_opened[] = $this->config->param['oid'];
     	}
 
-    	if ($this->config->drag && $this->config->type == 'add' && $this->config->field && isset($this->config->field->{$this->config->field_orderid})) {
+    	if ($this->config->use_db && $this->config->drag && $this->config->type == 'add' && $this->config->field && isset($this->config->field->{$this->config->field_orderid})) {
     		$nid = $this->config->model->fetchOne('MAX(`'.$this->config->field_orderid.'`)');
     		$this->config->post_field_extend->set(array(
     			$this->config->field_orderid => $nid + 1
@@ -484,17 +486,17 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 				if (!isset($p->fn)) {
 					$where = $this->config->where ? $this->config->where->toArray() : array();
 					$where['`id` = ?'] = $id;
-					$p->fn = $this->config->model->fetchOne($el->name, $where);
+					if ($this->config->use_db) $p->fn = $this->config->model->fetchOne($el->name, $where);
 				}
 			}
 		   $form->addElement($el->type, $el->name, $p->toArray());
 		}
 
 		$form->addElement('submit', 'oac_ok', array(
-		    'label' => 'ОК',
+		    'label' => $this->config->oac_ok_title,
     		'class' => 'c_button'
 		));
-		$form->addElement('submit', 'oac_cancel', array(
+		if ($this->config->oac_cancel) $form->addElement('submit', 'oac_cancel', array(
 		    'label' => 'Отмена',
 			'onclick' => 'return c.go("'.$this->config->request_cancel->controller.'", "'.$this->config->request_cancel->action.'", '.Zend_Json::encode(Zkernel_Common::url2array($this->config->request_cancel->param)).')',
     		'class' => 'c_button'

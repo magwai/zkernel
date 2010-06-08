@@ -18,12 +18,17 @@ class Zkernel_Form_Element_Date extends Zend_Form_Element_Text
 	}
 
 	public function render(Zend_View_Interface $view = null) {
+		$a = $this->getAttribs();
+    	unset($a['helper']);
+		$o = array(
+    		'dateFormat' => 'dd.mm.yy',
+			'firstDay' => '1'
+    	);
+    	if ($a) $o = array_merge($o, $a);
+
     	$js =
 '$.include("/zkernel/js/jquery/ui/ui.datepicker.js", function() {
-	$("input[name='.$this->getName().']").datepicker({
-		dateFormat: "dd.mm.yy",
-		firstDay: 1
-	});
+	$("input[name='.$this->getName().']").datepicker('.Zend_Json::encode($o).');
 });';
     	$this->getView()->inlineScript('script', $js);
     	return parent::render($view);

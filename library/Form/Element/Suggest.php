@@ -15,6 +15,7 @@ class Zkernel_Form_Element_Suggest extends Zend_Form_Element_Text {
     	$min_length = $min_length ? $min_length : 1;
 
     	$must_match = $this->getAttrib('must_match');
+    	$add_param = $this->getAttrib('add_param');
 
     	$s = new Zend_Session_Namespace();
 
@@ -27,8 +28,18 @@ class Zkernel_Form_Element_Suggest extends Zend_Form_Element_Text {
 	var i = $("input[name='.$this->getName().']");
 	i.autocomplete({
 		source: function(request, response) {
+			var add = "";
+			'.($add_param ?
+			'var ap = '.Zend_Json::encode($add_param).';
+			for (k in ap) {
+				if (ap[k].slice(0, 3) == "jq:") {
+					var o = $(ap[k].slice(3));
+					if (o.length && o.val()) add += "/" + k + "/" + o.val();
+				}
+				else add += "/" + k + "/" + ap[k];
+			}' : '').'
 			$.ajax({
-				url: "/z/suggest/name/'.$this->getName().'",
+				url: "/z/suggest/name/'.$this->getName().'" + add,
 				dataType: "json",
 				data: request,
 				success: function(data) {

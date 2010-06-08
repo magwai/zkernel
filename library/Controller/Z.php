@@ -22,6 +22,10 @@ class Zkernel_Controller_Z extends Zkernel_Controller_Action {
 	function suggestAction() {
 		$this->view->name = $this->getRequest()->getParam('name');
 		$this->view->term = $this->getRequest()->getParam('term');
+		$ps = $this->getRequest()->getParams();
+		unset($ps['name']);
+		unset($ps['term']);
+		$this->view->add = $ps;
 	}
 
 	public function minifyAction() {
