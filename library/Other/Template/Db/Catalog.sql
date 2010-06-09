@@ -5,7 +5,7 @@ CREATE TABLE `%name%` (
   `title` varchar(255) DEFAULT '',
   `stitle` varchar(255) DEFAULT '',
   `parentid` int DEFAULT 0,
-  `orderid` int DEFAULT 0
+  `orderid` int DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `i_parentid` (`parentid`),
   KEY `i_orderid` (`orderid`),
