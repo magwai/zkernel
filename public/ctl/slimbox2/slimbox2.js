@@ -52,10 +52,11 @@
 	$.slimbox_init = function(c, o) {
 		c = typeof c == 'undefined' ? null : c;
 		o = typeof o == 'undefined' ? {} : o;
-		$("a[rel^='lightbox']", c).slimbox(o, null, function(el) {
+		if (!o['linkMapper']) o['linkMapper'] = null;
+		if (!o['linksFilter']) o['linksFilter'] = function(el) {
 			return (this == el) || ((this.rel.length > 8) && (this.rel == el.rel));
-		});
-
+		};
+		$("a[rel^='lightbox']", c).slimbox(o, o['linkMapper'], o['linksFilter']);
 		$("a[rel^='videobox']", c).each (function () {
 			var p = [];
 			var r = $(this).attr('rel');
