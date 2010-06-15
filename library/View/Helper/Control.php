@@ -397,10 +397,10 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 				$parentid = $parentid == 0 ? null : $parentid;
 			}
 			if ($this->config->param['cid'] && isset($this->config->field->{$this->config->field_link})) $where['`'.$this->config->field_link.'` = ?'] = $this->config->param['cid'];
-			if ($this->config->data) {
+			/*if ($this->config->data) {
 				if (!$this->config->data_cnt) $this->config->data_cnt = count($this->config->data);
 			}
-			else {
+			else {*/
 				$rd = $this->config->model->fetchControlList(
 			    	$where,
 			    	$this->config->orderby.' '.$this->config->orderdir,
@@ -424,7 +424,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 			    	}
 			    }
 			    $this->config->data = $this->view->override($data, $this->config->controller);
-			}
+			//}
 		}
 		else {
 			$menus = $menu_model->fetchAll(array('`parentid` = ?' => @(int)$menu->id, '`show_it` = 0', 'orderid'));
