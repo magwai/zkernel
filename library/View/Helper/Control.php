@@ -78,6 +78,9 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 		$this->config->request_cancel->controller = $this->config->controller;
 		$this->config->request_ok->controller = $this->config->controller;
 		$this->_config_inited = true;
+
+		ini_set('session.cookie_lifetime', 86400 * 30);
+		ini_set('session.gc_maxlifetime', 86400 * 30);
 	}
 
 	private function userInit() {
@@ -276,9 +279,6 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
     	$conf_s = $mc->fetchPairs(null, $this->config->action, $this->config->controller);
     	if ($conf_s) $conf = array_merge($conf, $conf_s);
 
-    	//print_r($this->config->action);
-    	//exit();
-
     	//$this->config->set($conf_s);
 
 		if (isset($conf->use_db)) $this->config->use_db = $conf->use_db;
@@ -397,28 +397,34 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 				$parentid = $parentid == 0 ? null : $parentid;
 			}
 			if ($this->config->param['cid'] && isset($this->config->field->{$this->config->field_link})) $where['`'.$this->config->field_link.'` = ?'] = $this->config->param['cid'];
-			$rd = $this->config->model->fetchControlList(
-		    	$where,
-		    	$this->config->orderby.' '.$this->config->orderdir,
-		    	$this->config->pager_perpage
-		    		? $this->config->pager_perpage
-		    		: null,
-		    	$this->config->pager_perpage
-		    		? ($this->config->pager_page - 1) * $this->config->pager_perpage
-		    		: null
-		    );
+			if ($this->config->data) {
+				if (!$this->config->data_cnt) $this->config->data_cnt = count($this->config->data);
+			}
+			else {
+				$rd = $this->config->model->fetchControlList(
+			    	$where,
+			    	$this->config->orderby.' '.$this->config->orderdir,
+			    	$this->config->pager_perpage
+			    		? $this->config->pager_perpage
+			    		: null,
+			    	$this->config->pager_perpage
+			    		? ($this->config->pager_page - 1) * $this->config->pager_perpage
+			    		: null
+			    );
+			    $data = $rd->toArray();
 
-		    $this->config->data_cnt = $this->config->model->fetchCount($where);
-		   	$data = $rd->toArray();
-		    if ($this->config->tree && $data && $this->config->field) {
-		    	foreach ($data as &$el) {
-		    		$el['_level'] = $level;
-		    		$el['_count'] = (int)$this->config->model->fetchCount(array(
-		    			'`'.$this->config->tree_field.'` = ?' => (string)$el['id']
-		    		));
-		    	}
-		    }
-		    $this->config->data = $this->view->override($data, $this->config->controller);
+			    $this->config->data_cnt = $this->config->model->fetchCount($where);
+
+			    if ($this->config->tree && $data && $this->config->field) {
+			    	foreach ($data as &$el) {
+			    		$el['_level'] = $level;
+			    		$el['_count'] = (int)$this->config->model->fetchCount(array(
+			    			'`'.$this->config->tree_field.'` = ?' => (string)$el['id']
+			    		));
+			    	}
+			    }
+			    $this->config->data = $this->view->override($data, $this->config->controller);
+			}
 		}
 		else {
 			$menus = $menu_model->fetchAll(array('`parentid` = ?' => @(int)$menu->id, '`show_it` = 0', 'orderid'));
@@ -444,6 +450,15 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 				else {
 					$s = new Zend_Session_Namespace();
 					$s->control['history'][$menu->controller]['oid'] = $this->config->param['cid'];
+					if ($menu->controller) {
+						$cl_0 = stripos($menu->param, 'cl=0');
+						$this->config->button_bottom[] = array(
+							'controller' => $menu->controller,
+							'action' => $menu->action ? $menu->action : 'ctlshow',
+							'title' => 'Назад',
+							'cl' => $cl_0 !== false ? 'f' : 't'
+						);
+					}
 				}
 			}
 		}
@@ -462,6 +477,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
     	if ($this->config->field) foreach ($this->config->field as $el) {
 		    if (!$el->active) continue;
 			$p = new Zkernel_Config_Control($el->param, array(
+				'type' => 'text',
 				'label' => $el->title,
 				'description' => $el->description,
 	    		'required' => $el->required ? true : false,
@@ -489,7 +505,10 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 					if ($this->config->use_db) $p->fn = $this->config->model->fetchOne($el->name, $where);
 				}
 			}
-		   $form->addElement($el->type, $el->name, $p->toArray());
+			if ($el->type == 'select') $p->class = 'c_select';
+			else if ($el->type == 'textarea') $p->class = 'ui-state-default ui-corner-all c_textarea';
+			else $p->class = 'ui-state-default ui-corner-all c_input';
+			$form->addElement($el->type, $el->name, $p->toArray());
 		}
 
 		$form->addElement('submit', 'oac_ok', array(

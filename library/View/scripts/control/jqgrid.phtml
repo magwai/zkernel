@@ -17,7 +17,7 @@ if ($c->post['nd']) {
     			$cc[] = $el->_count ? false : true;
     			$cc[] = false;
     		}
-    		$rows[] = array('id' => $el->id, 'cell' => $cc);
+    		$rows[] = array('id' => $el['id'], 'cell' => $cc);
     	}
     }
 

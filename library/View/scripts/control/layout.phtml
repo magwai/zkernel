@@ -39,6 +39,7 @@ else {
 			->headScript('file', '/zkernel/js/jquery/ui/ui.widget.js')
 			->headScript('file', '/zkernel/js/jquery/ui/ui.mouse.js')
 			->headScript('file', '/zkernel/js/jquery/ui/ui.sortable.js')
+			->headScript('file', '/zkernel/js/jquery/ui/ui.button.js')
 			->headScript('file', '/zkernel/ctl/jqgrid/grid.zkernel.js')
 			->headScript('file', '/zkernel/js/swfobject.js')
 			->headScript('file', '/zkernel/ctl/uploadify/jquery.uploadify.js')
@@ -51,7 +52,7 @@ else {
 			->appendStylesheet('/zkernel/img/jquery/ui/themes/'.$this->control()->config->theme.'/ui.all.css')
 			->appendStylesheet('/zkernel/ctl/jqgrid/css/ui.jqgrid.css')
 			->appendStylesheet('/zkernel/ctl/uploadify/uploadify.css')
-			->appendStylesheet('/zkernel/img/control/main.css');
+			->appendStylesheet('/zkernel/img/control/main.css?1');
 
 	echo $this->doctype('HTML5');
 
@@ -76,9 +77,9 @@ else {
 				</div>
 				<div id="c_login"><form action="" method="post">
 					<span title="Имя пользователя" class="ui-icon ui-icon-person"></span><span title="Пароль" class="ui-icon ui-icon-key"></span>
-					<input type="text" name="login" />
-					<input type="password" name="password" />
-					<span><input type="submit" value="Войти" /></span>
+					<input class="ui-state-default ui-corner-all c_l_input" type="text" name="login" />
+					<input class="ui-state-default ui-corner-all c_l_input" type="password" name="password" />
+					<span><input class="c_l_button" type="submit" value="Войти" /></span>
 				</form></div>
 				<?php echo $reg ? $this->render('control/multi.phtml') : '' ?>
 				<div id="c_navpane"></div>

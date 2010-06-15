@@ -1,0 +1,57 @@
+<?php
+
+$mg = new Default_Model_Generator();
+
+$this->control(array(
+	'type' => 'list',
+	'field' => array(
+		'controller' => array(
+			'active' => false
+		),
+		'action' => array(
+			'active' => false
+		),
+		'key' => array(
+			'active' => false
+		),
+		'type' => array(
+			'active' => false
+		),
+		'value' => array(
+			'active' => false
+		),
+		'zk_title' => array(
+			'title' => 'Название',
+			'order' => 1,
+			'formatter' => 'function',
+			'formatoptions' => 'return "<span class=\'gg_span\'>" + data.name + "</span>" + data.zk_title;'
+		),
+		'name' => array(
+			'title' => 'Название',
+			'description' => 'Просто название. Без Controller...',
+			'order' => 1,
+			'required' => true,
+			'hidden' => true
+		)
+	),
+	'button_top' => array(array(
+		'title' => 'Действия',
+		'action' => 'ctlbuilderaction'
+	), '', ''),
+	'text' =>
+'<style>
+.gg_span{float:right;}
+.gg_span .ui-icon{float:right;margin:0 0 0 10px;}
+.c_text{height:0;padding:0;overflow:hidden;}
+</style>',
+	'navpane' => array(
+		'finish' => array(
+			array(
+				't' => 'Генератор',
+				'c' => 'cconf',
+				'a' => 'ctlbuilder'
+			)
+		)
+	),
+	'data' => $mg->fetchControlList()
+));

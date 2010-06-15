@@ -36,6 +36,7 @@ c.init = function(p) {
 	};
 	php.complete = function (request, status) {
 		c.loading_finish();
+		$('input[type=button],input[type=submit]').button();
 		$('.c_form input:first').focus();
 	};
 	$.ajax({
@@ -198,7 +199,7 @@ c.load_auth = function(success) {
 		success: function(data) {
 			$('#c_login').empty();
 			var login = data.login;
-			if (login.length && login != 'none') $('#c_login').append(login + ' &nbsp;&nbsp;<span><input type="button" value="Выйти" /></span>').find('input').click(c.logout);
+			if (login.length && login != 'none') $('#c_login').append(login + ' &nbsp;&nbsp;<span><input class="c_l_button" type="button" value="Выйти" /></span>').find('input').click(c.logout);
 			else {
 				$('#c_login').append(c.tpl['c_auth']).find('form input[type="submit"]').click(function() {
 					return c.login($('#c_login').find('form').serialize(), c.cfg.controller, c.cfg.action);
@@ -393,10 +394,12 @@ c.rnd = function() {
 };
 
 c.table_width = function() {
-	return $(window).width() - 43;
+	var nw = $(window).width() - 43;
+	return nw > 954 ? nw : 954;
 };
 
 c.table_height = function() {
+	$('input[type=button],input[type=submit]').button();
 	var th = 0;
 	$('.c_text').each(function() {
 		th += $(this).get(0).offsetHeight;
