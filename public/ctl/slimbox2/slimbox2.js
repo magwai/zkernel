@@ -95,6 +95,41 @@
 				}, c);
 			}
 		});
+		$("a[rel^='flashbox']", c).each (function () {
+			var p = [];
+			var r = $(this).attr('rel');
+			var i = r.indexOf('[');
+			if (i != -1) {
+				r = r.slice(i + 1);
+				r = r.replace(/\]/gi, '|');
+				var ln = 0;
+				for (var i = 0; i < r.length; i++) {
+					if (r[i] == '|') {
+						p.push(r.slice(ln, i));
+						ln = i + 1;
+					}
+				}
+				$(this).slimbox(o, function(el) {
+					return ['/zkernel/img/_.gif', el.title];
+				}, function(el) {
+					$('#lbImage').width(p[1]).height(p[2]);
+					$('object#lbObject').remove();
+					var o = $('<div id="lbObject" />');
+					$('#lbImage').prepend(o);
+					new swfobject.embedSWF(p[0], 'lbObject', p[1], p[2], "9.0.0", false, {}, {
+						wmode: "transparent",
+						allowScriptAccess: "always"
+					});
+					window.setTimeout('$("#lbObject").css("visibility", "visible");', 1000);
+					$('#lbCloseLink').add($('#lbOverlay')).unbind('click').click(function() {
+						$('#lbObject').remove();
+						close();
+						return false;
+					});
+					return (this == el) || ((this.rel.length > 8) && (this.rel == el.rel));
+				}, c);
+			}
+		});
 	};
 	// Open Slimbox with the specified parameters
 	$.slimbox = function(_images, startImage, _options) {
@@ -111,7 +146,9 @@
 			counterText: "Картинка {x} из {y}",	// Translate or change as you wish, or set it to false to disable counter text for image groups
 			closeKeys: [27, 88, 67],		// Array of keycodes to close Slimbox, default: Esc (27), 'x' (88), 'c' (67)
 			previousKeys: [37, 80],			// Array of keycodes to navigate to the previous image, default: Left arrow (37), 'p' (80)
-			nextKeys: [39, 78]			// Array of keycodes to navigate to the next image, default: Right arrow (39), 'n' (78)
+			nextKeys: [39, 78],			// Array of keycodes to navigate to the next image, default: Right arrow (39), 'n' (78)
+			callbackShow: function() {
+			}
 		}, _options);
 
 		// The function is called for a single image, with URL and Title as first two arguments
@@ -145,7 +182,7 @@
 	*/
 	$.fn.slimbox = function(_options, linkMapper, linksFilter) {
 		linkMapper = linkMapper || function(el) {
-			return [el.href, el.title];
+			return [el.href, el.title, el];
 		};
 
 		linksFilter = linksFilter || function() {
@@ -258,6 +295,7 @@
 		if (prevImage >= 0) $(prevLink).show();
 		if (nextImage >= 0) $(nextLink).show();
 		$(bottom).css("marginTop", -bottom.offsetHeight).animate({marginTop: 0}, options.captionAnimationDuration);
+		options.callbackShow(activeURL);
 		bottomContainer.style.visibility = "";
 	}
 

@@ -17,12 +17,12 @@ class Zkernel_View_Helper_Preview extends Zend_View_Helper_Abstract  {
 		if ($ext == 'avi' || $ext == '3gp') $ctype = 'video';
 		$modified_o = @filemtime(PUBLIC_PATH.'/upload/'.$dir.'/'.$name);
 		if (!$modified_o) return @$param['default'];
-	
+
 		$png_name = (@$param['corner'] && $ctype == 'image')? preg_replace('/\.(.+)$/','.png',$name):'';
 		$param['new_name'] = $png_name;
-		
+
 		$modified = @filemtime(PUBLIC_PATH.'/pc/'.$dir.'/'.$prefix.(($png_name)?$png_name:$name));
-		
+
 		if ($modified < $modified_o) {
 			if (!@file_exists(PUBLIC_PATH.'/pc/'.$dir)) mkdir(PUBLIC_PATH.'/pc/'.$dir, 0777, true);
 			if ($ctype == 'image') {

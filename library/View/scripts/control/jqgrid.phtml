@@ -71,7 +71,7 @@ else {
 			}
 			else {
 				$dt['formatter'] = $el->formatter;
-				if ($el->formatoptions) $dt['formatoptions'] = $el->formatoptions;
+				if ($el->formatoptions) $dt['formatoptions'] = $el->formatoptions->toArray();
 			}
 			if ($dt['formatter']) $is_fmatter = true;
 		}
