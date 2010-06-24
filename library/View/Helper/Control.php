@@ -318,7 +318,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 
 		$this->config->set($conf);
 
-		if ($this->config->field && !$this->config->drag && isset($this->config->field->{$this->config->field_orderid})) $this->config->drag = 1;
+		if ($this->config->field && !isset($this->config->drag) && isset($this->config->field->{$this->config->field_orderid})) $this->config->drag = 1;
 
 		if ($this->config->field && ($this->config->drag || $this->config->type == 'drag') && !$this->config->orderby && isset($this->config->field->{$this->config->field_orderid})) $this->config->orderby = $this->config->field_orderid;
 

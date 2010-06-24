@@ -113,7 +113,7 @@ class Zkernel_Db_Model_Basket {
     	return $ret;
     }
 
-    private function save() {
+    function save() {
     	if (!$this->_save) return;
     	if (is_string($this->_storage)) {
 			$s = new Zend_Session_Namespace();
