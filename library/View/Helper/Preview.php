@@ -14,7 +14,7 @@ class Zkernel_View_Helper_Preview extends Zend_View_Helper_Abstract  {
 		$ext = strrpos($name, '.');
 		$ext = $ext === false ? '' : @substr($name, $ext + 1);
 		$ctype = 'image';
-		if ($ext == 'avi' || $ext == '3gp') $ctype = 'video';
+		if ($ext == 'avi' || $ext == '3gp' || $ext == 'wmv') $ctype = 'video';
 		$modified_o = @filemtime(PUBLIC_PATH.'/upload/'.$dir.'/'.$name);
 		if (!$modified_o) return @$param['default'];
 
