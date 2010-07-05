@@ -477,7 +477,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
     	if ($this->config->field) foreach ($this->config->field as $el) {
 		    if (!$el->active) continue;
 			$p = new Zkernel_Config_Control($el->param, array(
-				'type' => 'text',
+				//'type' => 'text',
 				'label' => $el->title,
 				'description' => $el->description,
 	    		'required' => $el->required ? true : false,
