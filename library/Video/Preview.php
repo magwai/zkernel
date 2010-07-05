@@ -38,18 +38,18 @@ class Zkernel_Video_Preview {
 		}
 		if (@$param['time']) {
 			$name = explode('.', $name);
-			array_pop($name);
+			$ext = array_pop($name);
 			$name = implode('.', $name);
-			@exec('ffmpeg -i "'.$this->image_path.'/'.$name.'.avi" -an -ss '.(int)$param['time'].' -r 1 -vframes 1 '.($max_width && $max_height ? '-s '.$max_width.'x'.$max_height : '').' -y -f mjpeg "'.$this->path.'/'.$prefix.$name.'.jpg"');
+			@exec('ffmpeg -i "'.$this->image_path.'/'.$name.'.'.$ext.'" -an -ss '.(int)$param['time'].' -r 1 -vframes 1 '.($max_width && $max_height ? '-s '.$max_width.'x'.$max_height : '').' -y -f mjpeg "'.$this->path.'/'.$prefix.$name.'.jpg"');
 			$preview = new Zkernel_Image_Preview(
 				$this->path,
 				$this->path
 			);
 			$param['prefix'] = '';
 			$preview->create($prefix.$name.'.jpg', $param);
-			copy($this->path.'/'.$prefix.$name.'.jpg', $this->path.'/'.$prefix.$name.'.avi');
+			copy($this->path.'/'.$prefix.$name.'.jpg', $this->path.'/'.$prefix.$name.'.'.$ext);
 			unlink($this->path.'/'.$prefix.$name.'.jpg');
-			@chmod($this->path.'/'.$prefix.$name.'.avi', 0777);
+			@chmod($this->path.'/'.$prefix.$name.'.'.$ext, 0777);
 		}
 		else {
 			if (!$width || !$height) return false;
