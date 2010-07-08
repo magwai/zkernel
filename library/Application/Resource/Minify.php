@@ -17,7 +17,8 @@ class Zkernel_Application_Resource_Minify extends Zend_Application_Resource_Reso
 				'(.*)\.(js|css)$',
 				array(
 					'controller' => 'z',
-					'action'     => 'minify'
+					'action'     => 'minify',
+					'jsmin' => 1
 				),
 				array('', 'path', 'ext')
 			);
