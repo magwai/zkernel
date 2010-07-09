@@ -35,7 +35,9 @@ class Zkernel_View_Helper_Minify extends Zend_View_Helper_Abstract {
 			}
 		}
 		else if ($type == 'js') {
-			require_once 'Zkernel/Other/Lib/JSMin/JSMin.php';
+			//$packer = new Zkernel_Other_Lib_Packer($res, 'None', true, false);
+			//$res = "/* minified_packer */\n".$packer->pack();
+			//require_once 'Zkernel/Other/Lib/JSMin/JSMin.php';
 			//$res = "/* minified_jsmin */\n".JSMin::minify($res);
 		}
 		return $res;
