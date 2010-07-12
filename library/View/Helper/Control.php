@@ -736,24 +736,28 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 	    	foreach ($ids as $el) {
 	    		$where = $this->config->where ? $this->config->where->toArray() : array();
 				$where['`id` = ?'] = $el;
-	    		$item = $this->config->model->fetchControlCard($where);
-	    		$ok = $this->config->model->deleteControl($where);
-	    		if ($ok) {
-	    			$form = $this->buildForm();
-	    			$els = $form->getElements();
-	    			if ($els) {
-	    				foreach ($els as $k => $v) {
-							if ($v->getType() == 'Zkernel_Form_Element_Uploadify') {
-								if (isset($v->destination) && isset($item->$k)) @unlink($v->destination.'/'.$item->$k);
-							}
-	    				}
-	    			}
-	    			$cnt++;
+	    		$data = $this->config->model->fetchControlCard($where);
+				$data = $this->view->override()->overrideSingle($data, $this->config->controller, array('multilang_nofall' => true, 'module_nofall' => true));
+				$this->config->data->set($data->toArray());
+				$this->config->skip = false;
+	    		$this->config->func_check;
+	    		if (!$this->config->skip) {
+		    		$ok = $this->config->model->deleteControl($where);
+		    		if ($ok) {
+		    			$form = $this->buildForm();
+		    			$els = $form->getElements();
+		    			if ($els) {
+		    				foreach ($els as $k => $v) {
+								if ($v->getType() == 'Zkernel_Form_Element_Uploadify') {
+									if (isset($v->destination) && isset($this->config->data->$k)) @unlink($v->destination.'/'.$this->config->data->$k);
+								}
+		    				}
+		    			}
+		    			$cnt++;
+		    		}
 	    		}
 	    	}
-	    	$this->config->info[] = $cnt
-				? 'Удалено элементов: '.$cnt
-				: 'Ошибка удаления';
+	    	if ($cnt) $this->config->info[] = 'Удалено элементов: '.$cnt;
 		}
 		else $this->config->info[] = 'Элемент не выбран';
 		if ($cnt) {

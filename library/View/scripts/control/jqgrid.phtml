@@ -13,7 +13,7 @@ if ($c->post['nd']) {
     		}
     		if ($c->tree) {
     			$cc[] = $el->_level;
-    			$cc[] = $el->{$c->tree_field};
+    			$cc[] = (int)$el->{$c->tree_field};
     			$cc[] = $el->_count ? false : true;
     			$cc[] = false;
     		}
@@ -124,17 +124,21 @@ $.include([
 	    forceFit: true,
 	    shrinkToFit: true,
 	    altRows: true,
-		gridComplete: function() {'.($c->tree && count($c->tree_opened) ?
-			'var l = $("#list");
-			if (l.attr("opened") != 1) l.find("tr[id='.implode('],tr[id=', $c->tree_opened->toArray()).']").each(function() {
-				var o = $(this).find(".treeclick.tree-plus");
+		gridComplete: function() {
+			var l = $("#list");'.($c->tree && count($c->tree_opened) ?
+			'/*if (l.attr("opened") != 1) l.find("tr[id='.implode('],tr[id=', $c->tree_opened->toArray()).']").each(function() {
+				var o = $(this).find(".tree-plus.treeclick");
 				if (o.length) {
 				 	$("#list")[0].grid.hDiv.loading = false;
 					o.click();
 				}
 			});
-			l.attr("opened", 1);' : '').'
-			$("#list").find("td").attr("unselectable", "on").css({"-moz-user-select":"none","-o-user-select":"none","-khtml-user-select":"none","user-select":"none"});
+			l.attr("opened", 1);*/' : '').'
+			l.find("tbody:first").disableSelection();
+			l.find(".jqgrow").dblclick(function() {
+				$(".c_button:first input[default=1]:first").click();
+			});
+			'./*$("#list").find("td").attr("unselectable", "on").css({"-moz-user-select":"none","-o-user-select":"none","-khtml-user-select":"none","user-select":"none"});*/'
 		},
 		'.(!$c->drag && !$c->tree ? 'scroll: true,' : '').'
 		prmNames: {page: "_page", rows: "rows", sort: "_orderby", order: "_orderdir", search:"search", nd: "nd"}

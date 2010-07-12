@@ -5,7 +5,17 @@ $ajax = Zend_Controller_Front::getInstance()->getRequest()->isXmlHttpRequest();
 if ($ajax) {
 	switch ($this->control()->config->response_type) {
 		case 'jqphp':
-			if ($this->layout()->info) $this->jquery()->addMessage(
+			$r = array();
+			if ($this->layout()->info) $r['info'] = ($this->layout()->info_type == 'i' ? '' : 'e:').implode('<br />', $this->layout()->info);
+			if (!$this->control()->config->stop_frame) {
+				if ($this->layout()->navpane) $r['navpane'] = $this->layout()->navpane;
+				$r['content'] = $this->layout()->content;
+			}
+			$script = $this->inlineSingle('script_clean');
+			if ($script) $r['script'] = $script;
+			echo $this->json($r);
+			//sleep(7);
+			/*if ($this->layout()->info) $this->jquery()->addMessage(
 				($this->layout()->info_type == 'i' ? '' : 'e:').
 				implode('<br />', $this->layout()->info)
 			);
@@ -14,7 +24,7 @@ if ($ajax) {
 				$this->jquery('#c_content')->html($this->layout()->content);
 			}
 			$this->jquery()->evalScript($this->inlineSingle('script_clean'));
-			echo $this->json($this->jquery()->returnResponse());
+			echo $this->json($this->jquery()->returnResponse());*/
 			break;
 		case 'json':
 			echo $this->json($this->layout()->json);
@@ -28,8 +38,8 @@ else {
 
 	$this	->inlineScript('script', '$(function() { c.init('.Zend_Json::encode($p).'); });');
 
-	$this	->headScript('file', '/zkernel/js/jquery/jquery.include.js')
-			->headScript('file', '/zkernel/js/jquery/jquery.php.js')
+	$this	->headScript('file', '/zkernel/js/jquery/jquery.js')
+			->headScript('file', '/zkernel/js/jquery/jquery.include.js')
 			->headScript('file', '/zkernel/ctl/jqgrid/i18n/grid.locale-ru.js')
 			->headScript('file', '/zkernel/ctl/jqgrid/grid.base.js')
 			->headScript('file', '/zkernel/ctl/jqgrid/grid.treegrid.js')
@@ -40,19 +50,20 @@ else {
 			->headScript('file', '/zkernel/js/jquery/ui/ui.mouse.js')
 			->headScript('file', '/zkernel/js/jquery/ui/ui.sortable.js')
 			->headScript('file', '/zkernel/js/jquery/ui/ui.button.js')
+			->headScript('file', '/zkernel/js/jquery/ui/ui.datepicker.js')
 			->headScript('file', '/zkernel/ctl/jqgrid/grid.zkernel.js')
 			->headScript('file', '/zkernel/js/swfobject.js')
 			->headScript('file', '/zkernel/ctl/uploadify/jquery.uploadify.js')
 			->headScript('file', '/zkernel/ctl/uploadify/zuploadify.js')
 			->headScript('file', '/zkernel/js/jquery/jquery.tinymce.js')
-			->headScript('file', '/zkernel/js/control/main.js')
+			->headScript('file', '/zkernel/ctl/control/main.js')
 			->headScript('file', $this->inlineSingle('filename'));
 
 	$this	->headLink(array('rel' => 'favicon', 'href' => '/zkernel/img/favicon.ico'))
-			->appendStylesheet('/zkernel/img/jquery/ui/themes/'.$this->control()->config->theme.'/ui.all.css')
-			->appendStylesheet('/zkernel/ctl/jqgrid/css/ui.jqgrid.css')
-			->appendStylesheet('/zkernel/ctl/uploadify/uploadify.css')
-			->appendStylesheet('/zkernel/img/control/main.css?1');
+			->appendStylesheet('/zkernel/img/jquery/ui/themes/'.$this->control()->config->theme.'/ui.all.css', 'all')
+			->appendStylesheet('/zkernel/ctl/jqgrid/css/ui.jqgrid.css', 'all')
+			->appendStylesheet('/zkernel/ctl/uploadify/uploadify.css', 'all')
+			->appendStylesheet('/zkernel/ctl/control/main.css', 'all');
 
 	echo $this->doctype('HTML5');
 
@@ -62,12 +73,11 @@ else {
 	<head>
 		<meta charset=utf-8>
 		<?php echo $this->headTitle() ?>
-		<?php echo $this->headLink() ?>
-		<script type="text/javascript" src="/zkernel/js/jquery/jquery.js"></script>
-		<script type="text/javascript" src="/zkernel/ctl/mce/tiny_mce.js"></script>
+		<?php echo $this->linkSingle() ?>
 		<?php echo $this->headSingle() ?>
+		<script type="text/javascript" src="/zkernel/ctl/mce/tiny_mce.js"></script>
 	</head>
-	<body class="c_body">
+	<body class="c_body"><div class="c_frame">
 		<div class="ui-widget ui-widget-header ui-corner-bottom" id="c_menu_frame"><div id="c_menu"></div></div>
 		<div class="ui-widget ui-widget-header ui-corner-bottom c_tline">
 			<div class="h">
@@ -82,15 +92,16 @@ else {
 					<span><input class="c_l_button" type="submit" value="Войти" /></span>
 				</form></div>
 				<?php echo $reg ? $this->render('control/multi.phtml') : '' ?>
+				<div class="c_site"><a target="_blank" href="/<?php echo $reg ? $reg->stitle : '' ?>">на сайт</a></div>
 				<div id="c_navpane"></div>
 			</div>
-			<div id="c_tl">загрузка панели управления</div>
+			<div id="c_tl">загрузка панели управления<br /><a href="/<?php echo $reg ? $reg->stitle.'/' : '' ?>control">перезагрузить</a></div>
 		</div>
 		<script type="text/javascript">document.getElementById("c_tl").style.display = "block";</script>
-		<div id="c_loader"></div>
+		<div id="c_loader" title="Загрузка" class="ui-widget ui-corner-all ui-state-highlight"><div class="c_ldr"></div><div class="c_but"><input type="button" value="Отменить загрузку" /></div></div>
 		<div id="c_info" class="ui-widget ui-corner-all"></div>
 		<div id="c_content"><?php echo $this->layout()->content ?></div>
-	</body>
+	</div></body>
 </html>
 <?php
 

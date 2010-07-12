@@ -116,6 +116,21 @@ $this->control(array(
 					)
 				)
 			)
+		),
+		'ctldelete' => array(
+			'func_check' => 'php_function:
+if (!(int)$control->config->data->cedit && !(int)"'.$this->user()->isAllowed(
+		$this->user('role'),
+		Zkernel_Common::getById(array(
+			'model' => new Default_Model_Cresource(),
+			'field' => 'id',
+			'key' => 'key',
+			'id' => 'admin'
+		))
+	).'") {
+	$control->config->skip = true;
+	$control->config->info[] = "Запрешено удалять страницу \"".$control->config->data->title."\"";
+}'
 		)
 	)
 ));

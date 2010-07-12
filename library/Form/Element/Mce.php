@@ -32,7 +32,12 @@ class Zkernel_Form_Element_Mce extends Zend_Form_Element_Textarea {
 '$.include([
 	"/zkernel/js/jquery/jquery.tinymce.js"
 ], function() {
-    $("textarea[name='.$this->getName().']").tinymce('.Zend_Json::encode($o).');
+    $("textarea[name='.$this->getName().']")
+    	.addClass("ui-state-disabled")
+    	.mousedown(function() { return false; })
+    	.focus(function() { return false; })
+    	.keydown(function() { return false; })
+    	.tinymce('.Zend_Json::encode($o).');
 });
 ';
     	$this->getView()->inlineScript('script', $js);

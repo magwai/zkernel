@@ -42,7 +42,7 @@ class Zkernel_View_Helper_Preview extends Zend_View_Helper_Abstract  {
 			@chmod(PUBLIC_PATH.'/pc/'.$dir.'/'.$prefix.$name, 0777);
 	    }
 	    return $modified || @file_exists(PUBLIC_PATH.'/pc/'.$dir.'/'.$prefix.(($png_name)?$png_name:$name))
-	    	? '/pc/'.$dir.'/'.$prefix.(($png_name)?$png_name:$name)
+	    	? '/pc/'.$dir.'/'.$prefix.(($png_name)?$png_name:$name).'?'.$modified
 	    	: @$param['default'];
     }
 }

@@ -6,6 +6,26 @@ if (count($this->control()->config->button_top)) {
 <div class="c_button">
 <?php
 
+	$edit = -1;
+	$is_default = false;
+	foreach ($this->control()->config->button_top as $n => $el) {
+		if ($el->default) {
+			$is_default = true;
+			break;
+		}
+		if ($el->action == 'ctledit') $edit = $n;
+	}
+	if (!$is_default) {
+		if ($edit) $this->control()->config->button_top[$edit]->default = 1;
+		else {
+			foreach ($this->control()->config->button_top as $n => $el) {
+				if ($el->action != 'ctladd' && $el->action != 'ctldelete') {
+					$el->default = 1;
+					break;
+				}
+			}
+		}
+	}
 	foreach ($this->control()->config->button_top as $el) {
 		if (!$el->title) continue;
 ?>

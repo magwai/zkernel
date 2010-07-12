@@ -5,7 +5,7 @@
  * http://trirand.com/blog/ 
  * Dual licensed under the MIT and GPL licenses:
  * http://www.opensource.org/licenses/mit-license.php
- * http://www.gnu.org/licenses/gpl.html
+ * http://www.gnu.org/licenses/gpl-2.0.html
 **/ 
     $.jgrid.extend({
         jqGridImport : function(o) {
@@ -29,11 +29,15 @@
                 var $t = this;
                 var XmlConvert = function (xml,o) {
                     var cnfg = $(o.xmlGrid.config,xml)[0];
-                    var xmldata = $(o.xmlGrid.data,xml)[0];
+                    var xmldata = $(o.xmlGrid.data,xml)[0], jstr, jstr1;
                     if(xmlJsonClass.xml2json && $.jgrid.parse) {
-                        var jstr = xmlJsonClass.xml2json(cnfg," ");
-                        var jstr = $.jgrid.parse(jstr);
-                        for(var key in jstr) { var jstr1=jstr[key];}
+                        jstr = xmlJsonClass.xml2json(cnfg," ");
+                        jstr = $.jgrid.parse(jstr);
+                        for(var key in jstr) {
+                            if(jstr.hasOwnProperty(key)) {
+                                jstr1=jstr[key];
+                            }
+                        }
                         if(xmldata) {
                         // save the datatype
                             var svdatatype = jstr.grid.datatype;
@@ -151,8 +155,10 @@
                 gprm.knv = null;
                 if(gprm.treeGrid) {
                     for (var key in gprm.treeReader) {
-                        gprm.colNames.splice(gprm.colNames.length-1);
-                        gprm.colModel.splice(gprm.colModel.length-1);
+                        if(gprm.treeReader.hasOwnProperty(key)) {
+                            gprm.colNames.splice(gprm.colNames.length-1);
+                            gprm.colModel.splice(gprm.colModel.length-1);
+                        }
                     }
                 }
                 switch (o.exptype) {
@@ -161,7 +167,7 @@
                         break;
                     case 'jsonstring' :
                         ret = "{"+ xmlJsonClass.toJson(gprm,o.root,o.ident)+"}";
-                        if(gprm.postData.filters != undefined) {
+                        if(gprm.postData.filters !== undefined) {
                             ret=ret.replace(/filters":"/,'filters":');
                             ret=ret.replace(/}]}"/,'}]}');
                         }

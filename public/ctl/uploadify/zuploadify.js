@@ -108,13 +108,21 @@ zuf.add = function(n, title, url, required) {
 	var i = $('input[name=' + n + '][type=hidden]');
 	var v = zuf.explode('*', i.val());
 	var exist = false;
-	for (k in v) if (v[k].slice(2) == title) {
-		exist = true;
-		v[k] = title;
-		break;
+	for (k in v) {
+		if (title.length) {
+			if (v[k] == title) {
+				exist = true;
+				break;
+			}
+			if (v[k].slice(2) == title) {
+				v[k] = title;
+				break;
+			}
+		}
 	}
-	if (!exist) {
-		o = i.prev('div.uploadifyQueue');
+	o = i.prev('div.uploadifyQueue');
+	var in_q = o.find('div[rel="' + title + '"]').length;
+	if (title && !in_q) {
 		var url_valid = title.search(/^http\:\/\//gi) == -1
 			? url + '/' + title
 			: title;
