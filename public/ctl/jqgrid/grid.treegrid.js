@@ -60,7 +60,7 @@ $.jgrid.extend({
 				}
 			}
 			
-			var nw = ident*18 + 22;
+			var nw = ident*22 + 22;
 			if (nw > $t.grid.headers[0].width) {
 				var d = nw - $t.grid.headers[0].width;
 				$t.grid.headers[0].width = nw;
