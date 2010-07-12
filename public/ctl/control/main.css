@@ -67,9 +67,6 @@ div.c_button{padding:20px 20px 0 20px;}
 #c_form select{font-family:arial;font-size:14px;}
 #c_catalog{padding:0 20px 0 20px;-moz-user-select:none;-o-user-select:none;-khtml-user-select:none;user-select:none;}
 #c_form .required:after{content:' *';color:red;vertical-align:text-top;font-weight:bold;line-height:8px;}
-.c_branch{clear:both;float:left;background:url(c_branch_plus.gif) no-repeat 5px center;padding:5px 10px 5px 27px;margin:5px 0 5px 0;font-size:14px;font-weight:bold;}
-.c_leaf{background-image:url(c_branch_el.gif)}
-.c_branch_open{background-image:url(c_branch_minus.gif)}
 
 .c_current_cat{background-color:#9AB9EA;}
 .c_inner{padding:0 0 0 22px;display:none;clear:both;}
