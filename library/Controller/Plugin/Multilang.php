@@ -34,7 +34,7 @@ class Zkernel_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstrac
             $front->getRequest()
 		)));
 		$router->addRoute('lang', $langRoute);
-		if ($routes) foreach ($routes as $k => $el) $router->addRoute($k, $k == 'fu' || $k == 'minify' ? $el : $langRoute->chain($el));
+		if ($routes) foreach ($routes as $k => $el)  $router->addRoute($k, $k == 'fu' || $k == 'minify' ? $el : $langRoute->chain($el));
 	}
 
 	public function routeShutdown(Zend_Controller_Request_Abstract $request) {

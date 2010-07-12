@@ -42,6 +42,7 @@ class Zkernel_Application_Resource_Routedb extends Zend_Application_Resource_Res
 							$map,
 							$reverse
 						);
+
 						$router->addRoute($options['name'].$el['id'], $route);
 					}
 				}

@@ -8,6 +8,10 @@
  */
 
 class Zkernel_View_Helper_Override extends Zend_View_Helper_Abstract  {
+	protected $_inited = false;
+	
+	function _init(){}
+	
 	function _overrideModule(&$r, $options) {
 		if (@$options['module_nofall']) return;
 		foreach ($options['module_field'] as $el) {
@@ -56,6 +60,7 @@ class Zkernel_View_Helper_Override extends Zend_View_Helper_Abstract  {
 	}
 
 	public function override($data = null, $type = null, $options = null) {
+		if(!$this->_inited){$this->_init(); $this->_inited = true;}
 		if ($data === null) return $this;
 		$nd = array();
 		if (!$data) return $nd;
