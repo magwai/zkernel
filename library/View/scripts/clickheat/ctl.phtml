@@ -1,0 +1,15 @@
+<?php
+
+$this->placeholder('pma')->captureStart();
+
+?>
+<iframe style="width:100%;height:85%;" frameborder="0" src="/zkernel/ctl/clickheat?sid=<?php echo base64_encode(serialize(array(''))) ?>"></iframe>
+<?php
+
+$this->placeholder('pma')->captureEnd();
+
+$this->control(array(
+	'text' => (string)$this->placeholder('pma'),
+	'type' => 'text'
+));
+
