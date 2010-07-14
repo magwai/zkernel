@@ -54,7 +54,8 @@ class Zkernel_Controller_Plugin_Menu extends Zend_Controller_Plugin_Abstract {
 					$md = array(
 						'label' => $el->title,
 						'uri' => $el->url,
-						'pages' => $this->getDeeper($el->id)
+						'pages' => $this->getDeeper($el->id),
+						'key' => $el->key
 					);
 					$menu[] = $md;
 				}
