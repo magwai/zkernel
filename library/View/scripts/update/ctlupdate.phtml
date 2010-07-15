@@ -1,0 +1,74 @@
+<?php
+
+$s = new Zend_Session_Namespace();
+set_time_limit(120);
+
+$config = Zend_Controller_Front::getInstance()->getParam('bootstrap')->getOptions();
+$info = $this->control()->config->model->fetchControlCard($this->control()->config->param->id);
+$dest = $config['update'][$this->control()->config->param->id]['destination'];
+if ($dest) foreach ($dest as $k => $v) $dest[$k]['exclude'] = $info['source'][$k]['exclude'];
+
+$list = array();
+if ($s->update_add) $list = array_merge($list, $s->update_add);
+if ($s->update_diff) $list = array_merge($list, $s->update_diff);
+
+if ($s->update_delete) {
+	foreach ($s->update_delete as $el) {
+		$p = explode(':', $el);
+		$ok = unlink($dest[$p[0]]['path'].$p[1]);
+		if ($ok) $oks_d[] = $dest[$p[0]]['path'].$p[1];
+        else $errors_d[] = $dest[$p[0]]['path'].$p[1];
+	}
+}
+
+$data = $this->control()->config->model->fetchControlFile($this->control()->config->param->id, $list);
+
+$fn = 'zupdate'.time();
+$dir = sys_get_temp_dir();
+@mkdir($dir.'/'.$fn);
+@chmod($dir.'/'.$fn, 0777);
+file_put_contents($dir.'/'.$fn.'/update.zip', $data);
+exec('cd '.$dir.'/'.$fn.';unzip update.zip');
+exec('rm '.$dir.'/'.$fn.'/update.zip');
+
+$oks = $errors = array();
+$handle = opendir($dir.'/'.$fn);
+while ($path = @readdir($handle)) {
+	if ($path == '.' || $path == '..') continue;
+	$errors = array();
+	recurse_copy($dir.'/'.$fn.'/'.$path, PUBLIC_PATH.($dest[$path]['path'] ? '/'.$dest[$path]['path'] : ''), $oks, $errors);
+}
+@closedir($handle);
+exec('rm  -r '.$dir.'/'.$fn);
+
+$this->control(array(
+	'type' => 'none',
+	'stop_frame' => true,
+	'info' => array(
+		'Обновление закончено.'.
+		($oks ? ' Обновлено файлов: '.count($oks).'.' : '').
+		($errors ? ' Не удалось обновить файлов: '.count($errors).'.' : '').
+		($oks_d ? ' Удалено файлов: '.count($oks_d).'.' : '').
+		($errors_d ? ' Не удалось удалить файлов: '.count($errors_d).'.' : '')
+	)
+));
+
+if ($oks || $oks_d) $this->inlineScript('script', 'c.go("'.$this->control()->config->controller.'", "ctlcheck", "id='.$this->control()->config->param->id.'")');
+
+function recurse_copy($src,$dst, &$oks, &$errors) {
+    $dir = opendir($src);
+    @mkdir($dst);
+    while(false !== ( $file = readdir($dir)) ) {
+        if (( $file != '.' ) && ( $file != '..' )) {
+            if ( is_dir($src . '/' . $file) ) {
+                recurse_copy($src . '/' . $file,$dst . '/' . $file, $oks, $errors);
+            }
+            else {
+            	$res = @copy($src . '/' . $file,$dst . '/' . $file);
+                if ($res) $oks[] = $dst . '/' . $file;
+                else $errors[] = $dst . '/' . $file;
+            }
+        }
+    }
+    closedir($dir);
+}

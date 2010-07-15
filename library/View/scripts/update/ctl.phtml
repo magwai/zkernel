@@ -1,0 +1,24 @@
+<?php
+
+$this->control(array(
+	'field' => array(
+		'title' => array(
+			'title' => 'Название компонента',
+			'required' => true,
+			'sortable' => true,
+			'unique' => true,
+			'order' => 1
+		)
+	),
+	'action_config' => array(
+		'ctlshow' => array(
+			'button_top' => array(
+				array(
+					'title' => 'Проверить обновления',
+					'action' => 'ctlcheck'
+				),
+				'',
+				'')
+		)
+	)
+));

@@ -1,0 +1,147 @@
+<?php
+
+$s = new Zend_Session_Namespace();
+$s->update_add = $s->update_delete = $s->update_diff = array();
+set_time_limit(120);
+
+$config = Zend_Controller_Front::getInstance()->getParam('bootstrap')->getOptions();
+$info = $this->control()->config->model->fetchControlCard($this->control()->config->param->id);
+$dest = $config['update'][$this->control()->config->param->id]['destination'];
+if ($dest) foreach ($dest as $k => $v) $dest[$k]['exclude'] = $info['source'][$k]['exclude'];
+
+$remote = $this->control()->config->model->fetchControlMd5($this->control()->config->param->id);
+
+$local = $this->control()->config->model->getMd5Full($dest);
+
+if ($local == $remote) {
+	$text = 'Обновления не требуются';
+	$ok = true;
+}
+else {
+	$remote = $this->control()->config->model->fetchControlUpdate($this->control()->config->param->id);
+	$local = new Zkernel_View_Data($this->control()->config->model->getListFull($dest));
+
+	$add = $delete = $diff = $ld = $rd = array();
+	if (count($local)) foreach ($local as $k1 => $v1) {
+		if ($remote->$k1 != $v1) $ld[$k1] = $v1;
+	}
+
+	if (count($remote)) foreach ($remote as $k1 => $v1) {
+		if ($local->$k1 != $v1) $rd[$k1] = $v1;
+	}
+
+	if (count($ld)) foreach ($ld as $k1 => $v1) {
+		if (!array_key_exists($k1, $rd)) {
+			$delete[] = $k1;
+			unset($ld[$k1]);
+		}
+	}
+
+	if (count($rd)) foreach ($rd as $k1 => $v1) {
+		if (!array_key_exists($k1, $ld)) {
+			$add[] = $k1;
+			unset($rd[$k1]);
+		}
+	}
+
+	if (count($ld)) foreach ($ld as $k1 => $v1) {
+		$diff[] = $k1;
+	}
+
+	if (count($rd)) foreach ($rd as $k1 => $v1) {
+		if (!in_array($k1, $diff)) $diff[] = $k1;
+	}
+
+	$add_text = '';
+	if ($add) {
+		foreach ($add as $el) {
+			$s->update_add[] = $el;
+			$add_text .= ($add_text ? '<br />' : '').'<li>'.str_replace(':', '/', $el).'</li>';
+		}
+	}
+	$delete_text = '';
+	if ($delete) {
+		foreach ($delete as $el) {
+			$s->update_delete[] = $el;
+			$delete_text .= ($delete_text ? '<br />' : '').'<li>'.str_replace(':', '/', $el).'</li>';
+		}
+	}
+	$diff_text = '';
+	if ($diff) {
+		foreach ($diff as $el) {
+			$s->update_diff[] = $el;
+			$diff_text .= ($diff_text ? '<br />' : '').'<li>'.str_replace(':', '/', $el).'</li>';
+		}
+	}
+
+	$text =
+	'<div>Ваша версия устарела</div>'.
+	'<br />'.
+	'<div>Новых файлов: '.count($add).($add ? ' <a href="#" onclick="$(this).parent().next(\'ul:first\').toggle();return false;">подробнее</a></div><ul style="display:none;margin:0;padding:10px 0 0 35px;">'.$add_text.'</ul>' : '</div>').
+	'<br />'.
+	'<div>Ненужных файлов: '.count($delete).($delete ? ' <a href="#" onclick="$(this).parent().next(\'ul:first\').toggle();return false;">подробнее</a></div><ul style="display:none;margin:0;padding:10px 0 0 35px;">'.$delete_text.'</ul>' : '</div>').
+	'<br />'.
+	'<div>Устаревших файлов: '.count($diff).($diff ? ' <a href="#" onclick="$(this).parent().next(\'ul:first\').toggle();return false;">подробнее</a></div><ul style="display:none;margin:0;padding:10px 0 0 35px;">'.$diff_text.'</ul>' : '</div>').
+	$ok = false;
+
+	$na = array();
+	$all = array();
+	if ($diff) $all = array_merge($all, $diff);
+	if ($delete) $all = array_merge($all, $delete);
+
+	foreach ($dest as $k => $v) {
+		$rp = realpath(PUBLIC_PATH.'/'.$dest[$k]['path']);
+		if (!is_writable($rp)) $na[] = $k;
+	}
+
+	foreach ($all as $k) {
+		$p = explode(':', $k);
+		if (!is_writable($rp.'/'.$p[1])) $na[] = $p[0].'/'.$p[1];
+	}
+	if ($na) $text .=
+		'<br />'.
+		'<div style="color:red;">Файлы, недоступные для записи: '.count($na).($na ? ' <a href="#" onclick="$(this).parent().next(\'ul:first\').toggle();return false;">подробнее</a></div><ul style="display:none;margin:0;padding:10px 0 0 35px;"><li>'.implode('</li><li>', $na).'</li></ul>' : '</div>');
+}
+
+$at = array(
+	'title' => 'Проверить',
+	'action' => 'ctlcheck',
+	'param' => 'id='.$this->control()->config->param->id
+);
+
+$this->control(array(
+	'text' => $text,
+	'type' => 'text',
+	'button_top' => $ok || $na ? array($at, '', '') : array($at,
+		array(
+			'title' => 'Обновить',
+			'action' => 'ctlupdate',
+			'param' => 'id='.$this->control()->config->param->id
+		)
+	),
+	'button_bottom' => array(
+		array(
+			'title' => 'Назад',
+			'action' => 'ctlshow'
+		)
+	)
+));
+
+function check_rec_na($src, &$na) {
+	$fn = array();
+	$dir = opendir($src);
+    while(false !== ( $file = readdir($dir)) ) {
+        if (( $file != '.' ) && ( $file != '..' )) {
+			$fn[] = $src . '/' . $file;
+        }
+    }
+    closedir($dir);
+    if ($fn) {
+    	foreach ($fn as $el) {
+    		if (!is_writable($el)) $na[] = $el;
+        	if (is_dir($el) ) {
+               check_rec_na($el, $na);
+            }
+    	}
+    }
+}
