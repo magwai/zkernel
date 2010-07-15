@@ -39,16 +39,26 @@ class Zkernel_Controller_Plugin_Menu extends Zend_Controller_Plugin_Abstract {
 					$pp = explode(',', $el->param);
 					if ($mp && $pp) foreach ($mp as $n => $mp1) $p[$mp1] = $pp[$n];
 				}
-				$md = array(
-					'label' => $el->title,
-					'controller' => $el->controller,
-					'action' => $el->action,
-					'params' => $p,
-					'route' => $el->route ? $el->route : 'default',
-					'uri' => $el->url,
-					'pages' => $this->getDeeper($el->id)
-				);
-				$menu[] = array_merge($el->toArray(), $md);
+				if(empty($el->url)) {
+					$md = array(
+						'label' => $el->title,
+						'controller' => $el->controller,
+						'action' => $el->action,
+						'params' => $p,
+						'route' => $el->route ? $el->route : 'default',
+						'uri' => $el->url,
+						'pages' => $this->getDeeper($el->id)
+					);
+					$menu[] = array_merge($el->toArray(), $md);
+				}else{
+					$md = array(
+						'label' => $el->title,
+						'uri' => $el->url,
+						'pages' => $this->getDeeper($el->id),
+						'key' => $el->key
+					);
+					$menu[] = $md;
+				}
 			}
 		}
 		return $menu;
