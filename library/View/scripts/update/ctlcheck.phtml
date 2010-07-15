@@ -3,6 +3,7 @@
 $s = new Zend_Session_Namespace();
 $s->update_add = $s->update_delete = $s->update_diff = array();
 set_time_limit(120);
+$na = array();
 
 $config = Zend_Controller_Front::getInstance()->getParam('bootstrap')->getOptions();
 $info = $this->control()->config->model->fetchControlCard($this->control()->config->param->id);
@@ -12,6 +13,11 @@ if ($dest) foreach ($dest as $k => $v) $dest[$k]['exclude'] = $info['source'][$k
 $remote = $this->control()->config->model->fetchControlMd5($this->control()->config->param->id);
 
 $local = $this->control()->config->model->getMd5Full($dest);
+
+foreach ($dest as $k => $v) {
+	$rp = realpath(PUBLIC_PATH.'/'.$dest[$k]['path']);
+	if (!is_writable($rp)) $na[] = $k;
+}
 
 if ($local == $remote) {
 	$text = 'Обновления не требуются';
@@ -84,15 +90,9 @@ else {
 	'<div>Устаревших файлов: '.count($diff).($diff ? ' <a href="#" onclick="$(this).parent().next(\'ul:first\').toggle();return false;">подробнее</a></div><ul style="display:none;margin:0;padding:10px 0 0 35px;">'.$diff_text.'</ul>' : '</div>').
 	$ok = false;
 
-	$na = array();
 	$all = array();
 	if ($diff) $all = array_merge($all, $diff);
 	if ($delete) $all = array_merge($all, $delete);
-
-	foreach ($dest as $k => $v) {
-		$rp = realpath(PUBLIC_PATH.'/'.$dest[$k]['path']);
-		if (!is_writable($rp)) $na[] = $k;
-	}
 
 	foreach ($all as $k) {
 		$p = explode(':', $k);
