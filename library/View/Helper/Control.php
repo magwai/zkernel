@@ -575,6 +575,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 					foreach ($this->config->data as $k => $v) {
 						if (@$this->config->field->$k->m2m) {
 							$m2m_new = isset($this->config->data->$k) ? $this->config->data->$k->toArray() : array();
+							$m2m_orderid = (int)$this->config->field->$k->m2m->orderid;
 							$m2m_model = $this->config->field->$k->m2m->model;
 							$m2m_model = new $m2m_model();
 							$m2m_self = $this->config->field->$k->m2m->self;
@@ -599,10 +600,15 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 								if ($m2m_new) foreach ($m2m_new as $m2m_el) {
 									if (!in_array($m2m_el, $m2m_ids)) {
 										$m2m_changed = true;
-										$yyy = $m2m_model->insert(array(
+										$m2md = array(
 											$m2m_self => $id,
 											$m2m_foreign => $m2m_el
-										));
+										);
+										if ($m2m_orderid) {
+											$nid = $m2m_model->fetchOne('MAX(`orderid`)');
+											$m2md['orderid'] = $nid + 1;
+										}
+										$yyy = $m2m_model->insert($m2md);
 									}
 								}
 							}

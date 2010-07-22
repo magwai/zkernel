@@ -228,7 +228,7 @@ class GdThumb extends ThumbBase
 	 * @param int $maxHeight
 	 * @return GdThumb
 	 */
-	public function adaptiveResize ($width, $height)
+	public function adaptiveResize ($width, $height, $align = array('c', 'c'))
 	{
 		// make sure our arguments are valid
 		if (!is_numeric($width) || $width  == 0)
@@ -290,11 +290,13 @@ class GdThumb extends ThumbBase
 		// now, figure out how to crop the rest of the image...
 		if ($this->currentDimensions['width'] > $this->maxWidth)
 		{
-			$cropX = intval(($this->currentDimensions['width'] - $this->maxWidth) / 2);
+			if ($align[0] == 'l') $cropX = 0;
+			else $cropX = intval(($this->currentDimensions['width'] - $this->maxWidth) / 2);
 		}
 		elseif ($this->currentDimensions['height'] > $this->maxHeight)
 		{
-			$cropY = intval(($this->currentDimensions['height'] - $this->maxHeight) / 2);
+			if ($align[1] == 't') $cropY = 0;
+			else $cropY = intval(($this->currentDimensions['height'] - $this->maxHeight) / 2);
 		}
 
 		imagecopyresampled

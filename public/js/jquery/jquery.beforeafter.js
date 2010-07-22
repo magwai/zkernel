@@ -46,7 +46,7 @@
 			$('div', obj).css('float','left'); // Float all divs within the container left
 			
 			// Create an inner div wrapper (dragwrapper) to hold the images.
-			$(obj).prepend('<div id="dragwrapper'+randID+'"><div id="drag'+randID+'"><img width="8" height="56" alt="handle" src="'+o.imagePath+'handle.gif" title="Drag me left or right to see the before and after images" id="handle'+randID+'" /></div></div>'); // Create drag handle
+			$(obj).prepend('<div id="dragwrapper'+randID+'"><div id="drag'+randID+'"><img width="8" height="56" alt="handle" src="'+o.imagePath+'handle.gif" title="" id="handle'+randID+'" /></div></div>'); // Create drag handle
 			$('#dragwrapper'+randID).css({'position':'absolute','padding':'0','left':(imgWidth/2)-($('#handle'+randID).width()/2)+'px','z-index':'20'}).width($('#handle'+randID).width()).height(imgHeight);
 			$('#dragwrapper'+randID).css({'opacity':.25}); // Sets the dragwrapper and contents to .25 opacity
 				

@@ -43,7 +43,7 @@ rubr.init = function(id, opt) {
 
 rubr.activate_value = function(id) {
 	var o = $('#rubr_' + id);
-	$('.#rubr_' + id + '_value input:not(.active)').addClass('rubr_active').click(function() {
+	$('#rubr_' + id + '_value input').not('.rubr_active').addClass('rubr_active').click(function() {
 		var idd = $(this).attr('id');
 		var i = idd.lastIndexOf('-');
 		idd = idd.slice(i + 1);

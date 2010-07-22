@@ -21,11 +21,12 @@ class Zkernel_View_Helper_InlineSingle extends Zend_View_Helper_InlineScript  {
         if ($c) {
 			if ($type == 'file' || $type == 'filename' ) {
 				$md5 = substr(md5($c), 0, 5);
-		        $nm = '/pc/js/'.$md5.'.js';
+				$cp = defined('CACHE_DIR') ? CACHE_DIR : 'pc';
+		        $nm = '/'.$cp.'/js/'.$md5.'.js';
 				if (!file_exists(PUBLIC_PATH.$nm)) {
-					if (!@file_exists(PUBLIC_PATH.'/pc/js')) {
-						@mkdir(PUBLIC_PATH.'/pc/js', 0777, true);
-						@chmod(PUBLIC_PATH.'/pc/js', 0777);
+					if (!@file_exists(PUBLIC_PATH.'/'.$cp.'/js')) {
+						@mkdir(PUBLIC_PATH.'/'.$cp.'/js', 0777, true);
+						@chmod(PUBLIC_PATH.'/'.$cp.'/js', 0777);
 					}
 					file_put_contents(PUBLIC_PATH.$nm, $this->view->minify($c, 'js'));
 					@chmod(PUBLIC_PATH.$nm, 0777);

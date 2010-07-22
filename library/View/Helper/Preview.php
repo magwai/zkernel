@@ -21,28 +21,30 @@ class Zkernel_View_Helper_Preview extends Zend_View_Helper_Abstract  {
 		$png_name = (@$param['corner'] && $ctype == 'image')? preg_replace('/\.(.+)$/','.png',$name):'';
 		$param['new_name'] = $png_name;
 
-		$modified = @filemtime(PUBLIC_PATH.'/pc/'.$dir.'/'.$prefix.(($png_name)?$png_name:$name));
+		$cp = defined('CACHE_DIR') ? CACHE_DIR : 'pc';
+
+		$modified = @filemtime(PUBLIC_PATH.'/'.$cp.'/'.$dir.'/'.$prefix.(($png_name)?$png_name:$name));
 
 		if ($modified < $modified_o) {
-			if (!@file_exists(PUBLIC_PATH.'/pc/'.$dir)) mkdir(PUBLIC_PATH.'/pc/'.$dir, 0777, true);
+			if (!@file_exists(PUBLIC_PATH.'/'.$cp.'/'.$dir)) mkdir(PUBLIC_PATH.'/'.$cp.'/'.$dir, 0777, true);
 			if ($ctype == 'image') {
 				$preview = new Zkernel_Image_Preview(
-					PUBLIC_PATH.'/pc/'.$dir,
+					PUBLIC_PATH.'/'.$cp.'/'.$dir,
 					PUBLIC_PATH.'/upload/'.$dir
 				);
 				$preview->create($name, $param);
 			}
 			else if ($ctype == 'video') {
 				$preview = new Zkernel_Video_Preview(
-					PUBLIC_PATH.'/pc/'.$dir,
+					PUBLIC_PATH.'/'.$cp.'/'.$dir,
 					PUBLIC_PATH.'/upload/'.$dir
 				);
 				$preview->create($name, $param);
 			}
-			@chmod(PUBLIC_PATH.'/pc/'.$dir.'/'.$prefix.$name, 0777);
+			@chmod(PUBLIC_PATH.'/'.$cp.'/'.$dir.'/'.$prefix.$name, 0777);
 	    }
-	    return $modified || @file_exists(PUBLIC_PATH.'/pc/'.$dir.'/'.$prefix.(($png_name)?$png_name:$name))
-	    	? '/pc/'.$dir.'/'.$prefix.(($png_name)?$png_name:$name).'?'.$modified
+	    return $modified || @file_exists(PUBLIC_PATH.'/'.$cp.'/'.$dir.'/'.$prefix.(($png_name)?$png_name:$name))
+	    	? '/'.$cp.'/'.$dir.'/'.$prefix.(($png_name)?$png_name:$name).'?'.$modified
 	    	: @$param['default'];
     }
 }

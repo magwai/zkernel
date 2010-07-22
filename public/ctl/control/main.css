@@ -79,6 +79,7 @@ div.c_button{padding:20px 20px 0 20px;}
 
 .c_clear{font-size:0px;color:#ffffff;clear:both;}
 
+.c_rubr{padding:5px 0 0 0;}
 .c_rubr input{width:auto;}
 .c_rubr label,.c_rubr a{display:block;height:20px;}
 .c_rubr div{padding:0 0 0 20px;display:none;}

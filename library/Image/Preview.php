@@ -44,7 +44,7 @@ class Zkernel_Image_Preview {
 			'correctPermissions' => true
 		));
 
-		if ($fit) $thumb->adaptiveResize($width, $height);
+		if ($fit) $thumb->adaptiveResize($width, $height, $align);
 		else $thumb->resize($width, $height);
 
 		if ($min_width || $min_height) {
@@ -81,7 +81,7 @@ class Zkernel_Image_Preview {
 			$this->mark($image, $param['mark']);
 			$thumb->setOldImage($image);
 		}
-		
+
 		if($corner) {
 			$format = 'PNG';
 			$name = (@$param['new_name'])?$param['new_name']:$name;
@@ -120,60 +120,60 @@ class Zkernel_Image_Preview {
 		}
 		@imagedestroy($png);
 	}
-	
+
 	private function corner($image, $param) {
 		$radius = (@$param['radius'])?@(int)$param['radius']:10;
-		$rate = (@$param['radius'])?@(int)$param['rate']:10;	
+		$rate = (@$param['radius'])?@(int)$param['rate']:10;
     	$width = imagesx($image);
     	$height = imagesy($image);
-    	
+
     	imagealphablending($image, false);
     	imagesavealpha($image, true);
- 
+
 		$rs_radius = $radius * $rate;
 		$rs_size = $rs_radius * 2;
- 
+
 		$corner = imagecreatetruecolor($rs_size, $rs_size);
 		imagealphablending($corner, false);
- 
+
 		$trans = imagecolorallocatealpha($corner, 255, 255, 255, 127);
 		@imagefill($corner, 0, 0, $trans);
- 
+
 		$positions = array(
 	    	array(0, 0, 0, 0),
 	    	array($rs_radius, 0, $width - $radius, 0),
 	    	array($rs_radius, $rs_radius, $width - $radius, $height - $radius),
 	    	array(0, $rs_radius, 0, $height - $radius),
 		);
- 
+
 		foreach ($positions as $pos) {
 	    	@imagecopyresampled($corner, $image, $pos[0], $pos[1], $pos[2], $pos[3], $rs_radius, $rs_radius, $radius, $radius);
 		}
- 
+
 		$lx = $ly = 0;
 		$i = -$rs_radius;
 		$y2 = -$i;
 		$r_2 = $rs_radius * $rs_radius;
- 
+
 		for (; $i <= $y2; $i++) {
- 
+
 	    	$y = $i;
 	    	$x = sqrt($r_2 - $y * $y);
- 
+
 	    	$y += $rs_radius;
 	    	$x += $rs_radius;
- 
+
 	    	@imageline($corner, $x, $y, $rs_size, $y, $trans);
 	    	@imageline($corner, 0, $y, $rs_size - $x, $y, $trans);
- 
+
 	    	$lx = $x;
 	    	$ly = $y;
 		}
- 
+
 		foreach ($positions as $i => $pos) {
 	    	@imagecopyresampled($image, $corner, $pos[2], $pos[3], $pos[0], $pos[1], $radius, $radius, $rs_radius, $rs_radius);
 		}
-		
+
 		@imagedestroy($corner);
 	}
 }

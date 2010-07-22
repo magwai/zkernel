@@ -12,8 +12,11 @@ class Zkernel_View_Helper_FormRubr extends Zend_View_Helper_FormMultiCheckbox {
 		$options = array();
 		if ($value) {
 			$model = $attribs['rubr']['model'];
+			if (@$attribs['rubr']['override']) $override = $attribs['rubr']['override'];
+			else $override = str_replace('_', '', $model->info('name'));
 			foreach ($value as $el) {
 				$item = $model->fetchRow(array('`id` = ?' => $el));
+				$item = $this->view->override()->overrideSingle($item, $override);
 				$r = $this->digg_rubr($model, $item->parentid);
 				$options[$item->id] = (string)$item->title.($r ? ' <small>('.$r.')</small>' : '');
 			}

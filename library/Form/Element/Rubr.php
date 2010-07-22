@@ -9,8 +9,10 @@
 
 class Zkernel_Form_Element_Rubr extends Zend_Form_Element_Multi {
 	public $helper = 'formRubr';
+	protected $_registerInArrayValidator = false;
 
 	public function render(Zend_View_Interface $view = null) {
+
     	$value = $this->getValue();
     	$data = $this->build_tree();
 
@@ -33,8 +35,11 @@ class Zkernel_Form_Element_Rubr extends Zend_Form_Element_Multi {
 		$parentid = $rubr->parentid ? $rubr->parentid : 'parentid';
 		$orderby = $rubr->orderby ? $rubr->orderby : 'orderid';
 		$orderdir = $rubr->orderdir ? $rubr->orderdir : 'asc';
+		if ($rubr->override) $override = $rubr->overrride;
+		else $override = str_replace('_', '', $rubr->model->info('name'));
 		$result = $rubr->model->fetchAll(array('`'.$parentid.'` = ?' => $pid), $orderby.' '.$orderdir);
 		if ($result) {
+			$result = $this->getView()->override($result, $override);
 			foreach ($result as $el) {
 				$a = array(
 					'd' => $el->id,

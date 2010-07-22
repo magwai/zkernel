@@ -4,7 +4,8 @@ header('Content-Type: image/png');
 
 $this->layout()->disableLayout(true);
 if ($this->coord) {
-	$dir = PUBLIC_PATH.'/pc/poly';
+	$cp = defined('CACHE_DIR') ? CACHE_DIR : 'pc';
+	$dir = PUBLIC_PATH.'/'.$cp.'/poly';
 	if (!file_exists($dir)) {
 		mkdir($dir, true);
 		chmod($dir, 0777);
