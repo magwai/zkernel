@@ -53,6 +53,7 @@ class Zkernel_View_Helper_Mail extends Zkernel_View_Helper_Override  {
 			$this->view->txt('site_title').($data['subject'] ? ' — '.$data['subject'] : '')
 		);
 		$ok = true;
+
 		try {
 			$mail->send();
 		}

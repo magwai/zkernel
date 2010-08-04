@@ -202,4 +202,21 @@ class Zkernel_Common {
 		}
 		return $str;
 	}
+
+	static function truncateText($text, $length = 100, $dots = false) {
+		global $m;
+		$text = $ftext = str_ireplace(array('&nbsp;'), array(' '), trim(strip_tags($text)));
+		$pos_dot = $pos_com = $pos_sp = 0;
+		for ($i = $length + 10; $i > $length - 11; $i--) {
+			if (@($text[$i] == '.') && !$pos_dot) $pos_dot = $i;
+			else if (@($text[$i] == ',' || $text[$i] == ';') && !$pos_com) $pos_com = $i;
+			else if (@($text[$i] == ' ' || $text[$i] == '-' || $text[$i] == '_') && !$pos_sp) $pos_sp = $i;
+		}
+		if ($pos_dot) $pos = $pos_dot;
+		else if ($pos_com) $pos = $pos_com;
+		else if ($pos_sp) $pos = $pos_sp;
+		else $pos = $length;
+		$text = substr($text, 0, $pos);
+		return $text.($dots ? ($text == $ftext ? '' : '&nbsp;...') : '');
+	}
 }

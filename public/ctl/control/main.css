@@ -119,3 +119,5 @@ div.c_button{padding:20px 20px 0 20px;}
 .ui-jqgrid{font-size:14px!important;}
 .ui-jqgrid tr.jqgrow td{padding:3px 4px!important;}
 .ui-jqgrid .ui-jqgrid-htable th {padding:3px 4px!important;}
+
+#rubr-element hr{width:10%;text-align:left;margin:0.5em 0;}

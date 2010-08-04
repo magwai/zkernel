@@ -52,4 +52,8 @@ class Zkernel_Db_Model_Twitter {
 			'message' => (string)$el->text
 		);
 	}
+
+	function _update($msg) {
+		$this->_service->status->update($msg);
+	}
 }
