@@ -2,9 +2,11 @@
 
 class Zkernel_Db_Model_Basket {
 	protected $_storage = 'basket';
+	protected $_storage_ex = 'basket_ex';
 	protected $_model = null;
 	protected $_save = true;
 	protected $_data = array();
+	protected $_data_ex = array();
 
 	function getQuant($id = null) {
 		$p = 0;
@@ -47,29 +49,35 @@ class Zkernel_Db_Model_Basket {
 		if ($ok && $this->_model) $ok = $this->_model->fetchCount(array('`id` = ?' => $id));
     	if ($ok) {
     		unset($this->_data[$id]);
+    		unset($this->_data_ex[$id]);
 	    	$this->save();
 	    	return true;
     	}
     	return false;
 	}
 
-    function add($id, $quant) {
+    function add($id, $quant, $ex = array()) {
     	$ok = true;
     	if ($this->_model) $ok = $this->_model->fetchCount(array('`id` = ?' => $id));
     	if ($ok) {
     		if (isset($this->_data[$id])) $this->_data[$id] += $quant;
 	    	else $this->_data[$id] = $quant;
+
+	    	if (isset($this->_data_ex[$id])) $this->_data_ex[$id] = array_merge($this->_data_ex[$id], $ex);
+	    	else $this->_data_ex[$id] = $ex;
+
 	    	$this->save();
 	    	return true;
     	}
 		return false;
     }
 
-    function set($id, $quant) {
+    function set($id, $quant, $ex = array()) {
     	$ok = true;
     	if ($this->_model) $ok = $this->_model->fetchCount(array('`id` = ?' => $id));
     	if ($ok) {
     		$this->_data[$id] = $quant;
+    		$this->_data_ex[$id] = array_merge($this->_data_ex[$id], $ex);
 	    	$this->save();
 	    	return true;
     	}
@@ -80,18 +88,8 @@ class Zkernel_Db_Model_Basket {
     	if ($id === null) {
     		$ret = array();
     		if ($this->_data) foreach ($this->_data as $k => $v) {
-    			if ($this->_model) {
-    				$row = $this->_model->fetchRow(array('`id` = ?' => $k));
-    				if ($row) {
-    					$row = new Zkernel_View_Data($row);
-	    				$row->quant = $v;
-	    				$ret[$k] = $row;
-    				}
-	    		}
-	    		else $ret[$k] = new Zkernel_View_Data(array(
-	    			'id' => $k,
-	    			'quant' => $v
-	    		));
+    			$res = $this->get($k);
+    			if ($res) $ret[$k] = $res;
     		}
     	}
     	else {
@@ -102,11 +100,13 @@ class Zkernel_Db_Model_Basket {
     				if ($ret) {
     					$ret = new Zkernel_View_Data($ret);
     					$ret->quant = $this->_data[$id];
+    					if (@$this->_data_ex[$id]) $ret->ex = $this->_data_ex[$id];
     				}
 	    		}
 	    		else $ret = new Zkernel_View_Data(array(
 	    			'id' => $id,
-	    			'quant' => $this->_data[$id]
+	    			'quant' => $this->_data[$id],
+	    			'ex' => @$this->_data_ex[$id] ? $this->_data_ex[$id] : array()
 	    		));
     		}
     	}
@@ -118,6 +118,7 @@ class Zkernel_Db_Model_Basket {
     	if (is_string($this->_storage)) {
 			$s = new Zend_Session_Namespace();
 			$s->{$this->_storage} = $this->_data;
+			$s->{$this->_storage_ex} = $this->_data_ex;
     	}
     	else {
 			// Not yet
@@ -126,7 +127,7 @@ class Zkernel_Db_Model_Basket {
 
     function __construct($opt = array(), $data = null) {
     	$this->_storage = @$opt['storage'] ? $opt['storage'] : 'basket';
-    	$this->_model = @$opt['model'] ? $opt['model'] : new Default_Model_Catalogitem();
+    	$this->_model = @$opt['model'] ? $opt['model'] : (class_exists('Default_Model_Catalogitem') ? new Default_Model_Catalogitem() : false);
     	if ($data !== null) $this->_save = false;
     	if ($data !== null && is_array($data)) foreach ($data as $k => $v) {
 

@@ -53,7 +53,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 			'oac_cancel'			=> true,
 			'oac_ok_title'			=> 'OK',
 	    	'post_field_extend'		=> array(),
-	    	'post_field_uset'		=> array(),
+	    	'post_field_unset'		=> array(),
 	    	'orderby' 				=> '',
 	    	'orderdir' 				=> 'asc',
 	    	'field' 				=> array(),

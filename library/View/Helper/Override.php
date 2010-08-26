@@ -9,9 +9,9 @@
 
 class Zkernel_View_Helper_Override extends Zend_View_Helper_Abstract  {
 	protected $_inited = false;
-	
+
 	function _init(){}
-	
+
 	function _overrideModule(&$r, $options) {
 		if (@$options['module_nofall']) return;
 		foreach ($options['module_field'] as $el) {

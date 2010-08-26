@@ -49,7 +49,10 @@ class Zkernel_View_Helper_Mail extends Zkernel_View_Helper_Override  {
 			$to,
 			@$data['to_name'] ? $data['to_name'] : $to
 		);
-		$mail->setSubject(
+		if (@$data['subject_full']) $mail->setSubject(
+			$data['subject_full']
+		);
+		else $mail->setSubject(
 			$this->view->txt('site_title').($data['subject'] ? ' — '.$data['subject'] : '')
 		);
 		$ok = true;
