@@ -17,7 +17,7 @@ class Zkernel_Db_Table extends Zend_Db_Table_Abstract
 		$select = parent::_where($select, $where);
 
 		if(($this->_multilang_type == 1) && $this->_current_lang) 
-			$select->where('`lang` = "'.$this->_current_lang->stitle.'"');
+			$select->where('`lang` = '.$this->_current_lang->id);
 		
 		return $select;
 	}
@@ -27,7 +27,7 @@ class Zkernel_Db_Table extends Zend_Db_Table_Abstract
  		$select = parent::select($withFromPart);
  		
  		if(($this->_multilang_type == 1) && $this->_current_lang) 
- 			$select->where('`lang` = "'.$this->_current_lang->stitle.'"');
+ 			$select->where('`lang` = '.$this->_current_lang->id);
  			
  		return $select;
  	}
@@ -127,7 +127,7 @@ class Zkernel_Db_Table extends Zend_Db_Table_Abstract
 			if ($reg) {
 				switch($this->_multilang_type){
 				case 1:
-					$data['lang'] = $reg->stitle;
+					$data['lang'] = $reg->id;
 					break;
 				default:
 					foreach ($data as $k => $v) {
@@ -136,6 +136,7 @@ class Zkernel_Db_Table extends Zend_Db_Table_Abstract
 							unset($data[$k]);
 						}
 					}
+					break;
 				}	
 			}
 		}
@@ -153,7 +154,8 @@ class Zkernel_Db_Table extends Zend_Db_Table_Abstract
 				case 1:
 						if (!array_key_exists('lang', $cols)) {
 							$changed = true;
-							$this->getAdapter()->query('ALTER TABLE `'.$this->_name.'` ADD `lang` VARCHAR(255) NULL');
+							$this->getAdapter()->query('ALTER TABLE `'.$this->_name.'` ADD `lang` int(11)');
+							$this->getAdapter()->query('ALTER TABLE `'.$this->_name.'` ADD INDEX `i_lang` (`lang`)');
 						}
 					break;
 				default:	
@@ -172,6 +174,7 @@ class Zkernel_Db_Table extends Zend_Db_Table_Abstract
 							$this->getAdapter()->query('ALTER TABLE `'.$this->_name.'` DROP `'.$k.'`');
 						}
 					}
+					break;
 				}
 				
 				if ($changed) {
