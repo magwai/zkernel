@@ -15,6 +15,7 @@ class Zkernel_Controller_Plugin_Menu extends Zend_Controller_Plugin_Abstract {
     }
 
 	public function routeShutdown(Zend_Controller_Request_Abstract $request) {
+		//print_r($this->getDeeper());exit;
 		$this->_menu = new Zend_Navigation($this->getDeeper());
 		$this->save();
 	}
@@ -29,7 +30,7 @@ class Zkernel_Controller_Plugin_Menu extends Zend_Controller_Plugin_Abstract {
 		$reg = Zend_Registry::isRegistered('Zkernel_Multilang') ? Zend_Registry::get('Zkernel_Multilang') : '';
 		$view = Zend_Controller_Action_HelperBroker::getStaticHelper('viewRenderer')->view;
 		if ($m) foreach ($m as $el) {
-			//print_r($el);exit();
+			//print_r($el->route);
 			if (!$el->route || $router->hasRoute($el->route) && !(isset($el->show_it) && !$el->show_it)) {
 				$el = $view->override()->overrideSingle($el, 'menu');
 				$p = $reg ? array('lang' => $reg->stitle) : array();
