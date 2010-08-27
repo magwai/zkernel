@@ -64,7 +64,7 @@ class Zkernel_Config_Control implements Countable, Iterator, ArrayAccess {
 				'width' => '',
 				'description' => '',
 				'sortable' => false,
-				'active' => $k != 'parentid' && $k != 'orderid' && $k != 'id' && !preg_match('/^ml\_[^\_]+\_[\d]+$/i', $k),
+				'active' => $k != 'lang' && $k != 'parentid' && $k != 'orderid' && $k != 'id' && !preg_match('/^ml\_[^\_]+\_[\d]+$/i', $k),
 				'name' => $k,
 				'title' => $k == 'title' ? 'Название' : $k,
 				'hidden' => false,

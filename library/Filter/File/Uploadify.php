@@ -20,16 +20,15 @@ class Zkernel_Filter_File_Uploadify implements Zend_Filter_Interface {
 
     public function filter($value) {
 		$ext = strrpos($value, '.');
+
     	if ($ext !== false) {
     		$t = substr($value, $ext + 1);
     		$value = substr($value, 0, $ext);
     		$ext = $t;
     	}
-
     	$stitle = Zkernel_Common::stitle($value, $this->_length);
     	$p = '';
     	while (file_exists($this->_directory.'/'.$stitle.$p.($ext ? '.'.$ext : ''))) $p = $p ? $p + 1 : 1;
-
     	return $stitle.$p.($ext ? '.'.$ext : '');
     }
 }

@@ -16,6 +16,7 @@ while ($path = @readdir($handle)) {
 		$r = new Zend_Reflection_Class($c);
 		$met = $r->getMethods();
 		if (@$met) {
+			
 			$exist = false;
 			foreach ($met as $el) {
 				if ($el->name == '_getRoutes') {
