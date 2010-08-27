@@ -18,10 +18,10 @@ class Zkernel_Db_Model_Twitter {
 		else {
 			$user = isset($options['login']) ? $options['login'] : $this->_twitter['login'];
     		$pass = isset($options['password']) ? $options['password'] : $this->_twitter['password'];
-			$this->_service = new Zend_Service_Twitter(
+			$this->_service = new Zend_Service_Twitter(array(
 				$user,
 				$pass
-			);
+			));
 			$this->_twitter[$this->_name]['service'] = $this->_service;
 			Zend_Registry::set('Zkernel_Twitter', $this->_twitter);
 		}
