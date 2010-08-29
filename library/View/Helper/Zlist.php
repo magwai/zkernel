@@ -78,7 +78,7 @@ class Zkernel_View_Helper_Zlist extends Zend_View_Helper_Abstract  {
 				}
 			}
 			$this->view->data = $lv;
-			if ($data['pager']) {
+			if (@$data['pager']) {
 				$paginator = Zend_Paginator::factory($lv);
 				$paginator->setItemCountPerPage($data['pager_perpage']);
 				$paginator->setCurrentPageNumber($data['pager_page']);

@@ -10,7 +10,8 @@
 class Zkernel_View_Helper_LinkSingle extends Zend_View_Helper_HeadLink  {
 	function linkSingle($name = null) {
 		$css = array();
-		foreach ($this as $offset => $item) {
+		$i = (array)$this->getIterator();
+		foreach ($i as $offset => $item) {
 			if ($item->rel == 'stylesheet' && $item->type == 'text/css' && stripos($item->href, 'http://') === false) {
 				$css[$item->media] = isset($css[$item->media]) ? $css[$item->media] : array();
 				$css[$item->media][$offset] = $item;
@@ -21,6 +22,7 @@ class Zkernel_View_Helper_LinkSingle extends Zend_View_Helper_HeadLink  {
 			$zp = defined('ZKERNEL_DIR') ? ZKERNEL_DIR : 'zkernel';
 			$zpath = realpath(PUBLIC_PATH.'/'.$zp);
 			$cp = defined('CACHE_DIR') ? CACHE_DIR : 'pc';
+			$m = '';
 			foreach ($css as $media => $els) {
 				$c = '';
 				$items = array();
