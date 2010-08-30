@@ -672,7 +672,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 					if ($els) {
 						foreach ($els as $el) {
 							$k = $el->getName();
-							if ($this->config->field->$k->m2m) {
+							if (@$this->config->field->$k->m2m) {
 								$m2m_model = $this->config->field->$k->m2m->model;
 								$m2m_self = $this->config->field->$k->m2m->self;
 								$m2m_foreign = $this->config->field->$k->m2m->foreign;

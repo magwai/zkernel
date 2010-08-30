@@ -97,7 +97,7 @@ $.include([
 	'.($c->drag ? '"/zkernel/ctl/jqgrid/grid.jqueryui.js","/zkernel/js/jquery/ui/ui.sortable.js",' : '').'
 	"/zkernel/ctl/jqgrid/grid.zkernel.js"
 ], function() {
-	'.($formatter_function ? implode('', $formatter_function) : '').'
+	'.(@$formatter_function ? implode('', $formatter_function) : '').'
 	$("#list").jqGrid({
 		'.($c->tree
 ?		'treeGrid: true,

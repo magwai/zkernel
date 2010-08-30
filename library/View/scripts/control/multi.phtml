@@ -5,16 +5,16 @@ $list = $model->fetchAll(null, 'orderid');
 $reg = Zend_Registry::get('Zkernel_Multilang') ? Zend_Registry::get('Zkernel_Multilang') : '';
 
 ?>
-<div id="c_lang">
+<div id="c_lang"><select onchange="window.location = this.value">
 <?php
 
 if (count($list)) foreach ($list as $el) {
 
 ?>
-	<a<?php echo $reg->id == $el->id ? ' class="cur"' : '' ?> href="/<?php echo $el->stitle ?>/control"><?php echo $el->title ?></a>
+	<option<?php echo $reg->id == $el->id ? ' selected="selected"' : '' ?> value="/<?php echo $el->stitle ?>/control"><?php echo $el->title ?></option>
 <?php
 
 }
 
 ?>
-</div>
+</select></div>

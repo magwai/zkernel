@@ -34,6 +34,7 @@ class Zkernel_View_Helper_HeadSingle extends Zend_View_Helper_HeadScript  {
         	if ($res[1] != md5($m)) $mod = true;
         }
         else $mod = true;
+        $c = '';
 		if ($mod) {
 			$include = $jquery = false;
 			$inc = array();
