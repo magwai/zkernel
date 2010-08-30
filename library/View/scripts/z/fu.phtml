@@ -6,7 +6,7 @@ $ok = '';
 $key = array_keys($this->files);
 $key = @$key[0];
 if ($key){
-    Zend_Session::setId(@$this->post['sid']);
+    try { Zend_Session::setId(@$this->post['sid']); } catch (Exception $e) {  }
     $s = new Zend_Session_Namespace();
 	$tmp_name = $this->files[$key]['tmp_name'];
     $validators = array('Zend_Validate_File_Upload' => new Zend_Validate_File_Upload());
