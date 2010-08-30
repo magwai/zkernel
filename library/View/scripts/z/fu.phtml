@@ -16,9 +16,10 @@ if ($key){
     if (@$is['mime']) $this->files[$key]['type'] = $is['mime'];
     foreach ($validators as $k => $el) {
     	$el = clone $el;
-    	/*if ($el instanceof Zend_Validate_File_IsImage) {
-    		$el = new Zend_Validate_File_Extension()
-    	}*/
+    	if ($el instanceof Zend_Validate_File_IsImage) {
+    		$el = new Zend_Validate_File_Extension('gif,png,jpg,jpeg');
+    		//$el->enableHeaderCheck(true);
+    	}
     	$tocheck = $k == 'Zend_Validate_File_Upload' ? $key : $tmp_name;
     	if (!$el->isValid($tocheck, $this->files[$key])) {
     		$valid = false;
