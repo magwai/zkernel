@@ -39,7 +39,7 @@ class Zkernel_Controller_Error extends Zkernel_Controller_Action {
 </div></div>' : '';
 
 		$this->getResponse()->setHeader('zk_error',
-			$errors->exception->getMessage()
+			str_replace("\n", ' ', $errors->exception->getMessage())
 		);
 
     }

@@ -111,7 +111,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 				}
 				$s = new Zend_Session_Namespace();
 
-				if (!is_array($s->control['history'][$this->config->controller])) $s->control['history'][$this->config->controller] = array();
+				if (!is_array(@$s->control['history'][$this->config->controller])) $s->control['history'][$this->config->controller] = array();
 				$this->config->param = $s->control['history'][$this->config->controller] = array_merge($s->control['history'][$this->config->controller], $this->config->param->toArray());
 
 				$this->view->inlineScript('script', 'c.cfg.controller = "'.$this->config->controller.'";c.cfg.action = "'.$this->config->action.'";');
