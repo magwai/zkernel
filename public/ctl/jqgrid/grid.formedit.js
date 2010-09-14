@@ -243,7 +243,7 @@ $.jgrid.extend({
 			}
 			function resetFilters(op) {
 				var reload = op && op.hasOwnProperty("reload") ? op.reload : true;
-				grid = $("#"+$t.p.id), sdata=[];
+				grid = $("#"+$t.p.id), sdata={};
 				grid[0].p.search = false;
 				if(p.multipleSearch===false) {
 					sdata[p.sField] = sdata[p.sValue] = sdata[p.sOper] = "";
@@ -796,7 +796,7 @@ $.jgrid.extend({
 									fld[0].checked = false;
 									fld[0].defaultChecked = false;
 									vl = $(fld).attr("offval");
-								} else if (fld[0].type.substr(0,6)=='select') {
+								} else if (fld[0].type && fld[0].type.substr(0,6)=='select') {
 									fld[0].selectedIndex = 0; 
 								} else {
 									fld.val(vl);

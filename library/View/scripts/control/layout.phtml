@@ -56,6 +56,7 @@ else {
 			->headScript('file', '/zkernel/ctl/uploadify/jquery.uploadify.js')
 			->headScript('file', '/zkernel/ctl/uploadify/zuploadify.js')
 			->headScript('file', '/zkernel/js/jquery/jquery.tinymce.js')
+			->headScript('file', '/zkernel/ctl/fancybox/jquery.fancybox.js')
 			->headScript('file', '/zkernel/ctl/control/main.js')
 			->headScript('file', $this->inlineSingle('filename'));
 
@@ -63,6 +64,7 @@ else {
 			->appendStylesheet('/zkernel/img/jquery/ui/themes/'.$this->control()->config->theme.'/ui.all.css', 'all')
 			->appendStylesheet('/zkernel/ctl/jqgrid/css/ui.jqgrid.css', 'all')
 			->appendStylesheet('/zkernel/ctl/uploadify/uploadify.css', 'all')
+			->appendStylesheet('/zkernel/ctl/fancybox/jquery.fancybox.css', 'all')
 			->appendStylesheet('/zkernel/ctl/control/main.css', 'all');
 
 	echo $this->doctype('HTML5');

@@ -63,7 +63,7 @@ div.c_button{padding:20px 20px 0 20px;}
 .c_input,.c_textarea,.c_gmap{width:90%;border:1px solid #FECE00;padding:2px;font:12px Arial;}
 */
 .c_gmap{padding:0;height:400px;}
-/*.c_form .c_option input,.c_form input[type="checkbox"]{width:auto;padding:0;border:0;}*/
+#c_form input[type="checkbox"]{width:auto;padding:0;border:0;}
 #c_form select{font-family:arial;font-size:14px;}
 #c_catalog{padding:0 20px 0 20px;-moz-user-select:none;-o-user-select:none;-khtml-user-select:none;user-select:none;}
 #c_form .required:after{content:' *';color:red;vertical-align:text-top;font-weight:bold;line-height:8px;}

@@ -58,6 +58,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 	    	'orderdir' 				=> 'asc',
 	    	'field' 				=> array(),
 			'formatter_function'	=> array(),
+			'pager_scroll'			=> true,
 	    	'pager_perpage' 		=> 0,
 		   	'pager_page' 			=> 1,
 	    	'pre_view'				=> null,
@@ -342,6 +343,8 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 
 		if (!$this->config->drag && !$this->config->tree) $this->config->pager_perpage = 100;
 
+		if ($this->config->drag || $this->config->tree) $this->config->pager_scroll = false;
+
     	return $this;
 	}
 
@@ -389,7 +392,11 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 				$parentid = (string)$this->config->post['nodeid'];
 				if ($parentid) {
 					$s = new Zend_Session_Namespace();
-					$s->control['history'][$this->config->controller]['oid'] = $parentid;
+					$oids = Zkernel_Common::getOuterIds(array(
+		    			'model' => $this->config->model,
+		    			'id' => $parentid
+		    		));
+					if (!in_array($parentid, $oids)) $s->control['history'][$this->config->controller]['oid'] = $parentid;
 				}
 				$level = $this->config->post['n_level'];
 				$level = strlen($level) > 0 ? $level + 1 : 0;
@@ -429,9 +436,10 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 		else {
 			$menus = $menu_model->fetchAll(array('`parentid` = ?' => @(int)$menu->id, '`show_it` = 0', 'orderid'));
 			if ($menus) {
-				foreach ($menus as $el) {
+				foreach ($menus as $num => $el) {
 					$cl_0 = stripos($el->param, 'cl=0');
 					$this->config->button_top[] = array(
+						'inner' => $num == 0 ? 1 : 0,
 						'controller' => $el->controller,
 						'action' => $el->action ? $el->action : 'ctlshow',
 						'field' => 'cid',
@@ -476,7 +484,8 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
     	));
     	if ($this->config->field) foreach ($this->config->field as $el) {
 		    if (!$el->active) continue;
-			$p = new Zkernel_Config_Control($el->param, array(
+		    if (@(int)$this->config->post['sposted'] && !array_key_exists($el->name, $this->config->post->toArray())) continue;
+		    $p = new Zkernel_Config_Control($el->param, array(
 				//'type' => 'text',
 				'label' => $el->title,
 				'description' => $el->description,
@@ -539,7 +548,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
     	else {
 		    $this->config->form = $this->buildForm();
 
-			if (@(int)$this->config->post['cposted']) {
+			if (@(int)$this->config->post['cposted'] || @(int)$this->config->post['sposted']) {
 				if ($this->config->form->isValid($this->config->post->toArray())) {
 					if ($this->config->type == 'add') $id = $this->config->use_db
 						? (method_exists($this->config->model, 'fetchNextId') ? $this->config->model->fetchNextId() : 0)
@@ -627,7 +636,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 						if ($this->config->type == 'edit') {
 							$where = $this->config->where ? $this->config->where->toArray() : array();
 							$where['`id` = ?'] = $id;
-							$ok = $this->config->model->updateControl($data_db, $where);
+							$ok = $data_db ? $this->config->model->updateControl($data_db, $where) : false;
 						}
 						else $ok = $this->config->data->id =  $this->config->model->insertControl($data_db);
 					}
@@ -638,7 +647,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 					else {
 						//$this->config->info[] = 'Изменений данных не было';
 					}
-					if (!@$this->config->post['is_apply']) $this->view->inlineScript('script', 'c.go("'.$this->config->request_ok->controller.'", "'.$this->config->request_ok->action.'", '.Zend_Json::encode(Zkernel_Common::url2array($this->config->request_ok->param)).');');
+					if (!@$this->config->post['is_apply'] && !@$this->config->post['sposted']) $this->view->inlineScript('script', 'c.go("'.$this->config->request_ok->controller.'", "'.$this->config->request_ok->action.'", '.Zend_Json::encode(Zkernel_Common::url2array($this->config->request_ok->param)).');');
 				}
 				else {
 					$this->config->info_type = 'e';
@@ -700,6 +709,8 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
     	$cur = $this->config->model->fetchRow(array('`id` = ?' => (int)$this->config->param['id']));
     	$prev = $this->config->model->fetchRow(array('`id` = ?' => (int)$this->config->param['prev']));
     	$ok = false;
+    	$s = new Zend_Session_Namespace();
+		unset($s->control['history'][$this->config->controller]['prev']);
     	if ($cur) {
 	    	$cur->orderid = @(int)$prev->orderid + 1;
 	    	$ok = $cur->save();

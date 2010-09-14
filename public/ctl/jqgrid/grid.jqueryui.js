@@ -307,7 +307,6 @@ $.jgrid.extend({
 				};
 				opts.update = function (ev,ui) {
 					$(ui.item).css("border-width","");
-					$t.updateColumns();
 					if($t.p.rownumbers === true) {
 						var r = ui.item.get(0);
 						var cnt = 0;

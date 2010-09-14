@@ -203,6 +203,22 @@ class Zkernel_Common {
 		return $str;
 	}
 
+	static function stitleUnique($model, $stitle, $field = 'stitle', $where = array()) {
+		$where = is_array($where) ? $where : array();
+		$stitle = $stitle ? $stitle : '_';
+    	$stitle_n = $stitle;
+		$stitle_p = -1;
+		do {
+			$stitle_p++;
+			$stitle_n = $stitle.($stitle_p == 0 ? '' : $stitle_p);
+			$w = $where;
+			$w['`'.$field.'` = ?'] = $stitle_n;
+			$stitle_c = (int)$model->fetchCount($w);
+		}
+		while ($stitle_c > 0);
+		return $stitle_n;
+	}
+
 	static function truncateText($text, $length = 100, $dots = false) {
 		global $m;
 		$text = $ftext = str_ireplace(array('&nbsp;'), array(' '), trim(strip_tags($text)));

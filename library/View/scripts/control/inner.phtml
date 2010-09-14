@@ -16,7 +16,7 @@ if (count($this->control()->config->button_top)) {
 		if ($el->action == 'ctledit') $edit = $n;
 	}
 	if (!$is_default) {
-		if ($edit) $this->control()->config->button_top[$edit]->default = 1;
+		if ($edit) @$this->control()->config->button_top[$edit]->default = 1;
 		else {
 			foreach ($this->control()->config->button_top as $n => $el) {
 				if ($el->action != 'ctladd' && $el->action != 'ctldelete') {
@@ -29,7 +29,7 @@ if (count($this->control()->config->button_top)) {
 	foreach ($this->control()->config->button_top as $el) {
 		if (!$el->title) continue;
 ?>
-<input default="<?php echo (int)$el->default; ?>" type="button" value="<?php echo $el->title; ?>" onclick="c.do_action({controller:'<?php echo $el->controller; ?>',action:'<?php echo $el->action; ?>',param:'<?php echo $el->param ?>',confirm:'<?php echo (int)$el->confirm; ?>'<?php echo $el->field ? ',field:\''.$el->field.'\'' : ''; ?>,cl:'<?php echo $el->cl ?>'}, this)" />
+<input inner="<?php echo (int)$el->inner; ?>" default="<?php echo (int)$el->default; ?>" type="button" value="<?php echo $el->title; ?>" onclick="c.do_action({controller:'<?php echo $el->controller; ?>',action:'<?php echo $el->action; ?>',param:'<?php echo $el->param ?>',confirm:'<?php echo (int)$el->confirm; ?>'<?php echo $el->field ? ',field:\''.$el->field.'\'' : ''; ?>,cl:'<?php echo $el->cl ?>'}, this)" />
 <?php
 
 	}

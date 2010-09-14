@@ -1,5 +1,15 @@
 <?php
 
+$admin = (int)$this->user()->isAllowed(
+	$this->user('role'),
+	Zkernel_Common::getById(array(
+		'model' => new Default_Model_Cresource(),
+		'field' => 'id',
+		'key' => 'key',
+		'id' => 'admin'
+	))
+);
+
 $this->control(array(
 	'static_field' => true,
 	'field' => array(
@@ -14,15 +24,7 @@ $this->control(array(
 			'unique' => true,
 			'required' => true,
 			'formatter' => 'function',
-			'formatoptions' => 'return Number(data.cedit) || '.(int)$this->user()->isAllowed(
-				$this->user('role'),
-				Zkernel_Common::getById(array(
-					'model' => new Default_Model_Cresource(),
-					'field' => 'id',
-					'key' => 'key',
-					'id' => 'admin'
-				))
-			).' ? "/page/<strong>" + data.stitle + "</strong>" : "";',
+			'formatoptions' => 'return Number(data.cedit) || '.$admin.' ? "/page/<strong>" + data.stitle + "</strong>" : "";',
 			'sortable' => true,
 			'validators' => array(array(
 				'validator' => 'Regex',
@@ -39,6 +41,11 @@ $this->control(array(
 		'cedit' => array(
 			'title' => 'Можно редактировать',
 			'type' => 'select',
+			'width' => '70',
+			'align' => 'center',
+			'formatter' => 'checkbox',
+			'formatoptions' => array('disabled' => false),
+			'live' => true,
 			'param' => array(
 				'multioptions' => array('1' => 'Да', '0' => 'Нет')
 			),
@@ -52,7 +59,7 @@ $this->control(array(
 					'active' => false
 				),
 				'cedit' => array(
-					'hidden' => true
+					'hidden' => $admin ? false : true
 				)
 			)
 		),

@@ -219,6 +219,7 @@ c.go = function(controller, action, param, post) {
 				}
 				if (d.info) c.info(d.info);
 				if (d.script) eval(d.script);
+				$('.c_fancy').fancybox();
 			}
 		},
 		error: function() {
@@ -353,7 +354,8 @@ c.overlay_hide = function() {
 	}
 };
 
-c.do_action = function(obj, parent) {
+c.do_action = function(obj, parent, post) {
+	post = post ? post : '';
 	var cl = obj.cl;
 	var controller = obj.controller;
 	var action = obj.action;
@@ -364,7 +366,7 @@ c.do_action = function(obj, parent) {
 	if (conf && !confirm(parent.value + '?')) return;
 	var l = $('#list');
 	if (l.length) {
-		var id = l.getGridParam('selrow');
+		var id = obj.id ? obj.id : l.getGridParam('selrow');
 		if (cl == 't' && c.cfg.controller != controller && l.find('tr[id=' + id + '] .treeclick').length != 0) {
 			c.info('Разрешено переходить только в концевые рубрики');
 			return false;
@@ -376,12 +378,12 @@ c.do_action = function(obj, parent) {
 				return false;
 			}
 		}
-		var ids = l.getGridParam('selarrrow');
+		var ids = obj.id ? [obj.id] : l.getGridParam('selarrrow');
 		if (!ids || ids.length == 0) ids = [0];
 		param[field] = id ? id : 0;
 		param[field + 's'] = c.implode(',', ids);
 	}
-	c.go(controller, action, param);
+	c.go(controller, action, param, post);
 };
 
 c.implode = function(glue, pieces) {
@@ -468,6 +470,8 @@ c.table_height = function() {
 	$('.ui-search-toolbar').each(function() {
 		th += $(this).get(0).offsetHeight;
 	});
+	if ($('#list_pager').html().length) th += $('#list_pager')[0].offsetHeight;
+	
 	return $(window).height() - th - 105;
 };
 
@@ -494,6 +498,23 @@ c.build_navpane = function(d) {
 		);
 	$('#c_navpane').html(r).find('a').click(function() {
 		c.go($(this).attr('c'), $(this).attr('a'), $(this).attr('p'));
+		return false;
+	});
+};
+
+c.live_init = function(field, opt) {
+	opt = typeof opt == 'undefined' ? {} : opt;
+	$('#list td[aria-describedby=list_' + field + '] input,#list td[aria-describedby=list_' + field + '] select').bind(typeof opt.event == 'undefined' ? 'change' : opt.event, function() {
+		var o = {sposted: 1};
+		o[field] = $(this).attr('type') == 'checkbox'
+			? ($(this)[0].checked ? 1 : 0)
+			: $(this).val();
+		c.do_action({
+			controller: (typeof opt.controller == 'undefined' ? c.cfg.controller : opt.controller),
+			action: (typeof opt.action == 'undefined' ? 'ctledit' : opt.action),
+			param: (typeof opt.param == 'undefined' ? '' : opt.param),
+			id: $(this).parents('tr').attr('id')
+		}, null, o);
 		return false;
 	});
 };

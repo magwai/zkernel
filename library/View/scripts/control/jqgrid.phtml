@@ -44,13 +44,17 @@ else {
 </div>
 <?php
 	// Схема таблицы для списка и дерева
-	$field_title = $field_model = array();
+	$live = $field_title = $field_model = array();
 	$is_fmatter = false;
 	$is_search = false;
 	$reg = Zend_Registry::isRegistered('Zkernel_Multilang') ? Zend_Registry::get('Zkernel_Multilang') : '';
 
 	if ($c->field) foreach ($c->field as $el) {
 	    if (!$el->active) continue;
+	    if ($el->live) {
+	    	$opt = $el->live instanceof Zekrnel_Config_Control ? $el->live->toArray() : array();
+	    	$live[] = 'c.live_init("'.$el->name.'"'.($opt ? ', '.Zend_Json::encode($opt) : '').');';
+	    }
 	    $field_title[] = $el->title;
 	    $dt = array(
 	    	'name' => $el->name
@@ -125,22 +129,45 @@ $.include([
 	    shrinkToFit: true,
 	    altRows: true,
 		gridComplete: function() {
+			$(window).resize();
 			var l = $("#list");'.($c->tree && count($c->tree_opened) ?
-			'/*if (l.attr("opened") != 1) l.find("tr[id='.implode('],tr[id=', $c->tree_opened->toArray()).']").each(function() {
+			'var op = l.data("opened");
+			var s = "";
+			for (var i = 0; i < op.length; i++) s += (s.length ? "," : "") + "tr[id=" + op[i] + "]";
+
+			if (s.length) l.find(s).each(function() {
 				var o = $(this).find(".tree-plus.treeclick");
 				if (o.length) {
-				 	$("#list")[0].grid.hDiv.loading = false;
-					o.click();
+					for (var i = 0; i < op.length; i++) {
+						if (op[i] == $(this).attr("id")) {
+							op.splice(i, 1);
+							l.data("opened", op);
+							break;
+						}
+					}
+				 	window.setTimeout(function() {
+				 		op.push
+				 		l.data("opening", op);
+						o.click();
+					}, 1);
 				}
 			});
-			l.attr("opened", 1);*/' : '').'
+			' : '').'
 			l.find("tbody:first").disableSelection();
-			l.find(".jqgrow").dblclick(function() {
-				$(".c_button:first input[default=1]:first").click();
+			l.find(".jqgrow").unbind("dblclick").dblclick(function() {
+				var tp = $(this).find(".tree-plus,.tree-minus");
+				if (tp.length) tp.click();
+				else {
+					var inner = $(".c_button:first input[inner=1]:first");
+					if (inner.length) inner.click();
+					else $(".c_button:first input[default=1]:first").click();
+				}
 			});
+			'.(@$live ? implode('', $live) : '').'
 			'./*$("#list").find("td").attr("unselectable", "on").css({"-moz-user-select":"none","-o-user-select":"none","-khtml-user-select":"none","user-select":"none"});*/'
+			$(".c_fancy").fancybox();
 		},
-		'.(!$c->drag && !$c->tree ? 'scroll: true,' : '').'
+		'.($c->pager_scroll ? 'scroll: true,' : ($c->pager_perpage ? 'pager: "#list_pager",' : '')).'
 		prmNames: {page: "_page", rows: "rows", sort: "_orderby", order: "_orderdir", search:"search", nd: "nd"}
 	});
 	'.($is_search ? '$("#list").jqGrid("filterToolbar");$("#list").setGridHeight(c.table_height());' : '').'
@@ -156,7 +183,19 @@ $.include([
 		beforeStop: function(event, ui) {
 			var p = ui.item.get(0);
 			var r = ui.item.prev("tr").get(0);
-			if ((r && p.parent_id == r.parent_id && $(r).find(".tree-minus").length == 0) || (r && p.parent_id == r.id) || ((!p.parent_id || p.parent_id == 0) && (!r || typeof r == "undefined"))) return true;
+			var p_pid = Number($(p).find("td[aria-describedby=list_parent]").html());
+			var r_pid = Number($(r).find("td[aria-describedby=list_parent]").html());
+			if (
+				(r && p_pid == r_pid && $(r).find(".tree-minus").length == 0)
+					||
+				(r && p_pid == r.id)
+					||
+				(
+					(!p_pid)
+						&&
+					(!r || typeof r == "undefined")
+				)
+			) return true;
 			return false;
 		},
 		stop: function(event, ui) {
@@ -169,7 +208,9 @@ $.include([
 			'.($c->tree ? '$("#list").updateNodeChildren(ui.item.get(0));' : '$("#list").updateRowNum();').'
 		}
 	});' : '').'
-});');
+	'.($c->tree && count($c->tree_opened) ? '$("#list").data("opened", '.Zend_Json::encode($c->tree_opened->toArray()).');' : '').'
+});
+');
 
 	$c->response_type = 'jqphp';
 }

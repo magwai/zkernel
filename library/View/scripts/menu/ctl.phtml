@@ -16,7 +16,7 @@ while ($path = @readdir($handle)) {
 		$r = new Zend_Reflection_Class($c);
 		$met = $r->getMethods();
 		if (@$met) {
-			
+
 			$exist = false;
 			foreach ($met as $el) {
 				if ($el->name == '_getRoutes') {
@@ -89,10 +89,10 @@ $this->control(array(
 				'value' =>
 'php_function:
 $item = $control->config->model->fetchRow(array("`id` = ?" => (int)$control->config->param["id"]));
-return	$item->controller.
-		($item->action ? "|".$item->action : "").
-		($item->param ? "|".$item->param : "").
-		($item->route ? "|".$item->route : "");'
+return	$item ? @$item->controller.
+		(@$item->action ? "|".$item->action : "").
+		(@$item->param ? "|".$item->param : "").
+		(@$item->route ? "|".$item->route : "") : "";'
 			),
 			'order' => 3
 		),
@@ -121,7 +121,7 @@ return	$item->controller.
 	),
 	'func_override' =>
 'php_function:
-if ($control->config->data->cap && !$control->config->data->url) {
+if (@$control->config->data->cap && !@$control->config->data->url) {
 	$p = explode("|", $control->config->data->cap);
 	$control->config->data->controller = @$p[0];
 	$control->config->data->action = @$p[1];

@@ -13,8 +13,8 @@ class Zkernel_View_Helper_LinkSingle extends Zend_View_Helper_HeadLink  {
 		$i = (array)$this->getIterator();
 		foreach ($i as $offset => $item) {
 			if ($item->rel == 'stylesheet' && $item->type == 'text/css' && stripos($item->href, 'http://') === false) {
-				$css[$item->media] = isset($css[$item->media]) ? $css[$item->media] : array();
-				$css[$item->media][$offset] = $item;
+				$css[$item->media.'_'.$item->conditionalStylesheet] = isset($css[$item->media.'_'.$item->conditionalStylesheet]) ? $css[$item->media.'_'.$item->conditionalStylesheet] : array();
+				$css[$item->media.'_'.$item->conditionalStylesheet][$offset] = $item;
 				$this->offsetUnset($offset);
 			}
 		}
@@ -103,7 +103,8 @@ class Zkernel_View_Helper_LinkSingle extends Zend_View_Helper_HeadLink  {
 					file_put_contents(PUBLIC_PATH.$nm, "/* hash: ".md5($m)." */\n".$this->view->minify($c, 'css'));
 					@chmod(PUBLIC_PATH.$nm, 0777);
 				}
-				$this->appendStylesheet($nm, $media);
+				$media = explode('_', $media);
+				$this->appendStylesheet($nm, $media[0], $media[1]);
 			}
 		}
 		return $this->headLink();

@@ -68,6 +68,7 @@ class Zkernel_Config_Control implements Countable, Iterator, ArrayAccess {
 				'name' => $k,
 				'title' => $k == 'title' ? 'Название' : $k,
 				'hidden' => false,
+				'live' => false,
 				'formatter' => '',
 				'formatoptions' => '',
 				'param' => array(),
@@ -80,6 +81,7 @@ class Zkernel_Config_Control implements Countable, Iterator, ArrayAccess {
 			if (is_string($v)) {
 				$action = 'ctl'.$v;
 				$default = 0;
+				$inner = 0;
 				$confirm = (int)($v == 'delete');
 				$param = '';
 				$field = '';
@@ -88,6 +90,7 @@ class Zkernel_Config_Control implements Countable, Iterator, ArrayAccess {
 			else {
 				$action = $v->action;
 				$default = (int)$v->default;
+				$inner = (int)$v->inner;
 				$confirm = (int)$v->confirm;
 				$param = $v->param;
 				$cl = @$v->cl ? $v->cl : 't';
@@ -109,11 +112,12 @@ class Zkernel_Config_Control implements Countable, Iterator, ArrayAccess {
 			}
 			$v = new Zkernel_Config_Control(array(
 				'cl' => $cl,
-				'title' => $title,
+				'title' => @$title,
 				'controller' => $controller,
 				'action' => $action,
 				'param' => $param,
 				'default' => $default,
+				'inner' => $inner,
 				'confirm' => $confirm,
 				'field' => $field
 			));

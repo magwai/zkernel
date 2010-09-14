@@ -130,7 +130,7 @@ zuf.add = function(n, title, url, required) {
 			' + (required ? '' : '<div class="cancel">\
 				<a href="javascript:zuf.del(\'' + n + '\', \'' + title + '\')"><img src="/zkernel/ctl/uploadify/cancel.png" border="0" /></a>\
 			</div>') + '\
-			<span class="fileName"><a target="_blank" href="' + url_valid + '" title="Открыть">' + title + '</a></span><span class="percentage"></span>\
+			<span class="fileName"><a target="_blank" href="' + url_valid + '" class="c_fancy">' + title + '</a></span><span class="percentage"></span>\
 			<div class="uploadifyProgress">\
 				<div class="uploadifyProgressBar" style="width:100%;"><!--Progress Bar--></div>\
 			</div>\
