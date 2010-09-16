@@ -1,0 +1,48 @@
+<?php
+
+$s = new Zend_Session_Namespace();
+$this->layout()->disableLayout(true);
+
+$opt = array(
+    'version' => '1.0',
+    'signatureMethod' => 'HMAC-SHA1',
+    'requestTokenUrl' => 'https://api.twitter.com/oauth/request_token',
+    'authorizeUrl' => 'https://api.twitter.com/oauth/authorize',
+    'accessTokenUrl' => 'https://api.twitter.com/oauth/access_token',
+	'callbackUrl' => 'http://'.$_SERVER['HTTP_HOST'].'/z/oauth'
+);
+
+if ($this->get) {
+	$consumer = new Zend_Oauth_Consumer($opt);
+	$token = $consumer->getAccessToken($this->get, $s->oauth_reuqest);
+	echo $token->getToken().'&'.$token->getTokenSecret();
+}
+else {
+	$form = new Zkernel_Form();
+	$form->addElement('text', 'consumerKey', array(
+		'label' => 'consumerKey',
+		'required' => true
+	));
+	$form->addElement('text', 'consumerSecret', array(
+		'label' => 'consumerSecret',
+		'required' => true
+	));
+	$form->addElement('submit', 'submit', array(
+	    'label' => 'Отправить'
+	));
+
+	if ($this->post) {
+		$valid = $form->isValid($this->post);
+		$data = $form->getValues();
+		if ($valid) {
+			$opt = array_merge($opt, array(
+				'consumerKey' => @$data['consumerKey'],
+   				'consumerSecret' => @$data['consumerSecret']
+			));
+			$consumer = new Zend_Oauth_Consumer($opt);
+			$s->oauth_reuqest = $consumer->getRequestToken();
+		    $consumer->redirect();
+		}
+	}
+	echo (string)$form;
+}

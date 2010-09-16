@@ -41,4 +41,9 @@ class Zkernel_Controller_Z extends Zkernel_Controller_Action {
 	function feedbackAction() {
 		$this->view->post = $_POST;
 	}
+
+	function oauthAction() {
+		$this->view->post = $_POST;
+		$this->view->get = $_GET;
+	}
 }

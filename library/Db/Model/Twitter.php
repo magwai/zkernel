@@ -16,12 +16,14 @@ class Zkernel_Db_Model_Twitter {
     	$this->_twitter = Zend_Registry::get('Zkernel_Twitter');
     	if (isset($this->_twitter[$this->_name]['service'])) $this->_service = $this->_twitter[$this->_name]['service'];
 		else {
-			$user = isset($options['login']) ? $options['login'] : $this->_twitter['login'];
-    		$pass = isset($options['password']) ? $options['password'] : $this->_twitter['password'];
-			$this->_service = new Zend_Service_Twitter(
-				$user,
-				$pass
-			);
+			$token = isset($options['token']) ? $options['token'] : $this->_twitter['token'];
+			$token_secret = isset($options['token_secret']) ? $options['token_secret'] : $this->_twitter['token_secret'];
+			$at = new Zend_Oauth_Token_Access();
+			$at->setToken($token);
+			$at->setTokenSecret($token_secret);
+			$this->_service = new Zend_Service_Twitter(array(
+			    'accessToken' => $at
+			));
 			$this->_twitter[$this->_name]['service'] = $this->_service;
 			Zend_Registry::set('Zkernel_Twitter', $this->_twitter);
 		}
@@ -39,7 +41,7 @@ class Zkernel_Db_Model_Twitter {
 			foreach ($statuses as $el) {
 				$d = $this->_parseStatus($el);
 				$res[] = $d;
-				$this->_twitter[$this->_name]['status_card'][$d->id] = $d;
+				$this->_twitter[$this->_name]['status_card'][$d['id']] = $d;
 			}
 		}
 		return $res ? new Zkernel_View_Data($res) : array();
