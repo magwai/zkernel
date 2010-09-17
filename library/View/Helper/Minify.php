@@ -9,7 +9,7 @@
 
 class Zkernel_View_Helper_Minify extends Zend_View_Helper_Abstract {
     public function minify($res, $type = 'js') {
-    	return $res;
+    	//return $res;
     	if (substr($res, 0, 12) == '/* minified_') return $res;
     	$process = popen('java -client -Xmx64m 2>&1', 'r');
 		$ret = false;
