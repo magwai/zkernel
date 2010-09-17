@@ -1,4 +1,4 @@
-/*
+﻿/*
 Uploadify v2.1.0
 Release Date: August 24, 2009
 
@@ -63,7 +63,7 @@ if(jQuery)(
 				data.uploadifyID = settings.id;
 				data.pagepath = pagePath;
 				if (settings.buttonImg) data.buttonImg = escape(settings.buttonImg);
-				if (settings.buttonText) data.buttonText = escape(settings.buttonText);
+				if (settings.buttonText) data.buttonText = encodeURIComponent(settings.buttonText);
 				if (settings.rollover) data.rollover = true;
 				data.script = settings.script;
 				data.folder = escape(settings.folder);

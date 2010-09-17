@@ -19,6 +19,9 @@ class Zkernel_Form_Element_Uploadify extends Zend_Form_Element_Hidden {
     			'sid' => session_id()
     		)
     	);
+    	
+    	$o = array_merge($o,$this->getAttribs());
+    	
     	if ($this->getAttrib('multi')) $o['multi'] = 1;
     	$s = new Zend_Session_Namespace();
     	$js =
