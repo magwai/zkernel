@@ -96,7 +96,6 @@ class Zkernel_User {
 			$key = 'user_'.$this->_models['user']->info('name');
 			$this->_data = array();
 			unset($_COOKIE[$key]);
-			unset($s->$key);
 			setcookie(
 				$key,
 				'',

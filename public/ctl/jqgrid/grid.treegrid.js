@@ -65,7 +65,7 @@ $.jgrid.extend({
 					$(row).css("display","none");
 				}
 			}
-
+			
 			var nw = ident*22 + 22;
 			if (nw > $t.grid.headers[0].width) {
 				$t.grid.resizing = {
@@ -74,7 +74,7 @@ $.jgrid.extend({
 				$t.grid.headers[0].newWidth = nw;
 				$t.grid.dragEnd();
 			}
-
+			
 			$("td:eq("+expCol+")",row).wrapInner("<span></span>").prepend(twrap);
 			$(".treeclick",row).bind("click",function(e){
 				var target = e.target || e.srcElement,
@@ -184,7 +184,7 @@ $.jgrid.extend({
 			var childern = $($t).jqGrid("getNodeChildren",record),
 			expanded = $t.p.treeReader.expanded_field;
 			$(childern).each(function(i){
-				var id  = $.jgrid.getAccessor(this,$t.p.localReader.id)				
+				var id  = $.jgrid.getAccessor(this,$t.p.localReader.id);
 				$("#"+id,$t.grid.bDiv).css("display","none");
 				if(this[expanded]){
 					$($t).jqGrid("collapseRow",this);
@@ -381,7 +381,7 @@ $.jgrid.extend({
 			if(!this.grid || !this.p.treeGrid) { return; }
 			var expanded = this.p.treeReader.expanded_field;
 			if(!rc[expanded]) {
-				var id = $.jgrid.getAccessor(rc,this.p.localReader.id)
+				var id = $.jgrid.getAccessor(rc,this.p.localReader.id);
 				var rc1 = $("#"+id,this.grid.bDiv)[0];
 				var position = this.p._index[id];
 				if( $(this).jqGrid("isNodeLoaded",this.p.data[position]) ) {
@@ -412,7 +412,7 @@ $.jgrid.extend({
 			if(!this.grid || !this.p.treeGrid) { return; }
 			if(rc.expanded) {
 				rc.expanded = false;
-				var id = $.jgrid.getAccessor(rc,this.p.localReader.id)
+				var id = $.jgrid.getAccessor(rc,this.p.localReader.id);
 				var rc1 = $("#"+id,this.grid.bDiv)[0];
 				$("div.treeclick",rc1).removeClass(this.p.treeIcons.minus+" tree-minus").addClass(this.p.treeIcons.plus+" tree-plus");
 			}
@@ -467,7 +467,7 @@ $.jgrid.extend({
 	},
 	// experimental 
 	setTreeRow : function(rowid, data) {
-		var nm, success=false;
+		var success=false;
 		this.each(function(){
 			var t = this;
 			if(!t.grid || !t.p.treeGrid) { return; }

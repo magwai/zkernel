@@ -10,6 +10,7 @@
 class Zkernel_View_Helper_Zlist extends Zend_View_Helper_Abstract  {
 	public function zlist($data = array()) {
 		$res = '';
+		$lv = array();
 
 		$reg = Zend_Registry::isRegistered('Zkernel_Multilang') ? Zend_Registry::get('Zkernel_Multilang') : '';
 
@@ -60,7 +61,11 @@ class Zkernel_View_Helper_Zlist extends Zend_View_Helper_Abstract  {
 			$data['fetch_param']
 		);
 
-		if (count($list)) {
+		if ($list instanceOf Zend_Db_Select) {
+			if (@$data['pager']) $lv = $list;
+			else $list = $class->getAdapter()->fetchAll($list);
+		}
+		if (!$lv && count($list)) {
 			$lv = $this->view->override($list, $data['override_type']);
 			$reindex = false;
 			foreach ($lv as $k => $v) if (@$v->_skip) {
@@ -78,26 +83,28 @@ class Zkernel_View_Helper_Zlist extends Zend_View_Helper_Abstract  {
 				}
 			}
 			$this->view->data = $lv;
-			if (@$data['pager']) {
-				$paginator = Zend_Paginator::factory($lv);
-				$paginator->setItemCountPerPage($data['pager_perpage']);
-				$paginator->setCurrentPageNumber($data['pager_page']);
-				$this->view->data = $paginator;
-				$pager_param = array(
-					'url' => $data['pager_url']
-				);
-				if ($data['pager_param']) $pager_param = array_merge($pager_param, $data['pager_param']);
-				$this->view->pager = $this->view->paginationControl(
-					$paginator,
-					$data['pager_style'],
-					$data['pager_script'],
-					$pager_param
-				);
-			}
-			else $this->view->data = $lv;
 		}
 		else {
 			$this->view->data = array();
+		}
+		if (@$data['pager']) {
+			$paginator = Zend_Paginator::factory($lv);
+			$paginator->setItemCountPerPage($data['pager_perpage']);
+			$paginator->setCurrentPageNumber($data['pager_page']);
+			$this->view->data = $list instanceOf Zend_Db_Select
+				? $this->view->override($paginator, $data['override_type'])
+				: $paginator;
+			$this->view->pager_count = $paginator->getTotalItemCount();
+			$pager_param = array(
+				'url' => $data['pager_url']
+			);
+			if ($data['pager_param']) $pager_param = array_merge($pager_param, $data['pager_param']);
+			$this->view->pager = $this->view->paginationControl(
+				$paginator,
+				$data['pager_style'],
+				$data['pager_script'],
+				$pager_param
+			);
 		}
 		return $this->view->data || $data['view_empty']
 			? $this->view->render($data['view_script'])

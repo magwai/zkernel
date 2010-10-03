@@ -29,8 +29,8 @@
          // Return requested object
          if(options == 'api')
             return $(this).data('qtip').interfaces[ $(this).data('qtip').current ];
-         else if(options == 'interfaces')
-            return $(this).data('qtip').interfaces;
+         else if(options == 'interfaces') 
+        	return $(this).data('qtip').interfaces;
       }
 
       // Validate provided options
@@ -71,6 +71,7 @@
             interfaces = $(this).qtip('interfaces');
 
             // Make sure API data exists$('.qtip').qtip('destroy')
+   
             if(typeof interfaces == 'object')
             {
                // Check if API call is a BLANKET DESTROY command
@@ -129,9 +130,9 @@
 
             // Add API references
             $.fn.qtip.interfaces[id] = obj;
-
+           
             // Check if element already has qTip data assigned
-            if(typeof $(this).data('qtip') == 'object')
+            if(typeof $(this).data('qtip') == 'object' && $(this).data('qtip'))
             {
             	
                // Set new current interface id

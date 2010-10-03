@@ -341,7 +341,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 			$this->config->field->set($d1);
 		}
 
-		if (!$this->config->drag && !$this->config->tree) $this->config->pager_perpage = 100;
+		//if (!$this->config->drag && !$this->config->tree) $this->config->pager_perpage = 100;
 
 		if ($this->config->drag || $this->config->tree) $this->config->pager_scroll = false;
 

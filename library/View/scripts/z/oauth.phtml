@@ -15,7 +15,7 @@ $opt = array(
 if ($this->get) {
 	$consumer = new Zend_Oauth_Consumer($opt);
 	$token = $consumer->getAccessToken($this->get, $s->oauth_reuqest);
-	echo $token->getToken().'&'.$token->getTokenSecret();
+	echo $token->getToken()."<br />".$token->getTokenSecret();
 }
 else {
 	$form = new Zkernel_Form();

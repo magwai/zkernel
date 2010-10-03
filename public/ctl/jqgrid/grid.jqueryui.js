@@ -117,7 +117,16 @@ $.jgrid.extend({
 		if($("#colchooser_"+self[0].p.id).length ) { return; }
         var selector = $('<div id="colchooser_'+self[0].p.id+'" style="position:relative;overflow:hidden"><div><select multiple="multiple"></select></div></div>');
         var select = $('select', selector);
-
+		
+		function insert(perm,i,v) {
+			if(i>=0){
+				var a = perm.slice();
+				var b = a.splice(i,Math.max(perm.length-i,i));
+				if(i>perm.length) { i = perm.length; }
+				a[i] = v;
+				return a.concat(b);
+			}
+		}
         opts = $.extend({
             "width" : 420,
             "height" : 240,
@@ -243,15 +252,6 @@ $.jgrid.extend({
             select.append("<option value='"+i+"' "+
                           (this.hidden?"":"selected='selected'")+">"+colNames[i]+"</option>");
         });
-		function insert(perm,i,v) {
-			if(i>=0){
-				var a = perm.slice();
-				var b = a.splice(i,Math.max(perm.length-i,i));
-				if(i>perm.length) { i = perm.length; }
-				a[i] = v;
-				return a.concat(b);
-			}
-		}
         function call(fn, obj) {
             if (!fn) { return; }
             if (typeof fn == 'string') {
@@ -274,7 +274,7 @@ $.jgrid.extend({
 			var $t = this;
 			if(!$t.grid) { return; }
 			// Currently we disable a treeGrid sortable
-			//if($t.p.treeGrid) { return; }
+			if($t.p.treeGrid) { return; }
 			if($.fn.sortable) {
 				opts = $.extend({
 					"cursor":"move",
@@ -308,16 +308,8 @@ $.jgrid.extend({
 				opts.update = function (ev,ui) {
 					$(ui.item).css("border-width","");
 					if($t.p.rownumbers === true) {
-						var r = ui.item.get(0);
-						var cnt = 0;
-						$("td.jqgrid-rownum",$t.rows).each(function(){
-							if (r.parent_id === $(this).parent('tr').get(0).parent_id) {
-								var s = $(this).find('span');
-								s.length
-									? s.html(cnt + 1)
-									: $(this).html(cnt + 1);
-								cnt++;
-							}
+						$("td.jqgrid-rownum",$t.rows).each(function(i){
+							$(this).html(i+1);
 						});
 					}
 					if(opts._update_) {

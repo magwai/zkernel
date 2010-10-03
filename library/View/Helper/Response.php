@@ -17,7 +17,10 @@ private $_data = array();
 		echo $this->view->json($this->_data);
 	}
 	public function response($key = null, $data = '') {
-		if ($key !== null) $this->_data[$key] = $data ? $data : array('k' => 'v');
+		if ($key !== null) {
+			if (is_array($key)) $this->_data = array_merge($this->_data, $key);
+			else $this->_data[$key] = $data;
+		}
 		return $this;
 	}
 }

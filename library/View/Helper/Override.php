@@ -19,7 +19,7 @@ class Zkernel_View_Helper_Override extends Zend_View_Helper_Abstract  {
 			if (@$res[0]) {
 				foreach ($res[0] as $k => $v) {
 					$c = $this->view->render($res[1][$k].'/'.$res[2][$k].'.phtml');
-					$r->{$el.'_valid'} = str_ireplace(array('<p>'.$v.'</p>', $v), array($c), $r->$el);
+					$r->{$el.'_valid'} = str_ireplace(array('<p>'.$v.'</p>', '<div>'.$v.'</div>', $v), array($c), $r->$el);
 				}
 			}
 		}
@@ -47,9 +47,13 @@ class Zkernel_View_Helper_Override extends Zend_View_Helper_Abstract  {
 		$reg = Zend_Registry::isRegistered('Zkernel_Multilang') ? Zend_Registry::get('Zkernel_Multilang') : '';
 		if ($reg) {
 			foreach ($r as $k => $v) if (preg_match('/^ml\_([^\_]+)\_'.$reg->id.'$/i', $k, $f)) {
-				if ($r->{'ml_'.$f[1].'_'.$reg->_default->id} !== null || @$options['multilang_nofall']) $r->{$f[1]} = $v === null && !@$options['multilang_nofall']
-					? $r->{'ml_'.$f[1].'_'.$reg->_default->id}
-					: $v;
+				if ($v === null && !@$options['multilang_nofall']) {
+					if (@$r->{'ml_'.$f[1].'_'.$reg->_default->id} !== null) $r->{$f[1]} = $r->{'ml_'.$f[1].'_'.$reg->_default->id};
+				}
+				else $r->{$f[1]} = $v;
+				/*$r->{$f[1]} = $v === null && !@$options['multilang_nofall']
+					? @$r->{'ml_'.$f[1].'_'.$reg->_default->id}
+					: $v;*/
 			}
 
 		}

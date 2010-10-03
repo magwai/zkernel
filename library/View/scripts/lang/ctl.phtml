@@ -19,6 +19,13 @@ $this->control(array(
 			)),
 			'order' => 2
 		),
+		'domain' => array(
+			'title' => 'Домен',
+			'description' => 'Домен. Используется в адресах. Только латиница. Если задан домен, ключ перестает действовать',
+			'unique' => true,
+			'required' => true,
+			'order' => 3
+		),
 		'default' => array(
 			'align' => 'center',
 			'title' => 'По-умолчанию',
@@ -29,7 +36,7 @@ $this->control(array(
 			'param' => array(
 				'multioptions' => array('1' => 'Да', '0' => 'Нет')
 			),
-			'order' => 3
+			'order' => 4
 		)
 	),
 	'func_override' => 'php_function:if ((int)$control->config->data->default) $control->config->model->update(array("default" => 0));'

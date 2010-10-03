@@ -11,7 +11,7 @@ $reg = Zend_Registry::get('Zkernel_Multilang') ? Zend_Registry::get('Zkernel_Mul
 if (count($list)) foreach ($list as $el) {
 
 ?>
-	<option<?php echo $reg->id == $el->id ? ' selected="selected"' : '' ?> value="/<?php echo $el->stitle ?>/control"><?php echo $el->title ?></option>
+	<option<?php echo $reg->id == $el->id ? ' selected="selected"' : '' ?> value="<?php echo @$el->domain ? 'http://'.$d[0] : '/'.$el->stitle ?>/control"><?php echo $el->title ?></option>
 <?php
 
 }

@@ -33,7 +33,7 @@ class Zkernel_Controller_Plugin_Menu extends Zend_Controller_Plugin_Abstract {
 			//print_r($el->route);
 			if (!$el->route || $router->hasRoute($el->route) && !(isset($el->show_it) && !$el->show_it)) {
 				$el = $view->override()->overrideSingle($el, 'menu');
-				$p = $reg ? array('lang' => $reg->stitle) : array();
+				$p = $reg && !@$reg->_default->domain ? array('lang' => $reg->stitle) : array();
 				if ($el->route && $el->param && strpos($el->route, 'dbroute') !== false) {
 					$map = $mu->fetchOne('map', array('`id` = ?' => substr($el->route, 7)));
 					$mp = explode(',', $map);

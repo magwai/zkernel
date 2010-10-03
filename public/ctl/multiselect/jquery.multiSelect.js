@@ -70,9 +70,14 @@ if(jQuery) (function($){
 	// render the html for a single option
 	function renderOption(id, option)
 	{
+		var sel = false;
+		if (option.value.slice(0, 1) == '*') {
+			sel = true;
+			option.value = option.value.slice(1);
+		}
 		var html = '<label><input type="checkbox" name="' + id + '[]" value="' + option.value + '"';
-		if( option.selected ){
-			//html += ' checked="checked"';
+		if (sel) {
+			html += ' checked="checked"';
 		}
 		html += ' />' + option.text + '</label>';
 		
