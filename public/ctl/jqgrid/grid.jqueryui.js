@@ -274,7 +274,7 @@ $.jgrid.extend({
 			var $t = this;
 			if(!$t.grid) { return; }
 			// Currently we disable a treeGrid sortable
-			if($t.p.treeGrid) { return; }
+			//if($t.p.treeGrid) { return; }
 			if($.fn.sortable) {
 				opts = $.extend({
 					"cursor":"move",
@@ -308,8 +308,16 @@ $.jgrid.extend({
 				opts.update = function (ev,ui) {
 					$(ui.item).css("border-width","");
 					if($t.p.rownumbers === true) {
-						$("td.jqgrid-rownum",$t.rows).each(function(i){
-							$(this).html(i+1);
+						var r = ui.item.get(0);
+						var cnt = 0;
+						$("td.jqgrid-rownum",$t.rows).each(function(){
+							if (r.parent_id === $(this).parent('tr').get(0).parent_id) {
+								var s = $(this).find('span');
+								s.length
+									? s.html(cnt + 1)
+									: $(this).html(cnt + 1);
+								cnt++;
+							}
 						});
 					}
 					if(opts._update_) {

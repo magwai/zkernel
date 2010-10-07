@@ -77,7 +77,8 @@ class Zkernel_Db_Model_Basket {
     	if ($this->_model) $ok = $this->_model->fetchCount(array('`id` = ?' => $id));
     	if ($ok) {
     		$this->_data[$id] = $quant;
-    		$this->_data_ex[$id] = array_merge($this->_data_ex[$id], $ex);
+    		if (isset($this->_data_ex[$id])) $this->_data_ex[$id] = array_merge($this->_data_ex[$id], $ex);
+	    	else $this->_data_ex[$id] = $ex;
 	    	$this->save();
 	    	return true;
     	}

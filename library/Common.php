@@ -49,6 +49,21 @@ class Zkernel_Common {
 		)));
 	}
 
+	static function strtoupper($str) {
+		return iconv('windows-1251', 'utf-8', strtolower(strtr(
+			iconv('utf-8', 'windows-1251', $str),
+			iconv('utf-8', 'windows-1251', 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'),
+			iconv('utf-8', 'windows-1251', 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ')
+		)));
+	}
+
+	static function ucfirst($str) {
+		$s = iconv('utf-8', 'windows-1251', $str);
+		$f = @substr($s, 0, 1);
+		$l = @substr($s, 1);
+		return strtoupper(self::strtoupper(iconv('windows-1251', 'utf-8', $f))).strtolower(self::strtolower(iconv('windows-1251', 'utf-8', $l)));
+	}
+
 	static function hex2rgb ($hex , $asString = false) {
 		if ( 0 === strpos ( $hex , '#' )) {
 		$hex = substr ( $hex , 1 );
