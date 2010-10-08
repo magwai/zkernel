@@ -295,6 +295,7 @@ $.jgrid.extend({
 					$("td",ui.item).each(function(i){
 						this.style.width = $t.grid.cols[i].style.width;
 					});
+				
 					if($t.p.subGrid) {
 						var subgid = $(ui.item).attr("id");
 						try {
