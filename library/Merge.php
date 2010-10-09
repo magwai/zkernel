@@ -26,7 +26,7 @@ class Zkernel_Merge {
 
 
 
-	/*function merge($dir, $include = null, $exclude = null) {
+	function merge($dir, $include = null, $exclude = null) {
 		$f_d = DATA_PATH.'/merge';
 		$f_n = md5(var_export(array($dir), 1)).'.php';
 		$f_f = $f_d.'/'.$f_n;
@@ -61,13 +61,15 @@ class Zkernel_Merge {
 	function clean($fn) {
 		$res = '';
 		$c = file_get_contents($fn);
+
+
 		//$c = preg_replace('/(require|include)([^\;]*)\;/si', '', $c);
 		//$c = str_replace('  ', ' ', $c);
 		$tokens = token_get_all($c);
-		//$was_io = $was_i = $was_ro = $was_r = $was_shit = 0;
+		$was_io = $was_i = $was_ro = $was_r = $was_shit = 0;
 		$was_require_once = 0;
 		$was_shit_require_once = 0;
-		$skip = array(T_COMMENT, T_OPEN_TAG, T_CLOSE_TAG, T_DOC_COMMENT, T_ML_COMMENT);
+		$skip = array(T_COMMENT, T_OPEN_TAG, T_CLOSE_TAG, T_DOC_COMMENT/*, T_ML_COMMENT*/);
 		foreach ($tokens as $token) {
 			if (is_array($token)) {
 				if (in_array($token[0], $skip)) continue;
@@ -102,9 +104,9 @@ class Zkernel_Merge {
 
 
 
-			//if (is_string($token)) $res .= $token;
+			//if (is_string($token)) $res .= '*'.$token.'*';
 			//else {
-				list($id, $text) = $token;
+				@list($id, $text) = $token;
 				switch ($id) {
 					case T_INCLUDE:
 						$was_i = 1;
@@ -119,7 +121,7 @@ class Zkernel_Merge {
 						$was_ro = 1;
 						break;
 					case T_COMMENT:
-					case T_ML_COMMENT:
+					//case T_ML_COMMENT:
 					case T_DOC_COMMENT:
 					case T_OPEN_TAG:
 					case T_CLOSE_TAG:
@@ -130,6 +132,7 @@ class Zkernel_Merge {
 					default:
 						if ($was_r || $was_ro || $was_i || $was_io) {
 							if ($id == T_CONSTANT_ENCAPSED_STRING) $was_shit = 1;
+							else if ($id == T_VARIABLE) {/*$res .= '*';*/$was_io = false;}
 							else if ($text) $res .=
 									($was_r ? 'require' : '').
 									($was_ro ? 'require_once' : '').
@@ -141,13 +144,18 @@ class Zkernel_Merge {
 						}
 						else {
 							if ($was_shit) $was_shit = 0;
-							else $res .= $text;
+							//else $res .= $text;
 						}
 						break;
 				}
 			//}
 		}
+		//echo $res;
+		//if (stripos($fn, 'Modules.php') !== false) {
+		//	exit();
+		//}
+		//exit();
 		//$res = preg_replace('/\nclass\ ([^\ ]+)\ /si', "\n".'if (!class_exists(\'$1\')) class $1 ', $res);
 		return $res;
-	}*/
+	}
 }
