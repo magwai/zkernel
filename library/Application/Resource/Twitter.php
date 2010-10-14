@@ -16,7 +16,10 @@ class Zkernel_Application_Resource_Twitter extends Zend_Application_Resource_Res
 
 		$this->_twitter = array(
 			'token' => @$options['token'],
-			'token_secret' => @$options['token_secret']
+			'token_secret' => @$options['token_secret'],
+			'consumer_key' => @$options['consumer_key'],
+			'consumer_secret' => @$options['consumer_secret'],
+			'callback_url' => @$options['callback_url']
 		);
 
 		$key = (isset($options['registry']) && !is_numeric($options['registry'])) ? $options['registry'] : self::DEFAULT_REGISTRY_KEY;
