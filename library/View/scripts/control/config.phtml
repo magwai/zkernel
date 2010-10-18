@@ -8,5 +8,5 @@ echo $this->json(array(
 	'def_controller' => 'cindex',
 	'def_action' => 'ctlshow',
 	'controller' => @$s->control['last']['controller'] ? $s->control['last']['controller'] : 'cindex',
-	'action' => $s->control['last']['action'] ? $s->control['last']['action'] : 'ctlshow'
+	'action' => @$s->control['last']['action'] ? $s->control['last']['action'] : 'ctlshow'
 ));
