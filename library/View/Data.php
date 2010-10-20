@@ -22,7 +22,7 @@ class Zkernel_View_Data implements Countable, Iterator, ArrayAccess {
     }
 
     function set($k, $v = null) {
-		$this->_data[$k] = $v;
+		$this->_data[(string)$k] = $v;
 		$this->_count = count($this->_data);
 		return $this;
 	}

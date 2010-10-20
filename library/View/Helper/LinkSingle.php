@@ -8,7 +8,7 @@
  */
 
 class Zkernel_View_Helper_LinkSingle extends Zend_View_Helper_HeadLink  {
-	function linkSingle($name = null) {
+	function linkSingle($name = null, $mtime = true) {
 		$css = array();
 		$i = (array)$this->getIterator();
 		foreach ($i as $offset => $item) {
@@ -66,7 +66,7 @@ class Zkernel_View_Helper_LinkSingle extends Zend_View_Helper_HeadLink  {
 									'',
 									'/'.$zp
 								), $su);
-								$str = str_ireplace($matches[$k_1], 'url('.$su.'?'.filemtime($dir_full.'/'.$el_1).')', $str);
+								$str = str_ireplace($matches[$k_1], 'url('.$su.($mtime ? '?'.filemtime($dir_full.'/'.$el_1) : '').')', $str);
 							}
 
 						}
@@ -89,7 +89,7 @@ class Zkernel_View_Helper_LinkSingle extends Zend_View_Helper_HeadLink  {
 									'',
 									'/zkernel'
 								), $su);
-								$str = str_ireplace($matches[$k_1], 'src="'.$su.'?'.filemtime($dir_full.'/'.$el_1).'"', $str);
+								$str = str_ireplace($matches[$k_1], 'src="'.$su.($mtime ? '?'.filemtime($dir_full.'/'.$el_1) : '').'"', $str);
 							}
 						}
 
