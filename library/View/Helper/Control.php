@@ -58,6 +58,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 	    	'orderdir' 				=> 'asc',
 	    	'field' 				=> array(),
 			'formatter_function'	=> array(),
+			'pager_list'			=> array(10, 20, 30, 50, 100, 200, 500, 1000),
 			'pager_scroll'			=> true,
 	    	'pager_perpage' 		=> 0,
 		   	'pager_page' 			=> 1,
@@ -352,6 +353,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 		if ($this->config->param['orderby']) $this->config->orderby = $this->config->param['orderby'];
     	if ($this->config->param['orderdir']) $this->config->orderdir = $this->config->param['orderdir'];
     	if ($this->config->param['page']) $this->config->pager_page = $this->config->param['page'];
+    	if ($this->config->param['rows']) $this->config->pager_perpage = $this->config->param['rows'];
     	if ($this->config->tree && $this->config->param['oid']) {
     		$this->config->tree_opened = Zkernel_Common::getOuterIds(array(
     			'model' => $this->config->model,
