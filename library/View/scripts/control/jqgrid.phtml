@@ -52,8 +52,9 @@ else {
 	if ($c->field) foreach ($c->field as $el) {
 	    if (!$el->active) continue;
 	    if ($el->live) {
-	    	$opt = $el->live instanceof Zekrnel_Config_Control ? $el->live->toArray() : array();
-	    	$live[] = 'c.live_init("'.$el->name.'"'.($opt ? ', '.Zend_Json::encode($opt) : '').');';
+			$opt = $el->live instanceof Zkernel_Config_Control ? $el->live->toArray() : (is_array($el->live) ? $el->live : array());
+	    	if ($el->single) $opt['single'] = 1;
+			$live[] = 'c.live_init("'.$el->name.'"'.($opt ? ', '.Zend_Json::encode($opt) : '').');';
 	    }
 	    $field_title[] = $el->title;
 	    $dt = array(

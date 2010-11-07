@@ -639,6 +639,18 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 							$where = $this->config->where ? $this->config->where->toArray() : array();
 							$where['`id` = ?'] = $id;
 							$ok = $data_db ? $this->config->model->updateControl($data_db, $where) : false;
+							if ($ok) {
+								$keys = array_keys($data_db);
+								$dd = array();
+								foreach ($keys as $key) {
+									if (@(int)$this->config->field->$key->single) $dd[$key] = '';
+								}
+								if ($dd) {
+									unset($where['`id` = ?']);
+									$where['`id` != ?'] = $id;
+									$this->config->model->updateControl($dd, $where);
+								}
+							}
 						}
 						else $ok = $this->config->data->id =  $this->config->model->insertControl($data_db);
 					}
@@ -714,7 +726,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
     	$s = new Zend_Session_Namespace();
 		unset($s->control['history'][$this->config->controller]['prev']);
     	if ($cur) {
-	    	$cur->orderid = @(int)$prev->orderid + 1;
+	    	$cur->{$this->config->field_orderid} = @(int)$prev->{$this->config->field_orderid} + 1;
 	    	$ok = $cur->save();
 	    	if ($ok) {
 	    		$w = array('`id` != ?' => $cur->id);
@@ -761,7 +773,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 				$this->config->skip = false;
 	    		$this->config->func_check;
 	    		if (!$this->config->skip) {
-		    		$ok = $this->config->model->deleteControl($where);
+		    		$ok = $this->config->use_db ? $this->config->model->deleteControl($where) : true;
 		    		if ($ok) {
 		    			$form = $this->buildForm();
 		    			$els = $form->getElements();

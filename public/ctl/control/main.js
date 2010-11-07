@@ -509,6 +509,11 @@ c.live_init = function(field, opt) {
 		o[field] = $(this).attr('type') == 'checkbox'
 			? ($(this)[0].checked ? 1 : 0)
 			: $(this).val();
+		if (typeof opt.single != 'undefined' && opt.single) {
+			$('#list td[aria-describedby=list_' + field + '] input,#list td[aria-describedby=list_' + field + '] select').not($(this)).each(function() {
+				$(this).val('')[0].checked = false;
+			});
+		}
 		c.do_action({
 			controller: (typeof opt.controller == 'undefined' ? c.cfg.controller : opt.controller),
 			action: (typeof opt.action == 'undefined' ? 'ctledit' : opt.action),

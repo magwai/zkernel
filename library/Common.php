@@ -107,7 +107,7 @@ class Zkernel_Common {
 				foreach ($d as $el) $ret[$el->getName()] = $el->getDescription();
 			}
     	}
-    	$pk = method_exists($r, getParentClass)
+    	$pk = method_exists($r, 'getParentClass')
     		? $r->getParentClass()
     		: false;
     	if ($pk) {

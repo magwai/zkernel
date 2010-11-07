@@ -73,6 +73,7 @@ class Zkernel_View_Helper_LinkSingle extends Zend_View_Helper_HeadLink  {
 
 						$matches = $files = array();
 						preg_match_all('/src\=(\'|\"|)(.*?)(\'|\"|\,\))/si', $str, $res);
+						
 						if (@$res[2]) foreach ($res[2] as $k_1 => $el_1) {
 							$matches[] = $res[0][$k_1];
 							$files[] = $el_1;
