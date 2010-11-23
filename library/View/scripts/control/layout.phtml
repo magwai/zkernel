@@ -35,6 +35,7 @@ else {
 	$p = array();
 	$reg = Zend_Registry::isRegistered('Zkernel_Multilang') ? Zend_Registry::get('Zkernel_Multilang') : '';
 	if ($reg && !@$reg->domain) $p['lang'] = $reg->stitle;
+	if ($reg && @$reg->domain) $d = explode($reg->domain);
 
 	$this	->inlineScript('script', '$(function() { c.init('.Zend_Json::encode($p).'); });');
 
@@ -94,7 +95,7 @@ else {
 					<span><input class="c_l_button" type="submit" value="Войти" /></span>
 				</form></div>
 				<?php echo $reg ? $this->render('control/multi.phtml') : '' ?>
-				<div class="c_site"><a target="_blank" href="/<?php echo $reg ? $reg->stitle : '' ?>">на сайт</a></div>
+				<div class="c_site"><a target="_blank" href="<?php echo $reg ? (@$reg->domain ? 'http://'.$d[0] : '/'.$reg->stitle) : '/' ?>">на сайт</a></div>
 				<div id="c_navpane"></div>
 			</div>
 			<div id="c_tl">загрузка панели управления<br /><a href="/<?php echo $reg ? $reg->stitle.'/' : '' ?>control">перезагрузить</a></div>
