@@ -46,7 +46,7 @@ class Zkernel_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstrac
 
 		if ($this->_domain) {
 			$doms = $this->_model->fetchPairs('id', 'domain');
-			if ($doms) foreach ($doms as &$el) $el = @$el[0] ? explode(' ', $el) : array();
+			if ($doms) foreach ($doms as $k => $el) $doms[$k] = @$el[0] ? explode(' ', $el) : array();
 
 			$lang = $request->getParam('lang');
 			if ($lang) $this->_session->lang = $this->_model->fetchOne('id', array('`stitle` = ?' => $lang));
