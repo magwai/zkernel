@@ -326,7 +326,7 @@
 			<div id="mlink_panel" class="panel">
 				<fieldset>
 						<legend>{#advlink_dlg.mlink_link}</legend>
-						<div><iframe style="width:100%;height:200px;" frameborder="0" src="/menu/mce"></iframe></div>
+						<div><iframe style="width:100%;height:200px;" id="iframe" frameborder="0" src="about:blank"></iframe></div>
 				</fieldset>
 			</div>
 		</div>
@@ -336,5 +336,8 @@
 			<input type="button" id="cancel" name="cancel" value="{#cancel}" onclick="tinyMCEPopup.close();" />
 		</div>
     </form>
+	<script type="text/javascript">
+		document.getElementById('iframe').src = (window.top.c.cfg.lang ? '/' + window.top.c.cfg.lang : '') + '/menu/mce';
+	</script>
 </body>
 </html>

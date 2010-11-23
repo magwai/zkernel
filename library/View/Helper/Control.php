@@ -335,7 +335,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 			$d = array();
 			$d1 = $this->config->field->toArray();
 			foreach ($d1 as $k => $v) {
-				$d[$k] = $v['order'];
+				$d[$k] = @$v['order'];
 				unset($this->config->field->$k);
 			}
 			array_multisort($d, SORT_ASC, SORT_NUMERIC, $d1);
@@ -420,8 +420,8 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 			    		? ($this->config->pager_page - 1) * $this->config->pager_perpage
 			    		: null
 			    );
-			    $data = $rd->toArray();
 
+			    $data = $rd->toArray();
 			    $this->config->data_cnt = $this->config->model->fetchCount($where);
 
 			    if ($this->config->tree && $data && $this->config->field) {

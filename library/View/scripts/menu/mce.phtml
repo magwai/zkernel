@@ -3,8 +3,100 @@
 $this->layout()->disableLayout(true);
 Zend_Controller_Front::getInstance()->unregisterPlugin('Zkernel_Controller_Plugin_Debug');
 Zend_Controller_Front::getInstance()->unregisterPlugin('Zkernel_Controller_Plugin_Feedback');
-$menu = $this->navigation()->menu()->renderMenu();
-$menu = preg_replace('/href\=\"([^\"]+)\"/si', 'onclick="return m_set_url(\'$1\')" href="#"', $menu);
+
+$tt = array();
+$dir = Zend_Controller_Front::getInstance()->getControllerDirectory();
+$dir = @$dir['default'];
+$handle = @opendir($dir);
+$mu = new Default_Model_Url();
+
+while ($path = @readdir($handle)) {
+	if (is_file($dir.'/'.$path)) {
+		$n = $nn = strtolower(str_ireplace('Controller.php', '', $path));
+		$c = ucfirst($n).'Controller';
+		if (!class_exists($c)) include $dir.'/'.$path;
+		$db = Zkernel_Common::getDocblock($c);
+		if (isset($db['zk_title'])) $nn = $db['zk_title'];
+		$inner = array();
+		$r = new Zend_Reflection_Class($c);
+		$met = $r->getMethods();
+		if (@$met) {
+
+			$exist = false;
+			foreach ($met as $el) {
+				if ($el->name == '_getRoutes') {
+					$rq = new Zend_Controller_Request_Http();
+					$rq->setControllerName($n);
+					$ci = new $c(
+						$rq,
+						new Zend_Controller_Response_Http()
+					);
+					$ci->init();
+					$rs = $ci->_getRoutes();
+					if ($rs) foreach ($rs as $k_1 => $el_1) {
+						$r = explode('|', $k_1);
+						$map = $mu->fetchOne('map', array('`id` = ?' => substr($r[1], 7)));
+						$mp = explode(',', $map);
+						$pp = explode(',', $r[0]);
+						if ($mp && $pp) foreach ($mp as $n_1 => $mp1) $p[$mp1] = $pp[$n_1];
+						
+						$inner[] = array(
+							'label' => $el_1,
+							'route' => $r[1],
+							'controller' => $n,
+							'action' => 'index',
+							'params' => $p,
+							'uri' => ''
+						);
+					}
+					break;
+				}
+			}
+    		if (!$exist) foreach ($met as $el) {
+    			$db1 = Zkernel_Common::getDocblock($el, 'method');
+    			if (substr($el->name, -6) == 'Action') {
+    				$db1 = Zkernel_Common::getDocblock($el, 'method');
+    				if ($db1 && array_key_exists('zk_routable', $db1) && !$db1['zk_routable']) continue;
+    				if (!isset($db1['zk_title'])) continue;
+    				$inner[] = array(
+						'label' => $db1['zk_title'],
+						'controller' => $n,
+						'action' => substr($el->name, 0, -6),
+						'uri' => ''
+					);
+    			}
+    		}
+    	}
+		if ($db && array_key_exists('zk_routable', $db) && !$db['zk_routable']) {
+			if ($inner) {
+				$tt[] = array(
+					'label' => $nn,
+					'pages' => $inner,
+					'uri' => ''
+				);
+			}
+		}
+		else {
+			$tt[] = array(
+				'label' => $nn,
+				'controller' => $n,
+				'uri' => ''
+			);
+			if ($inner) {
+				foreach ($inner as $k => $v) {
+					$v['label'] = '---'.$v['label'];
+					$tt[] = $v;
+				}
+			}
+		}
+	}
+}
+
+@closedir($handle);
+
+$menu = $this->navigation()->menu()->renderMenu(new Zend_Navigation($tt));
+//$this->navigation()->menu()->renderMenu();
+$menu = preg_replace('/href\=\"([^\"]+)\"/si', 'style="text-decoration:none;" onclick="return m_set_url(\'$1\')" href="#"', $menu);
 
 echo $this->doctype('HTML5');
 
