@@ -17,7 +17,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 		$d = array(
 			'post'					=> array(),
 			'param'					=> array(),
-			'theme'					=> 'magwai',
+			'theme'					=> 'redmond',
 			'model' 				=> null,
 			'where'					=> null,
 			'tree'					=> false,
@@ -595,6 +595,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 							$m2m_old = $m2m_model->fetchAll(array(
 								'`'.$m2m_self.'` = ?' => $id
 							));
+
 							if ($m2m_old) {
 								$m2m_ids = array();
 								// Удаляем несуществующие связи
@@ -602,8 +603,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 									if (!$m2m_new || !in_array($m2m_el->$m2m_foreign, $m2m_new)) {
 										$m2m_changed = true;
 										$m2m_model->delete(array(
-											'`'.$m2m_self.'` = ?' => $id,
-											'`'.$m2m_foreign.'` = ?' => $m2m_el->$m2m_foreign
+											'`id` = ?' => $m2m_el->id
 										));
 									}
 									else $m2m_ids[] = $m2m_el->$m2m_foreign;
