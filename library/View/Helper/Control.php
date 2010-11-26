@@ -17,7 +17,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 		$d = array(
 			'post'					=> array(),
 			'param'					=> array(),
-			'theme'					=> 'redmond',
+			'theme'					=> 'magwai',
 			'model' 				=> null,
 			'where'					=> null,
 			'tree'					=> false,
@@ -602,6 +602,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 									if (!$m2m_new || !in_array($m2m_el->$m2m_foreign, $m2m_new)) {
 										$m2m_changed = true;
 										$m2m_model->delete(array(
+											'`'.$m2m_self.'` = ?' => $id,
 											'`'.$m2m_foreign.'` = ?' => $m2m_el->$m2m_foreign
 										));
 									}
