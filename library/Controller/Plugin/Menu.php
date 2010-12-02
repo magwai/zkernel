@@ -4,6 +4,7 @@ class Zkernel_Controller_Plugin_Menu extends Zend_Controller_Plugin_Abstract {
 	const DEFAULT_REGISTRY_KEY = 'Zend_Navigation';
     const DEFAULT_MODEL = 'Default_Model_Menu';
     private $_model;
+	protected $_map_cache = array();
 	protected $_menu = null;
 	protected $_key = null;
 	protected $_default = null;
@@ -34,11 +35,26 @@ class Zkernel_Controller_Plugin_Menu extends Zend_Controller_Plugin_Abstract {
 			if (!$el->route || $router->hasRoute($el->route) && !(isset($el->show_it) && !$el->show_it)) {
 				$el = $view->override()->overrideSingle($el, 'menu');
 				$p = $reg && !@$reg->_default->domain ? array('lang' => $reg->stitle) : array();
-				if ($el->route && $el->param && strpos($el->route, 'dbroute') !== false) {
-					$map = $mu->fetchOne('map', array('`id` = ?' => substr($el->route, 7)));
-					$mp = explode(',', $map);
+				if ($el->route && $el->param && ($el->route == 'default' || strpos($el->route, 'dbroute') !== false)) {
+					if ($el->route == 'default') $map = '';
+					else {
+						$mk = substr($el->route, 7);
+						if (isset($this->_map_cache[$mk])) $map = $this->_map_cache[$mk];
+						else {
+							$map = $mu->fetchOne('map', array('`id` = ?' => substr($el->route, 7)));
+							$this->_map_cache[$mk] = $map;
+						}
+					}
 					$pp = explode(',', $el->param);
-					if ($mp && $pp) foreach ($mp as $n => $mp1) $p[$mp1] = $pp[$n];
+					if ($map) {
+						$mp = explode(',', $map);
+						
+						if ($mp && $pp) foreach ($mp as $n => $mp1) $p[$mp1] = $pp[$n];
+					}
+					else if ($pp) foreach ($pp as $mp1) {
+						$ppp = explode(':', $mp1);
+						$p[@$ppp[0] ? $ppp[0] : 'id'] = @$ppp[1];
+					}
 				}
 				if(empty($el->url)) {
 					$md = array(
