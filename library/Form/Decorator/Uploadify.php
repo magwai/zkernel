@@ -17,8 +17,10 @@ class Zend_Form_Decorator_Uploadify
         $element 	= $this->getElement();
         $name      	= $element->getName();
         $attribs   	= $this->getAttribs();
+		$value      	= $element->getValue();
+
         $view = $element->getView();
-    	$markup[] 	= $view->formUploadify($name, $attribs);
+    	$markup[] 	= $view->formUploadify($name, $value, $attribs);
 
         $markup = implode($separator, $markup);
 

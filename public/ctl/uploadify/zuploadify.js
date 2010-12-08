@@ -16,6 +16,7 @@ zuf.init = function(o) {
 	var n = o.fileDataName;
 	var hh = $('input[name=' + n + '][type=file]');
 	var h = $('input[name=' + n + '][type=hidden]');
+	h.data('old_val', h.val());
 	var e = h.prevAll('em');
 	var oo = {
 		'multi': typeof o.multi == 'undefined' ? false : true,
@@ -62,7 +63,6 @@ zuf.init = function(o) {
 	};
 
 	hh.uploadify($.extend(oo, o));
-
 	zuf.inited = true;
 	
 	/*e.find('>a').click(function() {
@@ -96,6 +96,9 @@ zuf.init = function(o) {
 		}
 		return false;
 	});*/
+	window.setTimeout(function() {
+		h.val(h.data('old_val'));
+	}, 10);
 };
 
 zuf.add = function(n, title, url, required) {

@@ -201,7 +201,7 @@ c.go = function(controller, action, param, post) {
 		type: post ? 'post' : 'get',
 		data: post,
 		dataType: 'json',
-		timeout: 300000,
+		timeout: 600000,
 		beforeSend: function() {
 			c.loading_start(true/*, 1000*/);
 			c.pre_controller = controller;
@@ -430,6 +430,7 @@ c.submit = function(apply) {
 c.sumbit_full = function(apply) {
 	var form = $('#c_form');
 	apply = typeof apply == 'undefined' ? 0 : apply;
+	$('#c_form input[type=file]').remove();
 	var post = form.serialize();
 	post += (post.length ? '&' : '') + 'cposted=1&is_apply=' + escape(apply);
 	c.loading_finish();
