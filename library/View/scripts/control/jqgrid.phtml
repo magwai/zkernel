@@ -68,7 +68,7 @@ else {
 	    else $dt['search'] = false;
 	    if ($el->hidden) $dt['hidden'] = true;
 	    if ($el->stype) $dt['stype'] = $el->stype;
-	    if ($el->editoptions) $dt['editoptions'] = $el->editoptions;
+	    if ($el->editoptions) $dt['editoptions'] = $el->editoptions->toArray();
 	    if ($el->formatter) {
 			if ($el->formatter == 'function') {
 				$dt['formatter'] = 'fmt_'.$el->name;
