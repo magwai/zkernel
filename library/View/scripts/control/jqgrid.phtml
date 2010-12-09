@@ -201,9 +201,13 @@ $.include([
 			return false;
 		},
 		stop: function(event, ui) {
+			var $t = $("#list")[0];
 			var id = ui.item.attr("id");
 			var r = ui.item.prev("tr").get(0);
-			var prev = r ? (r.parent_id == ui.item.get(0).parent_id ? r.id : 0) : 0;
+			var pos_r = $t.p._index[r.id];
+			var pos_oo = $t.p._index[id];
+			var pid = $t.p.treeReader.parent_id_field;
+			var prev = r ? ($t.p.data[pos_r][pid] == $t.p.data[pos_oo][pid] ? r.id : 0) : 0;
 			if (prev == this._was) return;
 			prev = typeof prev == "undefined" ? 0 : prev;
 			c.go(c.cfg.controller, "ctldrag", {"id": id, "prev": prev});

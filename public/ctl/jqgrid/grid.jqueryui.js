@@ -295,7 +295,6 @@ $.jgrid.extend({
 					$("td",ui.item).each(function(i){
 						this.style.width = $t.grid.cols[i].style.width;
 					});
-				
 					if($t.p.subGrid) {
 						var subgid = $(ui.item).attr("id");
 						try {
@@ -309,10 +308,17 @@ $.jgrid.extend({
 				opts.update = function (ev,ui) {
 					$(ui.item).css("border-width","");
 					if($t.p.rownumbers === true) {
+						/*$("td.jqgrid-rownum",$t.rows).each(function(i){
+							$(this).html(i+1);
+						});*/
 						var r = ui.item.get(0);
+						var pos_r = $t.p._index[r.id];
 						var cnt = 0;
+						var parent_id = $t.p.treeReader.parent_id_field;
 						$("td.jqgrid-rownum",$t.rows).each(function(){
-							if (r.parent_id === $(this).parent('tr').get(0).parent_id) {
+							var oo = $(this).parent('tr')[0];
+							var pos_oo = $t.p._index[oo.id];
+							if ($t.p.data[pos_r][parent_id] === $t.p.data[pos_oo][parent_id]) {
 								var s = $(this).find('span');
 								s.length
 									? s.html(cnt + 1)
@@ -392,16 +398,18 @@ $.jgrid.extend({
 			"drop" : function (opts) {
 				return $.extend({
 					accept: function(d) {
+						if (!$(d).hasClass('jqgrow')) { return d;}
 						var tid = $(d).closest("table.ui-jqgrid-btable");
-						if($.data(tid[0],"dnd") !== undefined) {
+						if(tid.length > 0 && $.data(tid[0],"dnd") !== undefined) {
 						    var cn = $.data(tid[0],"dnd").connectWith;
 						    return $.inArray('#'+this.id,cn) != -1 ? true : false;
 						}
 						return d;
 					},
 					drop: function(ev, ui) {
+						if (!$(ui.draggable).hasClass('jqgrow')) { return; }
 						var accept = $(ui.draggable).attr("id");
-						var getdata = $('#'+$t.id).jqGrid('getRowData',accept);
+						var getdata = ui.draggable.parent().parent().jqGrid('getRowData',accept);
 						if(!opts.dropbyname) {
 							var j =0, tmpdata = {}, dropname;
 							var dropmodel = $("#"+this.id).jqGrid('getGridParam','colModel');

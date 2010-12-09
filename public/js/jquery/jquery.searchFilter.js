@@ -268,7 +268,7 @@ jQuery.fn.searchFilter = function(fields, options) {
             ");
             /* end hard-to-minify code */
             /* begin easier to minify code */
-            jQ.html("").addClass("ui-searchFilter").append("<div class='ui-widget-overlay' style='z-index: -1'>&#160;</div><table class='ui-widget-content ui-corner-all'><thead><tr><td colspan='5' class='ui-widget-header ui-corner-all' style='line-height: 18px;'><div class='ui-closer ui-state-default ui-corner-all ui-helper-clearfix' style='float: right;'><span class='ui-icon ui-icon-close'></span></div>" + opts.windowTitle + "</td></tr></thead><tbody><tr class='sf'><td class='fields'></td><td class='ops'></td><td class='data'></td><td><div class='ui-del ui-state-default ui-corner-all'><span class='ui-icon ui-icon-minus'></span></div></td><td><div class='ui-add ui-state-default ui-corner-all'><span class='ui-icon ui-icon-plus'></span></div></td></tr><tr><td colspan='5' class='divider'><div>&#160;</div></td></tr></tbody><tfoot><tr><td colspan='3'><span class='ui-reset ui-state-default ui-corner-all' style='display: inline-block; float: left;'><span class='ui-icon ui-icon-arrowreturnthick-1-w' style='float: left;'></span><span style='line-height: 18px; padding: 0 7px 0 3px;'>" + opts.resetText + "</span></span><span class='ui-search ui-state-default ui-corner-all' style='display: inline-block; float: right;'><span class='ui-icon ui-icon-search' style='float: left;'></span><span style='line-height: 18px; padding: 0 7px 0 3px;'>" + opts.searchText + "</span></span><span class='matchText'>" + opts.matchText + "</span> " + gOps_html + " <span class='rulesText'>" + opts.rulesText + "</span></td><td>&#160;</td><td><div class='ui-add-last ui-state-default ui-corner-all'><span class='ui-icon ui-icon-plusthick'></span></div></td></tr></tfoot></table>");
+            jQ.html("").addClass("ui-searchFilter").append("<div class='ui-widget-overlay' style='z-index: -1'>&#160;</div><table class='ui-widget-content ui-corner-all'><thead><tr><td colspan='5' class='ui-widget-header ui-corner-all' style='line-height: 18px;'><div class='ui-closer ui-state-default ui-corner-all ui-helper-clearfix' style='float: right;'><span class='ui-icon ui-icon-close'></span></div>" + opts.windowTitle + "</td></tr></thead><tbody><tr class='sf'><td class='fields'></td><td class='ops'></td><td class='data'></td><td><div class='ui-del ui-state-default ui-corner-all'><span class='ui-icon ui-icon-minus'></span></div></td><td><div class='ui-add ui-state-default ui-corner-all'><span class='ui-icon ui-icon-plus'></span></div></td></tr><tr><td colspan='5' class='divider'><hr class='ui-widget-content' style='margin:1px'/></td></tr></tbody><tfoot><tr><td colspan='3'><span class='ui-reset ui-state-default ui-corner-all' style='display: inline-block; float: left;'><span class='ui-icon ui-icon-arrowreturnthick-1-w' style='float: left;'></span><span style='line-height: 18px; padding: 0 7px 0 3px;'>" + opts.resetText + "</span></span><span class='ui-search ui-state-default ui-corner-all' style='display: inline-block; float: right;'><span class='ui-icon ui-icon-search' style='float: left;'></span><span style='line-height: 18px; padding: 0 7px 0 3px;'>" + opts.searchText + "</span></span><span class='matchText'>" + opts.matchText + "</span> " + gOps_html + " <span class='rulesText'>" + opts.rulesText + "</span></td><td>&#160;</td><td><div class='ui-add-last ui-state-default ui-corner-all'><span class='ui-icon ui-icon-plusthick'></span></div></td></tr></tfoot></table>");
             /* end easier-to-minify code */
 
             var jRow = jQ.find("tr.sf");
@@ -350,7 +350,7 @@ jQuery.fn.searchFilter = function(fields, options) {
                 var jElem = td.find(".field" + index);
                 if (jElem[0] == null) jElem = td.find(".default"); // if there's not an element for that field, use the default one
                 jElem.attr("name", "op").show();
-
+                return false;
             });
             else jOps.find(".default").attr("name", "op").show();
             if (has_custom_data) jFSelect.change(function(e) {
@@ -360,6 +360,7 @@ jQuery.fn.searchFilter = function(fields, options) {
                 var jElem = td.find(".field" + index);
                 if (jElem[0] == null) jElem = td.find(".default"); // if there's not an element for that field, use the default one
                 jElem.show().addClass("vdata");
+                return false;
             });
             else jData.find(".default").show().addClass("vdata");
             // go ahead and call the change event and setup the ops and data values
@@ -382,7 +383,7 @@ jQuery.fn.searchFilter = function(fields, options) {
                     row.find("select[name='op']")[0].selectedIndex = 0;
                     row.find(".data input").val(""); // blank all input values
                     row.find(".data select").each(function() { this.selectedIndex = 0; }); // select first option on all selects
-                    row.find("select[name='field']").change(); // trigger any change events
+                    row.find("select[name='field']").change(function(event){event.stopPropagation();}); // trigger any change events
                 }
                 return false;
             });
@@ -408,7 +409,7 @@ jQuery.fn.searchFilter = function(fields, options) {
                         newRow.find("#" + this.id).unbind().removeAttr("id").removeClass("hasDatepicker").datepicker(settings);
                     });
                 }
-                newRow.find("select[name='field']").change();
+                newRow.find("select[name='field']").change(function(event){event.stopPropagation();} );
                 return false;
             });
             jQ.find(".ui-search").click(function(e) {
@@ -465,7 +466,7 @@ jQuery.fn.searchFilter = function(fields, options) {
                         newRow.find("#" + this.id).unbind().removeAttr("id").removeClass("hasDatepicker").datepicker(settings);
                     });
                 }
-                newRow.find("select[name='field']").change();
+                newRow.find("select[name='field']").change(function(event){event.stopPropagation();});
                 return false;
             });
 
@@ -481,13 +482,13 @@ jQuery.fn.searchFilter = function(fields, options) {
                  *
                  *  author: Daniel Dotsenko (dotsa@hotmail.com)
                  */
-                selDOMobj = this.$.find("select[name='groupOp']")[0];
+                selDOMobj = jQ.find("select[name='groupOp']")[0];
                 var indexmap = {}, l = selDOMobj.options.length, i;
                 for (i=0; i<l; i++) {
                     indexmap[selDOMobj.options[i].value] = i;
                 }
                 selDOMobj.selectedIndex = indexmap[setting];
-                $(selDOMobj).change();
+                jQuery(selDOMobj).change(function(event){event.stopPropagation();});
             };
 
             this.setFilter = function(settings) {

@@ -13,10 +13,12 @@ $.jgrid.extend({
 		return this.each(function(){
 			var $t = this;
 			if( !$t.grid || !$t.p.treeGrid ) { return; }
-			var expCol = $t.p.expColInd;
-			var expanded = $t.p.treeReader.expanded_field;
-			var isLeaf = $t.p.treeReader.leaf_field;
-			var level = $t.p.treeReader.level_field;
+			var expCol = $t.p.expColInd,
+			expanded = $t.p.treeReader.expanded_field,
+			isLeaf = $t.p.treeReader.leaf_field,
+			level = $t.p.treeReader.level_field,
+			loaded = $t.p.treeReader.loaded;
+
 			row.level = rd[level];
 			
 			if($t.p.treeGridModel == 'nested') {
@@ -40,6 +42,13 @@ $.jgrid.extend({
 			var twrap = "<div class='tree-wrap tree-wrap-"+$t.p.direction+"' style='width:"+(ident*18)+"px;'>";
 			twrap += "<div style='"+($t.p.direction=="rtl" ? "right:" : "left:")+(lftpos*18)+"px;' class='ui-icon ";
 
+			if(rd[loaded] != undefined) {
+				if(rd[loaded]=="true" || rd[loaded]===true) {
+					rd[loaded] = true;
+				} else {
+					rd[loaded] = false;
+				}
+			}
 			if(rd[isLeaf] == "true" || rd[isLeaf] === true) {
 				twrap += $t.p.treeIcons.leaf+" tree-leaf'";
 				rd[isLeaf] = true;
@@ -65,7 +74,7 @@ $.jgrid.extend({
 					$(row).css("display","none");
 				}
 			}
-			
+
 			var nw = ident*22 + 22;
 			if (nw > $t.grid.headers[0].width) {
 				$t.grid.resizing = {
@@ -131,7 +140,8 @@ $.jgrid.extend({
 					left_field:"lft",
 					right_field: "rgt",
 					leaf_field: "isLeaf",
-					expanded_field: "expanded"
+					expanded_field: "expanded",
+					loaded: "loaded"
 				},$t.p.treeReader);
 			} else
 				if($t.p.treeGridModel == 'adjacency') {
@@ -139,7 +149,8 @@ $.jgrid.extend({
 						level_field: "level",
 						parent_id_field: "parent",
 						leaf_field: "isLeaf",
-						expanded_field: "expanded"
+						expanded_field: "expanded",
+						loaded: "loaded"
 				},$t.p.treeReader );
 			}
 			for (var key in $t.p.colModel){
@@ -437,14 +448,7 @@ $.jgrid.extend({
 			}
 			$.each(records, function(index, row) {
 				var id  = $.jgrid.getAccessor(this,$t.p.localReader.id);
-				if(index===0) {
-					var row1 = $("#"+id,$t.grid.bDiv);
-					$("td",row1).each( function( k ) {
-						$(this).css("width",$t.grid.headers[k].width+"px");
-					});
-					$t.grid.cols = row1[0].cells;
-				}
-				$('tbody',$t.grid.bDiv).append($("#"+id,$t.grid.bDiv));
+				$('#'+$t.p.id+ ' tbody tr:eq('+index+')').after($('tr#'+id,$t.grid.bDiv));
 			});
 			query = null; roots=null;records=null;
 		});
