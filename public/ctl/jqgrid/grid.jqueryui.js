@@ -308,9 +308,6 @@ $.jgrid.extend({
 				opts.update = function (ev,ui) {
 					$(ui.item).css("border-width","");
 					if($t.p.rownumbers === true) {
-						/*$("td.jqgrid-rownum",$t.rows).each(function(i){
-							$(this).html(i+1);
-						});*/
 						var r = ui.item.get(0);
 						var pos_r = $t.p._index[r.id];
 						var cnt = 0;
@@ -318,7 +315,7 @@ $.jgrid.extend({
 						$("td.jqgrid-rownum",$t.rows).each(function(){
 							var oo = $(this).parent('tr')[0];
 							var pos_oo = $t.p._index[oo.id];
-							if ($t.p.data[pos_r][parent_id] === $t.p.data[pos_oo][parent_id]) {
+							if (typeof parent_id == 'undefined' || $t.p.data[pos_r][parent_id] === $t.p.data[pos_oo][parent_id]) {
 								var s = $(this).find('span');
 								s.length
 									? s.html(cnt + 1)
