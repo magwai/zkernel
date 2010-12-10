@@ -62,7 +62,7 @@ point.init = function(id, value, opt) {
 point.set_point = function(id, x, y) {
 	var d = $('#' + id);
 	var p = $('#point_' + id + '_p');
-	if (typeof x == 'Array') {
+	if (typeof x == 'array' || typeof x == 'Array' || typeof x == 'object' || typeof x == 'Object') {
 		y = x[1];
 		x = x[0];
 	}
