@@ -41,9 +41,15 @@ class Zkernel_View_Helper_Mail extends Zkernel_View_Helper_Override  {
 		$fm = $this->view->txt('site_mail');
 		$from = @$data['from'] ? $data['from'] : $this->view->txt('site_mail');
 		$to = @$data['to'] ? $data['to'] : $this->view->txt('site_mail');
+		$reply_to = @$data['reply_to'] ? $data['reply_to'] : $this->view->txt('site_mail');
+		$from_name = @$data['from_name'] ? $data['from_name'] : ($from == $fm ? $this->view->txt('site_title') : $from);
+		$mail->setReplyTo(
+			$reply_to,
+			$from_name
+		);
 		$mail->setFrom(
 			$from,
-			@$data['from_name'] ? $data['from_name'] : ($from == $fm ? $this->view->txt('site_title') : $from)
+			$from_name
 		);
 		$mail->addTo(
 			$to,
