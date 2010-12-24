@@ -439,6 +439,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 			$menus = $menu_model->fetchAll(array('`parentid` = ?' => @(int)$menu->id, '`show_it` = 0', 'orderid'));
 			if ($menus) {
 				foreach ($menus as $num => $el) {
+					if(!$this->view->user()->isAllowed($this->view->user('role'), $el->resource)) continue;
 					$cl_0 = stripos($el->param, 'cl=0');
 					$this->config->button_top[] = array(
 						'inner' => $num == 0 ? 1 : 0,
