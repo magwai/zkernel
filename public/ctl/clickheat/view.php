@@ -59,17 +59,17 @@ foreach ($groups as $key => $options)
 	}
 }
 
-asort($__screenSizes);
+asort($clickheatConf['__screenSizes']);
 /** Screen sizes */
 $__selectScreens = '';
-for ($i = 0; $i < count($__screenSizes); $i++)
+for ($i = 0; $i < count($clickheatConf['__screenSizes']); $i++)
 {
-	$__selectScreens .= '<option value="'.$__screenSizes[$i].'">'.($__screenSizes[$i] === 0 ? LANG_ALL : $__screenSizes[$i].'px').'</option>';
+	$__selectScreens .= '<option value="'.$clickheatConf['__screenSizes'][$i].'">'.($clickheatConf['__screenSizes'][$i] === 0 ? LANG_ALL : $clickheatConf['__screenSizes'][$i].'px').'</option>';
 }
 
 /** Browsers */
 $__selectBrowsers = '';
-foreach ($__browsersList as $label => $name)
+foreach ($clickheatConf['__browsersList'] as $label => $name)
 {
 	$__selectBrowsers .= '<option value="'.$label.'">'.($label === 'all' ? LANG_ALL : ($label === 'unknown' ? LANG_UNKNOWN : $name)).'</option>';
 }
@@ -85,16 +85,16 @@ $__month = (int) date('m', $date);
 $__year = (int) date('Y', $date);
 ?>
 <div id="adminPanel"><span class="float-right">
-<a href="http://www.labsmedia.<?php echo CLICKHEAT_LANGUAGE === 'fr' ? 'fr' : 'com' ?>/clickheat/index.html"><img src="<?php echo CLICKHEAT_PATH ?>images/logo170.png" width="170" height="35" alt="ClickHeat" /></a><br />
-<!--<a href="#" onclick="adminCookie(); return false;"><?php echo LANG_LOG_MY_CLICKS ?></a>-->
+<!--<a href="http://www.labsmedia.<?php echo CLICKHEAT_LANGUAGE === 'fr' ? 'fr' : 'com' ?>/clickheat/index.html"><img src="<?php echo CLICKHEAT_PATH ?>images/logo170.png" width="170" height="35" alt="ClickHeat" /></a><br />
+<a href="#" onclick="adminCookie(); return false;"><?php echo LANG_LOG_MY_CLICKS ?></a>
 <?php if (CLICKHEAT_ADMIN === true) echo '<a href="', CLICKHEAT_INDEX_PATH, 'action=config">', LANG_CONFIG, '</a> <a href="#" onclick="showJsCode(); return false;">Javascript</a> <a href="#" onclick="showLatestVersion(); return false;">', LANG_LATEST_CHECK, '</a> '; ?>
-<!-- <a href="<?php echo CLICKHEAT_INDEX_PATH ?>action=logout"><?php echo LANG_LOGOUT ?></a><br />-->
+<a href="<?php echo CLICKHEAT_INDEX_PATH ?>action=logout"><?php echo LANG_LOGOUT ?></a><br />
 <?php
 foreach ($__languages as $lang)
 {
-	//echo '<a href="', CLICKHEAT_INDEX_PATH, 'language=', $lang, '"><img src="', CLICKHEAT_PATH, 'images/flags/', $lang, '.png" width="18" height="12" alt="', $lang, '" /></a> ';
+	echo '<a href="', CLICKHEAT_INDEX_PATH, 'language=', $lang, '"><img src="', CLICKHEAT_PATH, 'images/flags/', $lang, '.png" width="18" height="12" alt="', $lang, '" /></a> ';
 }
-?><br />
+?><br />-->
 <span id="cleaner">&nbsp;</span></span>
 <form action="<?php echo CLICKHEAT_INDEX_PATH ?>" method="get" onsubmit="return false;" id="clickForm">
 <table cellpadding="0" cellspacing="1" border="0" id="clickTable">
@@ -125,7 +125,7 @@ for ($d = 1; $d <= $before; $d++)
 	$__calendar .= '<td id="clickheat-calendar-10'.$d.'">'.($__lastDayOfMonth - $before + $d).'</td>';
 }
 $cols = $before - 1;
-$__js = 'var weekDays = [';
+$__js = 'weekDays = [';
 for ($d = 1, $days = date('t', $date); $d <= $days; $d++)
 {
 	$D = mktime(0, 0, 0, $__month, $d, $__year);
@@ -190,7 +190,7 @@ echo $__calendar;
 <?php echo $__js ?>
 pleaseWait = '<?php echo str_replace('\'', '\\\'', LANG_ERROR_LOADING); ?>';
 cleanerRunning = '<?php echo str_replace('\'', '\\\'', LANG_CLEANER_RUNNING); ?>';
-isJsOkay = '<?php echo CLICKHEAT_ADMIN === true ? '<a href="#" onclick="showJsCode(); return false;">'.str_replace('\'', '\\\'', LANG_ERROR_JAVASCRIPT).'</a>' : '' ?>';
+isJsOkay = '<?php echo CLICKHEAT_ADMIN === true ? ''/*'<a href="#" onclick="showJsCode(); return false;">'.str_replace('\'', '\\\'', LANG_ERROR_JAVASCRIPT).'</a>'*/ : '' ?>';
 jsAdminCookie = '<?php echo str_replace('\'', '\\\'', LANG_JAVASCRIPT_ADMIN_COOKIE) ?>';
 hideIframes = <?php echo $clickheatConf['hideIframes'] === true ? 'true' : 'false' ?>;
 hideFlashes = <?php echo $clickheatConf['hideFlashes'] === true ? 'true' : 'false' ?>;

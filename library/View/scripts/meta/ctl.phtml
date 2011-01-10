@@ -1,17 +1,41 @@
 <?php
 
-$t = '';//'По-умолчанию TITLE, KEYWORDS и DESCRITION заменяют все содержимое. Если вначале +, то добавит к содержимому, если -, то вставит перед содержимым';
+$titles = array();
+
+if ($this->control()->config->action == 'ctlshow') {
+	$list = $this->control()->config->model->fetchControlList(null, null, 0, 0);
+	if (count($list)) {
+		$db = Zkernel_Common::getControllerDocblock();
+		foreach ($list as $el) {
+			if (!$el->oid) continue;
+			$model = explode('_', $el->oid);
+			$id = (int)$model[1];
+			$oid = (string)$model[0];
+			$model = 'Default_Model_'.ucfirst($oid);
+			$m = new $model();
+			$titles[$el->oid] = $m->fetchOne('title', array('`id` = ?' => $id));
+			$titles[$el->oid] = (@$db[$oid]['zk_title'] ? $db[$oid]['zk_title'] : $oid).': '.(@$titles[$el->oid] ? $titles[$el->oid] : $el->id);
+		}
+	}
+}
+
+$t = '';
 $this->control(array(
+	'field_title' => 'id',
 	'field' => array(
 		'url' => array(
 			'title' => 'URL',
 			'unique' => true,
 			'required' => true,
+			'formatter' => 'function',
+			'formatoptions' => 'if (data.oid) { var d = '.Zend_Json::encode($titles).'; return d[data.oid]; } else return value;',
 			'description' => 'Адрес должен быть внутренним. Напимер: /news/*, /page/about',
-			'order' => 1
+			'order' => 1,
+			'active' => $this->control()->config->action != 'ctledit'
 		),
 		'title' => array(
 			'title' => 'TITLE',
+			'description' => 'Отображается в заголовке окна браузера, По-умолчанию TITLE заменяет все содержимое. Если вначале +, то добавит к содержимому, если -, то вставит перед содержимым',
 			'order' => 2
 		),
 		'keywords' => array(
@@ -23,7 +47,19 @@ $this->control(array(
 			'title' => 'META: DESCRIPTION',
 			'description' => 'Описание должно характеризовать содержимое страницы',
 			'order' => 4
-		)
+		),
+		'oid' => array(
+			'active' => false
+		),
+		'show_title' => array(
+			'title' => 'Показывать название сайта',
+			'description' => 'Включить/выключить отображения названия сайта в самом начале TITLE страницы',
+			'type' => 'select',
+			'param' => array(
+				'multiOptions' => array('1' => 'Да', '0' => 'Нет')
+			),
+			'order' => 5
+		),
 	),
 	'action_config' => array(
 		'ctladd' => array(
@@ -31,6 +67,26 @@ $this->control(array(
 		),
 		'ctledit' => array(
 			'text' => $t
+		),
+		'ctlshow' => array(
+			'field' => array(
+				'show_title' => array(
+					'active' => false
+				),
+				'title' => array(
+					'active' => false
+				),
+				'keywords' => array(
+					'active' => false
+				),
+				'description' => array(
+					'active' => false
+				),
+				'oid' => array(
+					'active' => true,
+					'hidden' => true
+				)
+			)
 		)
 	)
 ));

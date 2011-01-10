@@ -4,6 +4,7 @@
  * @zk_title   		Страницы
  * @zk_routable		0
  * @zk_routes		page/(.*)|id
+ * @zk_meta			1
  */
 class Zkernel_Controller_Page extends Zkernel_Controller_Action {
 	function indexAction() {

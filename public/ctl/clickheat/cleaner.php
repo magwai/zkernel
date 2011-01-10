@@ -19,9 +19,26 @@ if (CLICKHEAT_ADMIN === false)
 	return false;
 }
 
+/** Check for JS validation */
+if (strpos($_SERVER['REQUEST_URI'], 'debugjs') !== false)
+{
+	include '/data/engine/classes/Utils.class.php';
+	include '/data/engine/classes/Syntax/Checker.class.php';
+	foreach (array('clickheat-original', 'admin') as $file)
+	{
+		echo 'Fichier : ', $file, '<br/>';
+		$str = file_get_contents(dirname(__FILE__).'/js/'.$file.'.js');
+		if (($result = Syntax_Checker::js($str)) !== true)
+		{
+			echo 'JSLint : ', $file, '.js non valide :<br/>', str_replace("\n", '<br/>', $result);
+			break;
+		}
+	}
+}
+
 if (IS_PIWIK_MODULE === true)
 {
-	$clickheatConf = &Piwik_ClickHeat_Controller::$conf;
+	$clickheatConf = Piwik_ClickHeat_Controller::conf();
 }
 
 $deletedFiles = 0;
@@ -102,17 +119,18 @@ if (is_dir($clickheatConf['cachePath']) === true)
 		{
 			continue;
 		}
-		$ext = explode('.', $file);
-		if (count($ext) !== 2)
+		$pos = strrpos($file, '.');
+		if ($pos === false)
 		{
 			continue;
 		}
+		$ext = substr($file, $pos + 1);
 		$filemtime = filemtime($d->path.$file);
 		if ($debug === true)
 		{
 			echo '&nbsp;&nbsp;file: "', $file, '" ', ($filemtime - $time), ' seconds left<br/>';
 		}
-		switch ($ext[1])
+		switch ($ext)
 		{
 			case 'html':
 			case 'png':

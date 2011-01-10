@@ -74,7 +74,7 @@ $.jgrid.extend({
 					$(row).css("display","none");
 				}
 			}
-
+			
 			var nw = ident*22 + 22;
 			if (nw > $t.grid.headers[0].width) {
 				$t.grid.resizing = {

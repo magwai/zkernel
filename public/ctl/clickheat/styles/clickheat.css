@@ -107,7 +107,11 @@ img {
 	border-bottom: 1px solid #aaf;
 }
 .error {
-	font-weight:bold;
+	border:1px solid #faa;
+	background-color:#fee;
+	color:#c00;
+}
+.error a {
 	color:#c00;
 }
 .clickheat-calendar {

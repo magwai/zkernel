@@ -250,4 +250,32 @@ class Zkernel_Common {
 		$text = substr($text, 0, $pos);
 		return $text.($dots ? ($text == $ftext ? '' : '&nbsp;...') : '');
 	}
+
+	static function getControllerDocblock($c = null) {
+		$dbs = array();
+		$controllers = $c ? array($c) : array();
+		$dir = Zend_Controller_Front::getInstance()->getControllerDirectory();
+		if (!$c) {
+			$dir = @$dir['default'];
+			$handle = @opendir($dir);
+			while ($path = @readdir($handle)) {
+				if (is_file($dir.'/'.$path)) {
+					$controllers[] = strtolower(str_ireplace('Controller.php', '', $path));
+				}
+			}
+			@closedir($handle);
+		}
+		if ($controllers) {
+			foreach ($controllers as $el) {
+				$cc = ucfirst($el).'Controller';
+				if (!class_exists($cc)) include $dir.'/'.$cc.'.php';
+				$dbs[$el] = Zkernel_Common::getDocblock($cc);
+			}
+		}
+		if ($c) {
+			$keys = array_keys($dbs);
+			return @$dbs[$keys[0]];
+		}
+		else return $dbs;
+	}
 }

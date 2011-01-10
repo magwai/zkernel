@@ -8,154 +8,161 @@
  */
 
 class Zkernel_Merge {
-	function get() {
+	static $_content = '';
+	static $_parsed = array();
+	static $_written = array();
+	static $_na = array();
+	static $_exclude = array(
+		/*'/Zend\/Acl/i',
+		'/Zend\/Amf/i',
+		'/Zend\/Auth/i',
+		'/Zend\/Barcode/i',
+		'/Zend\/Cache/i',
+		'/Zend\/Captcha/i',
+		'/Zend\/Cloud/i',
+		'/Zend\/CodeGenerator/i',
+		'/Zend\/Console/i',
+		'/Zend\/Crypt/i',
+		'/Zend\/Currency/i',
+		'/Zend\/Date/i',
+		'/Zend\/Dom/i',
+		'/Zend\/Dojo/i',
+		'/Zend\/Feed/i',
+		'/Zend\/File/i',
+		'/Zend\/Gdata/i',
+		'/Zend\/Http/i',
+		'/Zend\/InfoCard/i',
+		'/Zend\/Locale/i',
+		'/Zend\/Log/i',
+		'/Zend\/Mail/i',
+		'/Zend\/Markup/i',
+		'/Zend\/Measure/i',
+		'/Zend\/Memory/i',
+		'/Zend\/Pdf/i',
+		'/Zend\/Oauth/i',
+		'/Zend\/OpenId/i',
+		'/Zend\/ProgressBar/i',
+		'/Zend\/Queue/i',
+		'/Zend\/Rest/i',
+		'/Zend\/Search/i',
+		'/Zend\/Serializer/i',
+		'/Zend\/Service/i',
+		'/Zend\/Soap/i',
+		'/Zend\/Tag/i',
+		'/Zend\/Test/i',
+		'/Zend\/Text/i',
+		'/Zend\/Tool/i',
+		'/Zend\/Translate/i',
+		'/Zend\/Uri/i',
+		'/Zend\/TimeSync/i',
+		'/Zend\/XmlRpc/i',
+		'/Zend\/Ldap/i',
+		'/Zend\/Wildfire/i'*/
+	);
 
+	/*function library() {
+		if (!self::get('library')) {
+			self::set('library');
+			return false;
+		}
+		return true;
+	}*/
+
+	function get_fn($hash) {
+		$dir = DATA_PATH.'/merge';
+		@mkdir($dir);
+		@chmod($dir, 0777);
+		$fn = realpath($dir).'/'.($hash == 'library' ? $hash : md5(var_export($hash, 1))).'.php';
+		return $fn;
 	}
 
-	function set() {
-		$i = get_included_files();
+	function get($hash) {
+		//return false;
+		$fn = self::get_fn($hash);
+		if (file_exists($fn)) {
+			require_once($fn);
+			//return false;
+			return true;
+		}
+		return false;
+	}
+
+	function set($hash) {
+		self::$_content = '';
+		self::$_parsed = array();
+		self::$_written = array();
+		set_time_limit(300);
+		$i = array();
+		if ($hash == 'library') {
+			$data = array();
+			self::go_deeper(APPLICATION_PATH.'/../library/Zend', $i);
+			self::go_deeper(APPLICATION_PATH.'/../library/Zkernel', $i);
+		}
+		else $i = get_included_files();
 		if ($i) {
-			foreach ($i as $el) {
+			
+			self::$_na = array(
+				realpath(PUBLIC_PATH.'/index.php'),
+				realpath(APPLICATION_PATH.'/../library/Zkernel/Merge.php')/*,
+				realpath(APPLICATION_PATH.'/Bootstrap.php')*/
+			);
+			foreach ($i as $el) self::process_file($el);
+		}
+		$fn = self::get_fn($hash);
+		file_put_contents($fn, "<?php\n".self::$_content);
+		file_put_contents($fn, php_strip_whitespace($fn));
+	}
 
-
-
-				//print_r($el);
+	function process_file($tfn, $dir = null) {
+		$fn = realpath($tfn);
+		if (!$fn) {
+			$fn = realpath(APPLICATION_PATH.'/../library/'.$tfn);
+			if (!$fn && $dir) {
+				$fn = realpath($dir.'/'.$tfn);
 			}
 		}
-	}
-
-
-
-	function merge($dir, $include = null, $exclude = null) {
-		$f_d = DATA_PATH.'/merge';
-		$f_n = md5(var_export(array($dir), 1)).'.php';
-		$f_f = $f_d.'/'.$f_n;
-		//if (!file_exists($f_f)) {
-			$dir = realpath(APPLICATION_PATH.'/../library/'.$dir);
-			$str = '';
-			$list = array();
-			self::merge_recursive($dir, $str, $list, $include, $exclude);
-			@mkdir($f_d, 0777, true);
-			@chmod($f_d, 0777);
-			@file_put_contents($f_f, "<?php\n".$str."\n?>");
-			@chmod($f_f, 0777);
-		//}
-		require_once $f_f;
-	}
-
-	function merge_recursive($dir, &$str, &$list, $include, $exclude) {
-		$handle = opendir($dir);
-		while ($path = @readdir($handle)) {
-			if ($path == '.' || $path == '..') continue;
-			$fn = $dir.'/'.$path;
-			if (is_dir($fn)) self::merge_recursive($fn, $str, $list, $include, $exclude);
-			else if (!in_array($fn, $list) && substr($path, -4) == '.php') {
-				$str .= "\n".self::clean($fn);
-				$list[] = $fn;
-
-			}
-		}
-		@closedir($handle);
-	}
-
-	function clean($fn) {
-		$res = '';
+		$is_written = in_array($fn, self::$_written);
+		$is_parsed = in_array($fn, self::$_parsed);
+		if ($is_parsed && $is_written) return;
+		self::$_parsed[] = $fn;
+		if (!$fn || in_array($fn, self::$_na) || stripos($fn, '.php') === false || stripos($fn, '.phtml') !== false/* || strpos($fn, '/application/') !== false || strpos($fn, '\\application\\') !== false || stripos($fn, 'chain') !== false || stripos($fn, 'navigation') !== false || stripos($fn, 'controller\\plugin') !== false || stripos($fn, 'controller/plugin') !== false*/) return;
+		$fn_l = str_replace('\\', '/', $fn);
+		foreach (self::$_exclude as $el) if (preg_match($el, $fn_l)) return;
+		$go_deeper = $is_parsed && !$is_written ? false : true;
 		$c = file_get_contents($fn);
-
-
-		//$c = preg_replace('/(require|include)([^\;]*)\;/si', '', $c);
-		//$c = str_replace('  ', ' ', $c);
-		$tokens = token_get_all($c);
-		$was_io = $was_i = $was_ro = $was_r = $was_shit = 0;
-		$was_require_once = 0;
-		$was_shit_require_once = 0;
-		$skip = array(T_COMMENT, T_OPEN_TAG, T_CLOSE_TAG, T_DOC_COMMENT/*, T_ML_COMMENT*/);
-		foreach ($tokens as $token) {
-			if (is_array($token)) {
-				if (in_array($token[0], $skip)) continue;
-				if ($token[0] == T_WHITESPACE) {
-					$res .= "\n";//' ';
-					continue;
-				}
-				if ($was_require_once) {
-					if ($token[0] == T_CONSTANT_ENCAPSED_STRING) {
-						$was_shit_require_once = 1;
-					}
-					else {
-						$res .= 'require_once '.$token[1];
-					}
-
-					$was_require_once = 0;
-					continue;
-				}
-				if ($token[0] == T_REQUIRE_ONCE) {
-					$was_require_once = 1;
-				}
-				else {
-					$res .= $token[1];
-				}
+		preg_match_all('/((require|include)(\_once|))(\ |\()(\'|\")(.+?)(\'|\")(\)|)\;/i', $c, $res);
+		if ($res) {
+			foreach ($res[6] as $n => $el) {
+				if ($go_deeper) self::process_file($el, dirname($fn));
+				$c = str_replace($res[0][$n], '', $c);
 			}
-			else {
-				if (!$was_shit_require_once) $res .= $token;
-				$was_shit_require_once = 0;
-			}
-
-
-
-
-
-			//if (is_string($token)) $res .= '*'.$token.'*';
-			//else {
-				@list($id, $text) = $token;
-				switch ($id) {
-					case T_INCLUDE:
-						$was_i = 1;
-						break;
-					case T_INCLUDE_ONCE:
-						$was_io = 1;
-						break;
-					case T_REQUIRE:
-						$was_r = 1;
-						break;
-					case T_REQUIRE_ONCE:
-						$was_ro = 1;
-						break;
-					case T_COMMENT:
-					//case T_ML_COMMENT:
-					case T_DOC_COMMENT:
-					case T_OPEN_TAG:
-					case T_CLOSE_TAG:
-						break;
-					case T_WHITESPACE:
-						$res .= ' ';
-						break;
-					default:
-						if ($was_r || $was_ro || $was_i || $was_io) {
-							if ($id == T_CONSTANT_ENCAPSED_STRING) $was_shit = 1;
-							else if ($id == T_VARIABLE) {/*$res .= '*';*/$was_io = false;}
-							else if ($text) $res .=
-									($was_r ? 'require' : '').
-									($was_ro ? 'require_once' : '').
-									($was_i ? 'include' : '').
-									($was_io ? 'include_once' : '').
-									$text;
-
-							$was_io = $was_i = $was_ro = $was_r = 0;
-						}
-						else {
-							if ($was_shit) $was_shit = 0;
-							//else $res .= $text;
-						}
-						break;
-				}
-			//}
 		}
-		//echo $res;
-		//if (stripos($fn, 'Modules.php') !== false) {
-		//	exit();
-		//}
-		//exit();
-		//$res = preg_replace('/\nclass\ ([^\ ]+)\ /si', "\n".'if (!class_exists(\'$1\')) class $1 ', $res);
-		return $res;
+		preg_match_all('/(extends|implements)\ (.+?)(\ |\{|\n|\t|\r|\,|\r\n)/si', $c, $res);
+		if ($res) {
+			foreach ($res[2] as $el) if ($go_deeper) self::process_file(str_replace('_', '/', $el).'.php', dirname($fn));
+		}
+		if (!in_array($fn, self::$_written)) {
+			self::$_content .= preg_replace(array(
+				'/\<\?php/si',
+				'/\n\?\>/i'
+			), array(
+				'',
+				"\n"
+			), $c);
+			self::$_written[] = $fn;
+		}
+	}
+
+	function go_deeper($dir, &$data) {
+		$handle = @opendir($dir);
+		if ($handle) {
+			while ($path = @readdir($handle)) {
+				if ($path == '.' || $path == '..') continue;
+				$fn = realpath($dir.'/'.$path);
+				if (is_dir($fn)) self::go_deeper($fn, $data);
+				else $data[] = $fn;
+			}
+			closedir($handle);
+		}
 	}
 }

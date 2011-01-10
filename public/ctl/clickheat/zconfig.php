@@ -24,5 +24,10 @@ $clickheatConf = array (
   'version' => '1.9-revD',
 );
 
+@mkdir($clickheatConf['logPath'], 0777, true);
+@chmod($clickheatConf['logPath'], 0777);
+@mkdir($clickheatConf['cachePath'], 0777, true);
+@chmod($clickheatConf['cachePath'], 0777);
+
 $_COOKIE['language'] = 'ru';
 $_COOKIE['clickheat'] = $clickheatConf['viewerLogin'].'||'.$clickheatConf['viewerPass'];

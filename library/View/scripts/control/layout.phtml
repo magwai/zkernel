@@ -32,12 +32,41 @@ if ($ajax) {
 	}
 }
 else {
-	$p = array();
+	$s = new Zend_Session_Namespace();
+	$l = array(
+		'no_connect' => 'Сервер не отвечает',
+		'no_template' => 'Ошибка загрузки шаблона',
+		'no_config' => 'Ошибка загрузки конфигурации',
+		'no_lang' => 'Ошибка загрузки языка',
+		'try_again' => 'Повторить попытку?',
+		'no_menu' => 'Ошибка загрузки меню',
+		'txt_alert_title' => 'Информация',
+		'no_login' => 'Ошибка получения сведений об авторизации',
+		'no_logout' => 'Ошибка выхода',
+		'no_loggin' => 'Ошибка входа',
+		'no_login_err' => 'Логин / пароль неверны',
+		'no_sel' => 'Элемент не выбран',
+		'no_response' => 'Ошибка загрузки модуля',
+		'no_filter' => 'Укажите запрос',
+		'file_error' => 'Ошибка загрузки файла',
+		'no_multi' => 'Ошибка загрузки языка',
+		'no_multi_change' => 'Ошибка смены языка',
+	);
+	$p = array(
+		'menu' => $this->control()->buldMenu(),
+		'login' => (string)$this->user('login'),
+		'title' => 'Панель управления',
+		//'multilang' => Zend_Registry::isRegistered('Zkernel_Multilang') ? 1 : 0,
+		'def_controller' => 'cindex',
+		'def_action' => 'ctlshow',
+		'controller' => @$s->control['last']['controller'] ? $s->control['last']['controller'] : 'cindex',
+		'action' => @$s->control['last']['action'] ? $s->control['last']['action'] : 'ctlshow'
+	);
 	$reg = Zend_Registry::isRegistered('Zkernel_Multilang') ? Zend_Registry::get('Zkernel_Multilang') : '';
 	if ($reg && !@$reg->domain) $p['lang'] = $reg->stitle;
 	if ($reg && @$reg->domain) $d = explode(' ', $reg->domain);
 
-	$this	->inlineScript('script', '$(function() { c.init('.Zend_Json::encode($p).'); });');
+	$this	->inlineScript('script', '$(function() { c.init('.Zend_Json::encode($p).', '.Zend_Json::encode($l).'); });');
 
 	$this	->headScript('file', '/zkernel/js/jquery/jquery.js')
 			->headScript('file', '/zkernel/js/jquery/jquery.include.js')
@@ -61,6 +90,13 @@ else {
 			->headScript('file', '/zkernel/ctl/control/main.js')
 			->headScript('file', $this->inlineSingle('filename'));
 
+	if ($this->control()->config->wysiwyg == 'ck') {
+		$this	->headScript('file', '/zkernel/ctl/ck/ckeditor.js')
+				->headScript('file', '/zkernel/ctl/ck/adapters/jquery.js');
+	}
+
+	$this	->headScript('file', $this->inlineSingle('filename'));
+
 	$this	->headLink(array('rel' => 'favicon', 'href' => '/zkernel/img/favicon.ico'))
 			->appendStylesheet('/zkernel/img/jquery/ui/themes/'.$this->control()->config->theme.'/ui.all.css', 'all')
 			->appendStylesheet('/zkernel/ctl/jqgrid/css/ui.jqgrid.css', 'all')
@@ -77,8 +113,10 @@ else {
 		<meta charset=utf-8>
 		<?php echo $this->headTitle() ?>
 		<?php echo $this->linkSingle() ?>
+		<!--[if lte IE 7]><style>.c_warning{display:block;}</style><![endif]-->
+		<?php echo $this->control()->config->wysiwyg == 'ck' ? '<script type="text/javascript">window.CKEDITOR_BASEPATH = "/zkernel/ctl/ck/";</script>' : '' ?>
 		<?php echo $this->headSingle() ?>
-		<script type="text/javascript" src="/zkernel/ctl/mce/tiny_mce.js"></script>
+		<?php echo $this->control()->config->wysiwyg == 'mce' ? '<script type="text/javascript" src="/zkernel/ctl/mce/tiny_mce.js"></script>' : '' ?>
 	</head>
 	<body class="c_body"><div class="c_frame">
 		<div class="ui-widget ui-widget-header ui-corner-bottom" id="c_menu_frame"><div id="c_menu"></div></div>
@@ -95,12 +133,13 @@ else {
 					<span><input class="c_l_button" type="submit" value="Войти" /></span>
 				</form></div>
 				<?php echo $reg ? $this->render('control/multi.phtml') : '' ?>
-				<div class="c_site"><a target="_blank" href="<?php echo $reg ? (@$reg->domain ? 'http://'.$d[0] : '/'.$reg->stitle) : '/' ?>">на сайт</a></div>
+				<div class="c_site"><a title="Перейти на сайт" target="_blank" href="<?php echo $reg ? (@$reg->domain ? 'http://'.$d[0] : '/'.$reg->stitle) : '/' ?>"><span class="ui-icon ui-icon-home"></span></a></div>
 				<div id="c_navpane"></div>
 			</div>
 			<div id="c_tl">загрузка панели управления<br /><a href="/<?php echo $reg ? $reg->stitle.'/' : '' ?>control">перезагрузить</a></div>
 		</div>
 		<script type="text/javascript">document.getElementById("c_tl").style.display = "block";</script>
+		<div class="c_warning ui-widget ui-corner-all ui-state-highlight">Вы используете устаревший браузер. Панель управления может работать некорректно</div>
 		<div id="c_loader" title="Загрузка" class="ui-widget ui-corner-all ui-state-highlight"><div class="c_ldr"></div><div class="c_but"><input type="button" value="Отменить загрузку" /></div></div>
 		<div id="c_info" class="ui-widget ui-corner-all"></div>
 		<div id="c_content"><?php echo $this->layout()->content ?></div>

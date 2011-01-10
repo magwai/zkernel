@@ -132,3 +132,11 @@ div.layout-left-fixed, div.layout-left-liquid, div.layout-left-empty {
 	color:#66a;
 	text-align:left;
 }
+.error {
+	border:1px solid #faa;
+	background-color:#fee;
+	color:#c00;
+}
+.error a {
+	color:#c00;
+}

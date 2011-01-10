@@ -7,6 +7,8 @@
  */
 
 c = {
+	menu: [],
+	login: '',
 	sel_block: false,
 	drag: [],
 	timer_l: null,
@@ -27,75 +29,56 @@ c = {
 	loading_ticks: 0
 }; 
 
-c.init = function(p) {
+c.init = function(p, l) {
 	c.cfg = $.extend(c.cfg, p);
+	c.lang = $.extend(c.lang, l);
 	bd = $('body');
-	document.title = "";
-	/*php.messages.defaultCallBack = function(msg, params) {
-		c.info(msg);
-	};
-	php.error = function(xmlEr, typeEr, except) {
-		c.info('e:' + c.lang['no_response'] + ': ' + c.pre_controller + '/' + c.pre_action);
-	};
-	php.complete = function (request, status) {
-		c.loading_finish();
-		$('input[type=button],input[type=submit]').button();
-		$('.c_form input:first').focus();
-	};*/
-	$.ajax({
-		url: (c.cfg.lang ? '/' + c.cfg.lang : '') + '/control/lang',
-		dataType: 'json',
-		error: function(e) {
-			if (confirm(c.lang.no_connect + '\n' + c.lang.try_again)) c.init();
-		},
-		success: function(data) {
-			if (data) {
-				c.lang = $.extend(c.lang, data);
-				$.ajax({
-					url: (c.cfg.lang ? '/' + c.cfg.lang : '') + '/control/config',
-					dataType: 'json',
-					error: function(e) {
-						c.info(c.lang.no_config);
-					},
-					success: function(data) {
-						if (data) {
-							c.cfg = $.extend(c.cfg, data);
-							$('#c_tl').remove();
-							$('.c_tline .h').css('display', 'block');
-							document.title = c.cfg.title;
-							c.tpl['c_auth'] = $('#c_login').html();
-							$('#c_mlink').click(function() {
-								var o = $('#c_menu_frame');
-								$('#c_menu_frame:visible').length
-									? o.slideUp('fast')
-									: o.slideDown('fast');
-								return false;
-							});
-							$('body').click(function() {
-								$('#c_menu_frame').hide();
-							});
-							$('#c_loader input').click(c.loading_cancel).button();
-							$(window).unbind("resize").resize(function() {
-								var l = $("#list");
-								if (l.length && l.setGridHeight && l.setGridWidth) l.setGridHeight(c.table_height()).setGridWidth(c.table_width());
-							});
-							$(window).bind('include_start', function(e, d) {
-								c.loading_start(true, 400);
-							}).bind('include_finish', function(e, d) {
-								c.loading_finish();
-							});
-							c.load_auth(function() {
-								c.load_menu(function() {
-									c.go(c.cfg.controller, c.cfg.action, c.cfg.param);
-								});
-							});
-						}
-					}
-				});
-			}
-			else if (confirm(c.lang['no_lang'] + '\n' + c.lang['try_again'])) c.init();
-		}
+	$('#c_tl').remove();
+	$('.c_tline .h').css('display', 'block');
+	document.title = c.cfg.title;
+	c.tpl['c_auth'] = $('#c_login').html();
+	c.build_auth();
+	$('#c_mlink').click(function() {
+		var o = $('#c_menu_frame');
+		$('#c_menu_frame:visible').length
+			? o.slideUp('fast')
+			: o.slideDown('fast');
+		return false;
 	});
+	$('body').click(function() {
+		$('#c_menu_frame').hide();
+	});
+	$('#c_loader input').click(c.loading_cancel).button();
+	$(window).unbind("resize").resize(function() {
+		var l = $("#list");
+		if (l.length && l.setGridHeight && l.setGridWidth) l.setGridHeight(c.table_height()).setGridWidth(c.table_width());
+	});
+	$(window).bind('include_start', function(e, d) {
+		c.loading_start(true, 400);
+	}).bind('include_finish', function(e, d) {
+		c.loading_finish();
+	});
+
+	$('.c_collapse legend').live('click', function() {
+		var d = $(this).next('dl:first');
+		if (d.css('display') == 'none') {
+			d.slideDown(200);
+		}
+		else {
+			d.slideUp(200);
+		}
+		return false;
+	});
+
+
+	if (c.cfg.menu && c.cfg.menu.length) {
+		c.build_menu(c.cfg.menu, $('#c_menu'));
+		$('.c_tline .mf').show();
+		$('#c_menu').fadeIn('fast');
+	}
+	else $('.c_tline .mf').hide();
+	$('#c_menu').fadeIn('fast');
+	c.go(c.cfg.controller, c.cfg.action, c.cfg.param);
 };
 
 c.loading_start = function(lock, delay) {
@@ -213,6 +196,7 @@ c.go = function(controller, action, param, post) {
 			if (typeof d == 'object') {
 				if (d.navpane) c.build_navpane(d.navpane);
 				if (d.content) {
+					if (typeof CKEDITOR != 'undefined') CKEDITOR.instances = {};
 					$('#c_content').html(d.content);
 					c.button_init();
 					$('.zend_form input:first').focus();
@@ -253,21 +237,26 @@ c.load_auth = function(success) {
 		url: (c.cfg.lang ? '/' + c.cfg.lang : '') + '/control/auth?' + c.rnd(),
 		dataType: 'json',
 		success: function(data) {
-			$('#c_login').empty();
-			var login = data.login;
-			if (login.length && login != 'none') $('#c_login').append(login + ' &nbsp;&nbsp;<span><input class="c_l_button" type="button" value="Выйти" /></span>').find('input').click(c.logout);
-			else {
-				$('#c_login').append(c.tpl['c_auth']).find('form input[type="submit"]').click(function() {
-					return c.login($('#c_login').find('form').serialize(), c.cfg.controller, c.cfg.action);
-				});
-			}
-			c.button_init();
+			c.cfg.login = data.login;
+			c.build_auth();
 			if (typeof success != 'undefined') success();
 		},
 		error: function() {
 			c.info(c.lang['no_login']);
 		}
 	});
+};
+
+c.build_auth = function() {
+	var login = c.cfg.login;
+	$('#c_login').empty();
+	if (login.length && login != 'none') $('#c_login').append(login + ' &nbsp;&nbsp;<span><input class="c_l_button" type="button" value="Выйти" /></span>').find('input').click(c.logout);
+	else {
+		$('#c_login').append(c.tpl['c_auth']).find('form input[type="submit"]').click(function() {
+			return c.login($('#c_login').find('form').serialize(), c.cfg.controller, c.cfg.action);
+		});
+	}
+	c.button_init();
 };
 
 c.login = function(data, controller, action) {

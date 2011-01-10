@@ -6,7 +6,7 @@
  * @since 27/10/2006
 **/
 
-$__languages = array('bg', 'cz', 'de', 'en', 'es', 'fr', 'hu', 'id', 'it', 'ja', 'nl', 'pl', 'pt', 'ro', 'ru', 'sr', 'tr', 'uk', 'zh');
+$__languages = array(/*'bg', 'cz', 'de', 'en', 'es', 'fr', 'hu', 'id', 'it', 'ja', 'nl', 'pl', 'pt', 'ro', */'ru'/*, 'sr', 'tr', 'uk', 'zh'*/);
 $__action = isset($_GET['action']) && $_GET['action'] !== '' ? $_GET['action'] : 'view';
 
 if (isset($_SERVER['REQUEST_URI']) && $_SERVER['REQUEST_URI'] !== '')
@@ -171,8 +171,8 @@ if (!defined('CLICKHEAT_ADMIN'))
 }
 
 /** Specific definitions */
-$__screenSizes = array(0 /** Must start with 0 */, 240, 640, 800, 1024, 1152, 1280, 1440, 1600, 1800);
-$__browsersList = array('all' => '', 'msie' => 'Internet Explorer', 'firefox' => 'Firefox', 'chrome' => 'Chrome', 'safari' => 'Safari', 'opera' => 'Opera', 'unknown' => '');
+$clickheatConf['__screenSizes'] = array(0 /** Must start with 0 */, 240, 640, 800, 1024, 1152, 1280, 1440, 1600, 1800);
+$clickheatConf['__browsersList'] = array('all' => '', 'msie' => 'Internet Explorer', 'firefox' => 'Firefox', 'chrome' => 'Chrome', 'safari' => 'Safari', 'opera' => 'Opera', 'unknown' => '');
 
 switch ($__action)
 {

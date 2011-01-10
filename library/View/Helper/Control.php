@@ -15,6 +15,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 	private function configInit($data = null) {
 		if ($this->_config_inited) return;
 		$d = array(
+			'wysiwyg'				=> 'mce',
 			'post'					=> array(),
 			'param'					=> array(),
 			'theme'					=> 'redmond',
@@ -83,6 +84,33 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 
 		ini_set('session.cookie_lifetime', 86400 * 30);
 		ini_set('session.gc_maxlifetime', 86400 * 30);
+	}
+
+	public function buldMenu($parentid = 0) {
+		$menu = array();
+		$res = new Default_Model_Cresource();
+		$db = new Default_Model_Cmenu();
+		$row = $db->fetchRow(array('id = ?' => $parentid));
+
+		$result = $db->fetchAll(array('parentid = ?' => $parentid, '`show_it` = 1'), 'orderid');
+
+		if ($result) {
+			foreach ($result as $num => $el) {
+				if (!@$el['title']) continue;
+				if (!$el->resource || $this->view->user()->isAllowed($this->view->user('role'), $el->resource)) {
+					$item = array(
+						't' => $el['title']
+					);
+					if (@$el['controller']) $item['c'] = $el['controller'];
+					if (@$el['action']) $item['a'] = $el['action'];
+					if (@$el['param']) $item['p'] = Zkernel_Common::url2array($el['param']);
+					$e = $this->buldMenu($el['id']);
+					if ($e) $item['e'] = $e;
+					$menu[] = $item;
+				}
+			}
+		}
+		return $menu;
 	}
 
 	private function userInit() {
@@ -485,42 +513,70 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
     		'onsubmit' => 'return c.submit()',
     		'id' => 'c_form'
     	));
-    	if ($this->config->field) foreach ($this->config->field as $el) {
-		    if (!$el->active) continue;
-		    if (@(int)$this->config->post['sposted'] && !array_key_exists($el->name, $this->config->post->toArray())) continue;
-		    $p = new Zkernel_Config_Control($el->param, array(
-				//'type' => 'text',
-				'label' => $el->title,
-				'description' => $el->description,
-	    		'required' => $el->required ? true : false,
-				'validators' => $el->validators ? $el->validators : array()
-			));
-			if ($el->unique) {
-				$select = $this->config->model->getAdapter()->select()->where('`id` != ?', $id);
-				if (isset($el->unique->where)) $select->where($el->unique->where);
-				$p->validators[] = array(
-					'validator' => 'Db_NoRecordExists',
-					'options' => array(
-						$this->config->model->info('name'),
-						$el->name,
-						implode(' ', $select->getPart(Zend_Db_Select::WHERE))
-					)
+    	if ($this->config->field) {
+			$fields = $this->config->field;
+
+			$db = Zkernel_Common::getDocblock(ucfirst($this->config->controller).'Controller');
+			$meta = isset($db['zk_meta']) && $db['zk_meta'];
+			if ($meta) {
+				$fields['meta_title'] = array(
+					'title' => 'Title',
+					'description' => 'Отображается в заголовке окна браузера',
+					'order' => 2000
+				);
+				$fields['meta_keywords'] = array(
+					'title' => 'Keywords',
+					'description' => 'Ключевые слова перечисляются через запятую',
+					'order' => 2001
+				);
+				$fields['meta_description'] = array(
+					'title' => 'Description',
+					'description' => 'Описание должно характеризовать содержимое страницы',
+					'order' => 2002
 				);
 			}
-			if ($el->type == 'textarea') $p->rows = 10;
-			if ($el->type == 'editarea') $p->rows = 15;
-			if ($el->type == 'uploadify') {
-				if (!isset($p->destination)) $p->destination = PUBLIC_PATH.'/upload/'.$this->config->controller.'_'.$el->name;
-				if (!isset($p->fn)) {
-					$where = $this->config->where ? $this->config->where->toArray() : array();
-					$where['`id` = ?'] = $id;
-					if ($this->config->use_db) $p->fn = $this->config->model->fetchOne($el->name, $where);
+
+			foreach ($fields as $el) {
+				if (!$el->active) continue;
+				if (@(int)$this->config->post['sposted'] && !array_key_exists($el->name, $this->config->post->toArray())) continue;
+				$p = new Zkernel_Config_Control($el->param, array(
+					//'type' => 'text',
+					'label' => $el->title,
+					'description' => $el->description,
+					'required' => $el->required ? true : false,
+					'validators' => $el->validators ? $el->validators : array()
+				));
+				if ($el->unique) {
+					$select = $this->config->model->getAdapter()->select()->where('`id` != ?', $id);
+					if (isset($el->unique->where)) $select->where($el->unique->where);
+					$p->validators[] = array(
+						'validator' => 'Db_NoRecordExists',
+						'options' => array(
+							$this->config->model->info('name'),
+							$el->name,
+							implode(' ', $select->getPart(Zend_Db_Select::WHERE))
+						)
+					);
 				}
+				if ($el->type == 'textarea') $p->rows = 10;
+				if ($el->type == 'editarea') $p->rows = 15;
+				if ($el->type == 'uploadify') {
+					if (!isset($p->destination)) $p->destination = PUBLIC_PATH.'/upload/'.$this->config->controller.'_'.$el->name;
+					if (!isset($p->fn)) {
+						$where = $this->config->where ? $this->config->where->toArray() : array();
+						$where['`id` = ?'] = $id;
+						if ($this->config->use_db) $p->fn = $this->config->model->fetchOne($el->name, $where);
+					}
+				}
+				if ($el->type == 'select') $p->class = 'c_select';
+				else if ($el->type == 'textarea') $p->class = 'ui-state-default ui-corner-all c_textarea';
+				else $p->class = 'ui-state-default ui-corner-all c_input';
+				$form->addElement($el->type, $el->name, $p->toArray());
 			}
-			if ($el->type == 'select') $p->class = 'c_select';
-			else if ($el->type == 'textarea') $p->class = 'ui-state-default ui-corner-all c_textarea';
-			else $p->class = 'ui-state-default ui-corner-all c_input';
-			$form->addElement($el->type, $el->name, $p->toArray());
+
+			if ($meta) {
+				$form->addDisplayGroup(array('meta_title', 'meta_keywords', 'meta_description'), 'meta', array('legend' => 'Дополнительно', 'class' => 'c_collapse'));
+			}
 		}
 
 		$form->addElement('submit', 'oac_ok', array(
@@ -629,6 +685,27 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 						}
 					}
 
+					$db = Zkernel_Common::getDocblock(ucfirst($this->config->controller).'Controller');
+					if (isset($db['zk_meta']) && $db['zk_meta']) {
+						$empty = !$this->config->data->meta_title && !$this->config->data->meta_keywords && !$this->config->data->meta_description;
+						$md = array(
+							'title' => $this->config->data->meta_title,
+							'keywords' => $this->config->data->meta_keywords,
+							'description' => $this->config->data->meta_description
+						);
+						$mm = new Default_Model_Meta();
+						$me = (int)$mm->fetchOne('id', array('`oid` = "'.$this->config->controller.'_'.$id.'"'));
+						
+						if ($me) {
+							if ($empty) $mm->delete(array('`id` = ?' => $me));
+							else $mm->update($md, array('`id` = ?' => $me));
+						}
+						else {
+							$md['oid'] = $this->config->controller.'_'.$id;
+							$mm->insert($md);
+						}
+					}
+					
 					$ok = false;
 					$this->config->func_override;
 					$this->config->func_check;
@@ -707,6 +784,16 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 							}
 						}
 					}
+
+					$db = Zkernel_Common::getDocblock(ucfirst($this->config->controller).'Controller');
+					if (isset($db['zk_meta']) && $db['zk_meta']) {
+						$mm = new Default_Model_Meta();
+						$md = $mm->fetchRow(array('`oid` = "'.$this->config->controller.'_'.$id.'"'));
+						if ($md) {
+							foreach ($md as $k => $v) $this->config->data['meta_'.$k] = $v;
+						}
+					}
+
 					//$this->config->data->set($this->config->data->toArray());
 					$this->config->func_preset;
 					$this->config->form->setDefaults($this->config->data->toArray());

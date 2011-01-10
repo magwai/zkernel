@@ -53,7 +53,6 @@ class Zkernel_View_Helper_LinkSingle extends Zend_View_Helper_HeadLink  {
 							$matches[] = $res[0][$k_1];
 							$files[] = $el_1;
 						}
-
 						if ($files) {
 							foreach ($files as $k_1 => $el_1) {
 								if (stripos($el_1, 'http://') !== false || substr($el_1, 0, 1) == '/') continue;
@@ -61,10 +60,12 @@ class Zkernel_View_Helper_LinkSingle extends Zend_View_Helper_HeadLink  {
 								if (!$su) continue;
 								$su = str_ireplace(array(
 									PUBLIC_PATH,
-									$zpath
+									$zpath,
+									'\\'
 								), array(
 									'',
-									'/'.$zp
+									'/'.$zp,
+									'/'
 								), $su);
 								$str = str_ireplace($matches[$k_1], 'url('.$su.($mtime ? '?'.filemtime($dir_full.'/'.$el_1) : '').')', $str);
 							}
@@ -85,10 +86,12 @@ class Zkernel_View_Helper_LinkSingle extends Zend_View_Helper_HeadLink  {
 								if (!$su) continue;
 								$su = str_ireplace(array(
 									PUBLIC_PATH,
-									$zpath
+									$zpath,
+									'\\'
 								), array(
 									'',
-									'/zkernel'
+									'/zkernel',
+									'/'
 								), $su);
 								$str = str_ireplace($matches[$k_1], 'src="'.$su.($mtime ? '?'.filemtime($dir_full.'/'.$el_1) : '').'"', $str);
 							}

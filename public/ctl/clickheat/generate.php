@@ -14,9 +14,7 @@ if (!defined('CLICKHEAT_LANGUAGE'))
 
 if (IS_PIWIK_MODULE === true)
 {
-	$clickheatConf = &Piwik_ClickHeat_Controller::$conf;
-	$__screenSizes = &Piwik_ClickHeat_Controller::$conf['__screenSizes'];
-	$__browsersList = &Piwik_ClickHeat_Controller::$conf['__browsersList'];
+	$clickheatConf = Piwik_ClickHeat_Controller::conf();
 }
 
 /** Main class */
@@ -34,15 +32,15 @@ if ($screen < 0)
 else
 {
 	$maxScreen = $screen;
-	if (!in_array($screen, $__screenSizes) || $screen === 0)
+	if (!in_array($screen, $clickheatConf['__screenSizes']) || $screen === 0)
 	{
 		errorGenerate(LANG_ERROR_SCREEN);
 	}
-	for ($i = 1; $i < count($__screenSizes); $i++)
+	for ($i = 1; $i < count($clickheatConf['__screenSizes']); $i++)
 	{
-		if ($__screenSizes[$i] === $screen)
+		if ($clickheatConf['__screenSizes'][$i] === $screen)
 		{
-			$minScreen = $__screenSizes[$i - 1];
+			$minScreen = $clickheatConf['__screenSizes'][$i - 1];
 			break;
 		}
 	}
@@ -51,7 +49,7 @@ else
 
 /** Browser */
 $browser = isset($_GET['browser']) ? $_GET['browser'] : '';
-if (!isset($__browsersList[$browser]))
+if (!isset($clickheatConf['__browsersList'][$browser]))
 {
 	$browser = 'all';
 }
@@ -106,7 +104,6 @@ if (file_exists($htmlPath) && filemtime($htmlPath) > $time - $delay)
 	readfile($htmlPath);
 	exit;
 }
-
 /** Get some data for the current group (centered and/or fixed layout) */
 if (file_exists($clickheatConf['logPath'].$group.'/url.txt'))
 {

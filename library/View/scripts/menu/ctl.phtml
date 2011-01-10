@@ -1,22 +1,16 @@
 <?php
 
 $tt = array('' => '[ не указан ]');
-$dir = Zend_Controller_Front::getInstance()->getControllerDirectory();
-$dir = @$dir['default'];
-$handle = @opendir($dir);
-
-while ($path = @readdir($handle)) {
-	if (is_file($dir.'/'.$path)) {
-		$n = $nn = strtolower(str_ireplace('Controller.php', '', $path));
+$data = Zkernel_Common::getControllerDocblock();
+if ($data) {
+	foreach ($data as $n => $db) {
+		$nn = $n;
 		$c = ucfirst($n).'Controller';
-		if (!class_exists($c)) include $dir.'/'.$path;
-		$db = Zkernel_Common::getDocblock($c);
 		if (isset($db['zk_title'])) $nn = $db['zk_title'];
 		$inner = array();
 		$r = new Zend_Reflection_Class($c);
 		$met = $r->getMethods();
 		if (@$met) {
-
 			$exist = false;
 			foreach ($met as $el) {
 				if ($el->name == '_getRoutes') {
@@ -56,8 +50,6 @@ while ($path = @readdir($handle)) {
 		}
 	}
 }
-
-@closedir($handle);
 
 $this->control(array(
 	'tree' => 1,

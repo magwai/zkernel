@@ -62,8 +62,8 @@ if ($server > 0) {
 echo '<div id="maincontainer">' . "\n";
 echo '<div id="main_pane_left">';
 
-if ($server > 0
- || (! $cfg['LeftDisplayServers'] && count($cfg['Servers']) > 1)) {
+if (0
+ /*|| (! $cfg['LeftDisplayServers'] && count($cfg['Servers']) > 1*/) {
     echo '<div class="group">';
     echo '<h2>' . $strActions . '</h2>';
     echo '<ul>';
@@ -107,7 +107,7 @@ if ($server > 0
 }
 
 
-if ($server > 0) {
+if (0) {
     echo '<div class="group">';
     echo '<h2>MySQL ' . $short_server_info . '</h2>';
     echo '<ul>' . "\n";
@@ -134,7 +134,7 @@ if ($server > 0) {
     echo '  </ul>';
     echo ' </div>';
 }
-
+/*
 echo '<div class="group">';
 echo '<h2>' . $strInterface . '</h2>';
 echo '  <ul>';
@@ -176,7 +176,7 @@ echo PMA_Config::getFontsizeForm();
 echo '</li>';
 
 echo '</ul>';
-echo '</div>';
+echo '</div>';*/
 
 
 echo '</div>';

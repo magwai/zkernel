@@ -343,15 +343,15 @@ if ($databases_count > 0) {
 
     if ($is_superuser || $cfg['AllowUserDropDatabase']) {
         $common_url_query = PMA_generate_common_url() . '&amp;sort_by=' . $sort_by . '&amp;sort_order=' . $sort_order . '&amp;dbstats=' . $dbstats;
-        echo '<img class="selectallarrow" src="' . $pmaThemeImage . 'arrow_' . $text_dir . '.png" width="38" height="22" alt="' . $strWithChecked . '" />' . "\n"
+       /* echo '<img class="selectallarrow" src="' . $pmaThemeImage . 'arrow_' . $text_dir . '.png" width="38" height="22" alt="' . $strWithChecked . '" />' . "\n"
            . '<a href="./server_databases.php?' . $common_url_query . '&amp;checkall=1" onclick="if (markAllRows(\'tabledatabases\')) return false;">' . "\n"
            . '    ' . $strCheckAll . '</a> / ' . "\n"
            . '<a href="./server_databases.php?' . $common_url_query . '" onclick="if (unMarkAllRows(\'tabledatabases\')) return false;">' . "\n"
            . '    ' . $strUncheckAll . '</a>' . "\n"
-           . '<i>' . $strWithChecked . '</i>' . "\n";
-        PMA_buttonOrImage('drop_selected_dbs', 'mult_submit', 'drop_selected_dbs', $strDrop, 'b_deltbl.png');
+           . '<i>' . $strWithChecked . '</i>' . "\n";*/
+        //PMA_buttonOrImage('drop_selected_dbs', 'mult_submit', 'drop_selected_dbs', $strDrop, 'b_deltbl.png');
     }
-
+/*
     echo '<ul><li id="li_switch_dbstats"><strong>' . "\n";
     if (empty($dbstats)) {
         echo '        <a href="./server_databases.php?' . $url_query . '&amp;dbstats=1"'
@@ -365,7 +365,7 @@ if ($databases_count > 0) {
     echo '</a></strong><br />' . "\n";
     PMA_Message::warning('strDatabasesStatsHeavyTraffic')->display();
     echo '</li>' . "\n"
-        .'</ul>' . "\n";
+        .'</ul>' . "\n";*/
     echo '</form>';
 } else {
     echo $strNoDatabases;

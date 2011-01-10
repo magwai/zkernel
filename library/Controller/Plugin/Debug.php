@@ -260,7 +260,7 @@ class Zkernel_Controller_Plugin_Debug extends Zend_Controller_Plugin_Abstract
                 $pluginClass = $plugin;
             }
 
-            require_once str_replace('_', DIRECTORY_SEPARATOR, $pluginClass) . '.php';
+            //require_once str_replace('_', DIRECTORY_SEPARATOR, $pluginClass) . '.php';
             $object = new $pluginClass($options);
     		$this->registerPlugin($object);
     	}

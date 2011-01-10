@@ -191,7 +191,7 @@ function PMA_auth()
 //<![CDATA[
 // show login form in top frame
 if (top != self) {
-    window.top.location.href=location;
+    //window.top.location.href=location;
 }
 //]]>
 </script>

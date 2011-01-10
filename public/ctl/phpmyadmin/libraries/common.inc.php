@@ -188,7 +188,8 @@ $variables_whitelist = array (
     'PMA_PHP_SELF',
     'variables_whitelist',
     'key',
-	'sid'
+	'sid',
+	'_zdb'
 );
 
 foreach (get_defined_vars() as $key => $value) {
