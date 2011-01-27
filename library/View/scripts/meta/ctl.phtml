@@ -1,13 +1,13 @@
 <?php
 
 $titles = array();
-
+$meta = $this->control()->config->model->info('metadata');
 if ($this->control()->config->action == 'ctlshow') {
 	$list = $this->control()->config->model->fetchControlList(null, null, 0, 0);
 	if (count($list)) {
 		$db = Zkernel_Common::getControllerDocblock();
 		foreach ($list as $el) {
-			if (!$el->oid) continue;
+			if (!isset($meta['oid']) || !$el->oid) continue;
 			$model = explode('_', $el->oid);
 			$id = (int)$model[1];
 			$oid = (string)$model[0];
@@ -52,6 +52,7 @@ $this->control(array(
 			'active' => false
 		),
 		'show_title' => array(
+			'active' => $meta['show_title'],
 			'title' => 'Показывать название сайта',
 			'description' => 'Включить/выключить отображения названия сайта в самом начале TITLE страницы',
 			'type' => 'select',

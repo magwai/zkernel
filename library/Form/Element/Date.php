@@ -19,7 +19,9 @@ class Zkernel_Form_Element_Date extends Zend_Form_Element_Text
 
 	public function render(Zend_View_Interface $view = null) {
 		$a = $this->getAttribs();
+		$regional = @$a['regional'] ? $a['regional'] : 'ru';
     	unset($a['helper']);
+		unset($a['regional']);
 		$o = array(
     		'dateFormat' => 'dd.mm.yy',
 			'firstDay' => '1'
@@ -27,7 +29,7 @@ class Zkernel_Form_Element_Date extends Zend_Form_Element_Text
     	if ($a) $o = array_merge($o, $a);
 
     	$js =
-'$.include("/zkernel/js/jquery/ui/ui.datepicker.js", function() {
+'$.include(["/zkernel/js/jquery/ui/ui.datepicker.js", "/zkernel/js/jquery/ui/i18n/jquery.ui.datepicker-'.$regional.'.js"], function() {
 	$("input[name='.$this->getName().']").datepicker('.Zend_Json::encode($o).');
 });';
     	$this->getView()->inlineScript('script', $js);
