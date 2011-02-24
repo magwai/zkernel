@@ -177,7 +177,6 @@
 				isScrollableH = percentInViewH > 1;
 
 				//console.log(paneWidth, paneHeight, contentWidth, contentHeight, percentInViewH, percentInViewV, isScrollableH, isScrollableV);
-
 				if (!(isScrollableH || isScrollableV)) {
 					elem.removeClass('jspScrollable');
 					pane.css({
@@ -631,9 +630,9 @@
 					animate = settings.animateScroll;
 				}
 				if (animate) {
-					jsp.animate(verticalDrag, 'top', destY,	_positionDragY);
+					if (destY) jsp.animate(verticalDrag, 'top', destY,	_positionDragY);
 				} else {
-					verticalDrag.css('top', destY);
+					if (destY) verticalDrag.css('top', destY);
 					_positionDragY(destY);
 				}
 
@@ -660,7 +659,7 @@
 				}
 				
 				updateVerticalArrows(isAtTop, isAtBottom);
-				pane.css('top', destTop);
+				if (destTop) pane.css('top', destTop);
 				elem.trigger('jsp-scroll-y', [-destTop, isAtTop, isAtBottom]);
 			}
 
@@ -679,9 +678,9 @@
 					animate = settings.animateScroll;
 				}
 				if (animate) {
-					jsp.animate(horizontalDrag, 'left', destX,	_positionDragX);
+					if (destX) jsp.animate(horizontalDrag, 'left', destX,	_positionDragX);
 				} else {
-					horizontalDrag.css('left', destX);
+					if (destX) horizontalDrag.css('left', destX);
 					_positionDragX(destX);
 				}
 			}
@@ -694,7 +693,6 @@
 
 				container.scrollTop(0);
 				horizontalDragPosition = destX;
-
 				var isAtLeft = horizontalDragPosition == 0,
 					isAtRight = horizontalDragPosition == dragMaxX,
 					percentScrolled = destX / dragMaxX,
@@ -707,7 +705,7 @@
 				}
 				
 				updateHorizontalArrows(isAtLeft, isAtRight);
-				pane.css('left', destLeft);
+				if (destLeft) pane.css('left', destLeft);
 				elem.trigger('jsp-scroll-x', [-destLeft, isAtLeft, isAtRight]);
 			}
 
