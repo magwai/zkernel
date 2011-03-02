@@ -20,8 +20,13 @@ class Zkernel_Db_Model_Meta extends Zkernel_Db_Table {
 	}
 
 	function fetchMatch($url) {
-		if ($url!=='/'){
-			return $this->fetchRow('"'.$url.'" LIKE CONCAT("%", REPLACE(REPLACE(`url`, "*", "%"), "?", "_"), "%")', 'LENGTH(`url`) DESC');
+		if ($url=='/') {
+			return $this->fetchRow('"'.$url.'" LIKE "/"', 'LENGTH(`url`) DESC');
+		} else {
+			if (substr($url, -1)=='/') {
+				$url=substr_replace($url, '', -1);
+			}
+			return $this->fetchRow('"'.$url.'" LIKE REPLACE(REPLACE(`url`, "*", "%"), "?", "_")', 'LENGTH(`url`) DESC');
 		}
 	}
 
