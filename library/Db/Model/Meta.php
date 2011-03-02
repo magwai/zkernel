@@ -21,7 +21,7 @@ class Zkernel_Db_Model_Meta extends Zkernel_Db_Table {
 
 	function fetchMatch($url) {
 		if ($url=='/') {
-			return $this->fetchRow('"'.$url.'" LIKE "/"', 'LENGTH(`url`) DESC');
+			return $this->fetchRow('"'.$url.'" LIKE "/"', 'LENGTH(`url`) ASC');
 		} else {
 			if (substr($url, -1)=='/') {
 				$url=substr_replace($url, '', -1);
