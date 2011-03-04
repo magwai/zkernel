@@ -44,7 +44,7 @@
     $.fn.scale = function (val, duration, options)
     {
         var style = $(this).css('transform');
-        
+       
         if (typeof val == 'undefined')
         {
             if (style)
@@ -58,12 +58,12 @@
             
             return 1;
         }
-        
-        $(this).css(
-            'transform',
-            style.replace(/none|scale\([^)]*\)/, '') + 'scale(' + val + ')'
-        );
-        
+
+		$(this).css(
+		'transform',
+			(style ? style.replace(/none|scale\([^)]*\)/, '') : '') + 'scale(' + val + ')'
+		);
+            
         return this;
     }
 
