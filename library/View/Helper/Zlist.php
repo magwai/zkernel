@@ -52,8 +52,10 @@ class Zkernel_View_Helper_Zlist extends Zend_View_Helper_Abstract  {
 
 		$data['pager_param'] = @$data['pager_param'];
 
-		$class = $data['fetch_model'];
-		$class = new $class();
+		if (!$data['fetch_data']) {
+			$class = $data['fetch_model'];
+			$class = new $class();
+		}
 
 		$list = $data['fetch_data'] ? $data['fetch_data'] : call_user_func_array(
 			array(
@@ -68,7 +70,7 @@ class Zkernel_View_Helper_Zlist extends Zend_View_Helper_Abstract  {
 			else $list = $class->getAdapter()->fetchAll($list);
 		}
 		if (!$lv && count($list)) {
-			$lv = $this->view->override($list, $data['override_type']);
+			$lv = $data['override_type'] == 'none' ? $list : $this->view->override($list, $data['override_type']);
 			$reindex = false;
 			foreach ($lv as $k => $v) if (@$v->_skip) {
 				unset($lv[$k]);

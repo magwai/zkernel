@@ -574,7 +574,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 				$form->addElement($el->type, $el->name, $p->toArray());
 			}
 
-			if ($meta) {
+			if ($meta && !@(int)$this->config->post['sposted']) {
 				$form->addDisplayGroup(array('meta_title', 'meta_keywords', 'meta_description'), 'meta', array('legend' => 'Дополнительно', 'class' => 'c_collapse'));
 			}
 		}
@@ -583,17 +583,24 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 		    'label' => $this->config->oac_ok_title,
     		'class' => 'c_button'
 		));
-		if ($this->config->oac_cancel) $form->addElement('submit', 'oac_cancel', array(
-		    'label' => 'Отмена',
-			'onclick' => 'return c.go("'.$this->config->request_cancel->controller.'", "'.$this->config->request_cancel->action.'", '.Zend_Json::encode(Zkernel_Common::url2array($this->config->request_cancel->param)).')',
-    		'class' => 'c_button'
-		));
-		if ($this->config->oac_apply) $form->addElement('submit', 'oac_apply', array(
-		    'label' => 'Применить',
-    		'onclick' => 'return c.submit(1)',
-    		'class' => 'c_button'
-		));
-    	$form->addDisplayGroup(array('oac_ok', 'oac_cancel', 'oac_apply'), 'oac');
+		$oac_array = array('oac_ok');
+		if ($this->config->oac_cancel) {
+			$oac_array[] = 'oac_cancel';
+			$form->addElement('submit', 'oac_cancel', array(
+				'label' => 'Отмена',
+				'onclick' => 'return c.go("'.$this->config->request_cancel->controller.'", "'.$this->config->request_cancel->action.'", '.Zend_Json::encode(Zkernel_Common::url2array($this->config->request_cancel->param)).')',
+				'class' => 'c_button'
+			));
+		}
+		if ($this->config->oac_apply) {
+			$oac_array[] = 'oac_apply';
+			$form->addElement('submit', 'oac_apply', array(
+				'label' => 'Применить',
+				'onclick' => 'return c.submit(1)',
+				'class' => 'c_button'
+			));
+		}
+    	$form->addDisplayGroup($oac_array, 'oac');
     	return $form;
     }
 

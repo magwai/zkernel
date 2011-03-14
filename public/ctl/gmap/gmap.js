@@ -13,6 +13,7 @@ gmap.init = function(id, value, opt) {
 	if (!opt.mapTypeId) opt.mapTypeId = 'ROADMAP';
 	if (!opt.zoom) opt.zoom = 15;
 	if (!opt.center) opt.center = [48.712688, 44.513394];
+	if (!opt.type) opt.type = 'point';
 	opt.mapTypeId = google.maps.MapTypeId[opt.mapTypeId];
 	opt.center = new google.maps.LatLng(opt.center[0], opt.center[1]);
 	if (opt.width) o.width(opt.width);
@@ -26,30 +27,68 @@ gmap.init = function(id, value, opt) {
 	google.maps.event.addListener(gmap[id], 'click', function(e) {
 		var latlng = e.latLng;
 		if (!gmap[id].marker) {
-			gmap[id].marker = new google.maps.Marker({
-				flat: false,
-				map: gmap[id],
-				draggable: true,
-				position: latlng
-			});
-			google.maps.event.addListener(gmap[id].marker, 'click', function(e) {
-				this.setVisible(false);
-				$('#' + id).val('');
-			});
+			gmap[id].marker = [];
 		}
-		gmap[id].marker.setVisible(true);
-		gmap[id].marker.setPosition(latlng);
-		$('#' + id).val(
+		var m = opt.type == 'route' || !gmap[id].marker.length ? new google.maps.Marker({
+			flat: false,
+			map: gmap[id],
+			draggable: true,
+			position: latlng,
+			title: opt.type == 'route'
+				? String(gmap[id].marker.length + 1)
+				: ''
+		}) : gmap[id].marker[0];
+
+		google.maps.event.addListener(m, 'click', function() {
+			this.setVisible(false);
+			var ll1 = this.getPosition();
+			gmap.value_delete(id,
+				ll1.lat().toFixed(6) +
+				'|' +
+				ll1.lng().toFixed(6)
+			);
+		});
+
+		if (opt.type == 'route' || !gmap[id].marker.length) gmap[id].marker.push(m);
+
+		m.setVisible(true);
+		m.setPosition(latlng);
+		gmap.value_add(id,
 			latlng.lat().toFixed(6) +
 			'|' +
 			latlng.lng().toFixed(6)
 		);
 	});
 	if (value) {
-		var ll = new google.maps.LatLng(value[0], value[1]);
-		google.maps.event.trigger(gmap[id], 'click', {
-			latLng: ll
-		});
-		gmap[id].setCenter(ll);
+		var ll = [];
+		for (var i = 0; i < value.length; i+=2) {
+			ll.push(new google.maps.LatLng(value[i], value[i + 1]));
+			google.maps.event.trigger(gmap[id], 'click', {
+				latLng: ll[ll.length - 1]
+			});
+		}
+		gmap[id].setCenter(ll[0]);
 	}
+};
+
+gmap.value_add = function(id, v) {
+	var old = $('#' + id).val();
+	old = old.length == 0 ? [] : old.split(' ');
+	for (var i = 0; i < old.length; i++) {
+		if (old[i] == v) return;
+	}
+	old.push(v);
+	$('#' + id).val(old.join(' '));
+};
+
+gmap.value_delete = function(id, v) {
+	var old = $('#' + id).val();
+	old = old.length == 0 ? [] : old.split(' ');
+	for (var i = 0; i < old.length; i++) {
+		if (old[i] == v) {
+			old.splice(i, 1);
+			break;
+		}
+	}
+	$('#' + id).val(old.join(' '));
 };
