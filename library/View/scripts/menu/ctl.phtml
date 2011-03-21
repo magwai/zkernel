@@ -23,7 +23,15 @@ if ($data) {
 					$ci->init();
 					$rs = $ci->_getRoutes();
 					if ($rs) foreach ($rs as $k_1 => $el_1) {
-						$inner[$n.'|index|'.$k_1] = $el_1;
+						$is_route = strpos($k_1, '|');
+						$ap = 'index';
+						$pp = explode('@', $k_1);
+						if (count($pp) == 2) {
+							$ap = $pp[0];
+							$k_1 = $pp[1];
+						}
+						else $k_1 = $pp[0];
+						$inner[$n.'|'.($is_route === false ? $k_1 : $ap.'|'.$k_1)] = $el_1;
 					}
 					break;
 				}

@@ -74,12 +74,17 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 	    		'finish' => array()
 	    	),
 	    	'data' => array(),
-	    	'static_field' => false
+	    	'static_field' => false,
+			'zk_meta' => 0
 		);
 		if ($data !== null) $d = array_merge($d, $data);
 		$this->config = new Zkernel_Config_Control($d);
 		$this->config->request_cancel->controller = $this->config->controller;
 		$this->config->request_ok->controller = $this->config->controller;
+		if ($this->config->controller) {
+			$db = Zkernel_Common::getDocblock(ucfirst($this->config->controller).'Controller');
+			$this->config->zk_meta = isset($db['zk_meta']) && $db['zk_meta'] ? 1 : 0;
+		}
 		$this->_config_inited = true;
 
 		ini_set('session.cookie_lifetime', 86400 * 30);
@@ -516,9 +521,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
     	if ($this->config->field) {
 			$fields = $this->config->field;
 
-			$db = Zkernel_Common::getDocblock(ucfirst($this->config->controller).'Controller');
-			$meta = isset($db['zk_meta']) && $db['zk_meta'];
-			if ($meta) {
+			if ($this->config->zk_meta) {
 				$fields['meta_title'] = array(
 					'title' => 'Title',
 					'description' => 'Отображается в заголовке окна браузера',
@@ -574,7 +577,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 				$form->addElement($el->type, $el->name, $p->toArray());
 			}
 
-			if ($meta && !@(int)$this->config->post['sposted']) {
+			if ($this->config->zk_meta && !@(int)$this->config->post['sposted']) {
 				$form->addDisplayGroup(array('meta_title', 'meta_keywords', 'meta_description'), 'meta', array('legend' => 'Дополнительно', 'class' => 'c_collapse'));
 			}
 		}
@@ -692,8 +695,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 						}
 					}
 
-					$db = Zkernel_Common::getDocblock(ucfirst($this->config->controller).'Controller');
-					if (isset($db['zk_meta']) && $db['zk_meta']) {
+					if ($this->config->zk_meta) {
 						$empty = !$this->config->data->meta_title && !$this->config->data->meta_keywords && !$this->config->data->meta_description;
 						$md = array(
 							'title' => $this->config->data->meta_title,
@@ -792,8 +794,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 						}
 					}
 
-					$db = Zkernel_Common::getDocblock(ucfirst($this->config->controller).'Controller');
-					if (isset($db['zk_meta']) && $db['zk_meta']) {
+					if ($this->config->zk_meta) {
 						$mm = new Default_Model_Meta();
 						$md = $mm->fetchRow(array('`oid` = "'.$this->config->controller.'_'.$id.'"'));
 						if ($md) {

@@ -385,7 +385,7 @@
 				if (this.$controlsContainer) {
 					this.$controlsContainer
 						.find('div.ss-controls a').removeClass().addClass('play')
-						.attr('title', this.playLinkText)
+						//.attr('title', this.playLinkText)
 						.attr('href', '#play')
 						.html(this.playLinkText);
 				}
@@ -400,7 +400,7 @@
 				if (this.$controlsContainer) {
 					this.$controlsContainer
 						.find('div.ss-controls a').removeClass().addClass('pause')
-						.attr('title', this.pauseLinkText)
+						//.attr('title', this.pauseLinkText)
 						.attr('href', '#pause')
 						.html(this.pauseLinkText);
 				}
@@ -802,7 +802,7 @@
 				// Prev Page Link
 				if (page > 0) {
 					var prevPage = startIndex - this.numThumbs;
-					pager.append('<a rel="history" href="#'+this.data[prevPage].hash+'" title="'+this.prevPageLinkText+'">'+this.prevPageLinkText+'</a>');
+					pager.append('<a rel="history" href="#'+this.data[prevPage].hash+'">'+this.prevPageLinkText+'</a>');
 				}
 
 				// Create First Page link if needed
@@ -833,7 +833,7 @@
 				// Next Page Link
 				var nextPage = startIndex + this.numThumbs;
 				if (nextPage < this.data.length) {
-					pager.append('<a rel="history" href="#'+this.data[nextPage].hash+'" title="'+this.nextPageLinkText+'">'+this.nextPageLinkText+'</a>');
+					pager.append('<a rel="history" href="#'+this.data[nextPage].hash+'">'+this.nextPageLinkText+'</a>');
 				}
 
 				pager.find('a').click(function(e) {
@@ -894,10 +894,10 @@
 			if (this.renderSSControls) {
 				if (this.autoStart) {
 					this.$controlsContainer
-						.append('<div class="ss-controls"><a href="#pause" class="pause" title="'+this.pauseLinkText+'">'+this.pauseLinkText+'</a></div>');
+						.append('<div class="ss-controls"><a href="#pause" class="pause">'+this.pauseLinkText+'</a></div>');
 				} else {
 					this.$controlsContainer
-						.append('<div class="ss-controls"><a href="#play" class="play" title="'+this.playLinkText+'">'+this.playLinkText+'</a></div>');
+						.append('<div class="ss-controls"><a href="#play" class="play">'+this.playLinkText+'</a></div>');
 				}
 
 				this.$controlsContainer.find('div.ss-controls a')
@@ -910,7 +910,7 @@
 		
 			if (this.renderNavControls) {
 				this.$controlsContainer
-					.append('<div class="nav-controls"><a class="prev" rel="history" title="'+this.prevLinkText+'">'+this.prevLinkText+'</a><a class="next" rel="history" title="'+this.nextLinkText+'">'+this.nextLinkText+'</a></div>')
+					.append('<div class="nav-controls"><a class="prev" rel="history">'+this.prevLinkText+'</a><a class="next" rel="history">'+this.nextLinkText+'</a></div>')
 					.find('div.nav-controls a')
 					.click(function(e) {
 						gallery.clickHandler(e, this);
