@@ -15,8 +15,8 @@ class Zkernel_View_Helper_Zlist extends Zend_View_Helper_Abstract  {
 		$reg = Zend_Registry::isRegistered('Zkernel_Multilang') ? Zend_Registry::get('Zkernel_Multilang') : '';
 
 		$data['fetch_data'] = isset($data['fetch_data']) ? $data['fetch_data'] : array();
-		
-		$data['fetch_model'] = class_exists($data['fetch_model']) ? $data['fetch_model'] : 'Default_Model_'.ucfirst($data['fetch_model']);
+
+		$data['fetch_model'] = @$data['fetch_model'] ? (class_exists($data['fetch_model']) ? $data['fetch_model'] : 'Default_Model_'.ucfirst($data['fetch_model'])) : '';
 
 		$data['fetch_param'] = @$data['fetch_param'] ? (is_array($data['fetch_param']) ? $data['fetch_param'] : array($data['fetch_param'])) : array();
 
@@ -52,18 +52,19 @@ class Zkernel_View_Helper_Zlist extends Zend_View_Helper_Abstract  {
 
 		$data['pager_param'] = @$data['pager_param'];
 
-		if (!$data['fetch_data']) {
+		if (!$data['fetch_data'] && $data['fetch_model']) {
 			$class = $data['fetch_model'];
 			$class = new $class();
 		}
+		else $class = '';
 
-		$list = $data['fetch_data'] ? $data['fetch_data'] : call_user_func_array(
+		$list = $data['fetch_data'] ? $data['fetch_data'] : ($class ? call_user_func_array(
 			array(
 				$class,
 				$data['fetch_method']
 			),
 			$data['fetch_param']
-		);
+		) : array());
 
 		if ($list instanceOf Zend_Db_Select) {
 			if (@$data['pager']) $lv = $list;

@@ -11,6 +11,8 @@
  */
 class Zkernel_Controller_Z extends Zkernel_Controller_Action {
 	function pointAction() {
+		$this->view->size = $this->getRequest()->getParam('size');
+		if ($this->view->size) $this->view->size = explode(',', $this->view->size);
 		$this->view->color = str_replace('-', '#', $this->getRequest()->getParam('color'));
 		$this->view->coord_original = $this->getRequest()->getParam('coord');
 		$this->view->coord = explode(';', $this->getRequest()->getParam('coord'));

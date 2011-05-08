@@ -28,7 +28,9 @@ tr.ui-search-toolbar input {margin: 1px 0px 0px 0px}
 tr.ui-search-toolbar select {margin: 1px 0px 0px 0px}
 /* body */ 
 .ui-jqgrid .ui-jqgrid-bdiv {position: relative; margin: 0em; padding:0; overflow: auto; text-align:left;}
-.ui-jqgrid .ui-jqgrid-btable {table-layout:fixed; margin:0em;}
+.ui-jqgrid .ui-jqgrid-btable {table-layout:fixed; margin:0em; outline-style: none; }
+.ui-jqgrid tr.jqgrow { outline-style: none; }
+.ui-jqgrid tr.jqgroup { outline-style: none; }
 .ui-jqgrid tr.jqgrow td {font-weight: normal; overflow: hidden; white-space: pre; height: 22px;padding: 0 2px 0 2px;border-bottom-width: 1px; border-bottom-color: inherit; border-bottom-style: solid;}
 .ui-jqgrid tr.jqgfirstrow td {padding: 0 2px 0 2px;border-right-width: 1px; border-right-style: solid;}
 .ui-jqgrid tr.jqgroup td {font-weight: normal; overflow: hidden; white-space: pre; height: 22px;padding: 0 2px 0 2px;border-bottom-width: 1px; border-bottom-color: inherit; border-bottom-style: solid;}
@@ -130,10 +132,4 @@ tr.ui-search-toolbar select {margin: 1px 0px 0px 0px}
 .ui-jqgrid .ui-sort-rtl {left:0px;}
 .ui-jqgrid .tree-wrap-ltr {float: left;}
 .ui-jqgrid .tree-wrap-rtl {float: right;}
-.ui-jqgrid .ui-ellipsis {text-overflow:ellipsis;}
-.ui-searchFilter { display: none; position: absolute; z-index: 770; overflow: visible;}
-.ui-searchFilter table {position:relative; margin:0em; width:auto}
-.ui-searchFilter table td {margin: 0em; padding: 1px;}
-.ui-searchFilter table td input, .ui-searchFilter table td select {margin: 0.1em;}
-.ui-searchFilter .ui-state-default { cursor: pointer; }
-.ui-searchFilter .divider hr {margin: 1px; }
+.ui-jqgrid .ui-ellipsis {text-overflow:ellipsis;/* -moz-binding:url('ellipsis-xbl.xml#ellipsis');*/}

@@ -27,7 +27,7 @@ c = {
 	xhr: null,
 	loading_timer: null,
 	loading_ticks: 0
-}; 
+};
 
 c.init = function(p, l) {
 	c.cfg = $.extend(c.cfg, p);
@@ -356,7 +356,7 @@ c.do_action = function(obj, parent, post) {
 	var l = $('#list');
 	if (l.length) {
 		var id = obj.id ? obj.id : l.getGridParam('selrow');
-		if (cl == 't' && c.cfg.controller != controller && l.find('tr[id=' + id + '] .treeclick').length != 0) {
+		if (cl == 't' && c.cfg.controller != controller && l.find('tr[id=' + id + '] .tree-leaf').length == 0) {
 			c.info('Разрешено переходить только в концевые рубрики');
 			return false;
 		}
@@ -461,7 +461,7 @@ c.table_height = function() {
 		th += $(this).get(0).offsetHeight;
 	});
 	if ($('#list_pager').html().length) th += $('#list_pager')[0].offsetHeight;
-	
+
 	return $(window).height() - th - 105;
 };
 

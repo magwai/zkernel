@@ -53,7 +53,7 @@ class Zkernel_View_Helper_Meta extends Zend_View_Helper_Abstract  {
 						if ($titles && $f != '+' && $f != '-') $this->view->headTitle($this->view->escape($titles), 'PREPEND');
 					}
 				}
-				else if ($f != '+' && $f != '-') $this->view->headTitle($title, 'SET');
+				else if (@$title && $f != '+' && $f != '-') $this->view->headTitle($title, 'SET');
 			}
 		}
     }

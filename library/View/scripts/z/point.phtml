@@ -11,7 +11,7 @@ if ($this->coord) {
 		chmod($dir, 0777);
 	}
 
-	$md5 = md5($this->coord_original.$this->color);
+	$md5 = md5($this->coord_original.$this->color.($this->size ? implode('', $this->size) : ''));
 
 	$file = $dir.'/'.$md5.'.png';
 	if (file_exists($file)) {
@@ -25,15 +25,22 @@ if ($this->coord) {
 			$arr[] = $el[0];
 			$arr[] = $el[1];
 		}
-		$x_max = max($mx);
-		$y_max = max($my);
-		$x_min = min($mx);
-		$x_min = min($my);
+		if ($this->size) {
+			$x_max = $this->size[0];
+			$y_max = $this->size[1];
+		}
+		else {
+			$x_max = max($mx);
+			$y_max = max($my);
+			$x_min = min($mx);
+			$x_min = min($my);
+		}
 
 		$i = imagecreatetruecolor($x_max, $y_max);
 		$rgb = Zkernel_Common::hex2rgb($this->color);
 		$color = imagecolorallocate($i, $rgb[0], $rgb[1], $rgb[2]);
 		$trans = imagecolorallocate($i, 255, 255, 0);
+		
 		imagecolortransparent($i, $trans);
 		imagefilledrectangle($i, 0, 0, $x_max - 1, $y_max - 1, $trans);
 		imagefilledpolygon($i, $arr, count($this->coord), $color);
