@@ -356,7 +356,7 @@ c.do_action = function(obj, parent, post) {
 	var l = $('#list');
 	if (l.length) {
 		var id = obj.id ? obj.id : l.getGridParam('selrow');
-		if (cl == 't' && c.cfg.controller != controller && l.find('tr[id=' + id + '] .treeclick.tree-leaf').length == 0) {
+		if (cl == 't' && c.cfg.controller != controller && l.find('tr[id=' + id + '] .treeclick').length > 0 && l.find('tr[id=' + id + '] .tree-leaf').length == 0) {
 			c.info('Разрешено переходить только в концевые рубрики');
 			return false;
 		}
