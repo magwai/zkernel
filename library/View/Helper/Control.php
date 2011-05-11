@@ -474,13 +474,14 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 				foreach ($menus as $num => $el) {
 					if(!$this->view->user()->isAllowed($this->view->user('role'), $el->resource)) continue;
 					$cl_0 = stripos($el->param, 'cl=0');
+					$cl_1 = stripos($el->param, 'cl=1');
 					$this->config->button_top[] = array(
 						'inner' => $num == 0 ? 1 : 0,
 						'controller' => $el->controller,
 						'action' => $el->action ? $el->action : 'ctlshow',
 						'field' => 'cid',
 						'title' => $el->title,
-						'cl' => $cl_0 !== false ? 'f' : 't'
+						'cl' => $cl_0 !== false ? 'f' : ($cl_1 !== false ? 'a' : 't')
 					);
 				}
 			}
@@ -704,7 +705,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 						);
 						$mm = new Default_Model_Meta();
 						$me = (int)$mm->fetchOne('id', array('`oid` = "'.$this->config->controller.'_'.$id.'"'));
-						
+
 						if ($me) {
 							if ($empty) $mm->delete(array('`id` = ?' => $me));
 							else $mm->update($md, array('`id` = ?' => $me));
@@ -714,7 +715,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 							$mm->insert($md);
 						}
 					}
-					
+
 					$ok = false;
 					$this->config->func_override;
 					$this->config->func_check;
