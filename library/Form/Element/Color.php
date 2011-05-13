@@ -12,7 +12,7 @@ class Zkernel_Form_Element_Color extends Zend_Form_Element_Text {
     	$js =
 '$.include("/zkernel/ctl/colorpicker/css/colorpicker.css|link");
 $.include("/zkernel/ctl/colorpicker/colorpicker.js", function() {
-	$("input[name='.$this->getName().']").ColorPicker({
+	$(\'input[name="'.$this->getName().'"]\').ColorPicker({
     	color: "'.$this->getValue().'",
     	onBeforeShow: function () {
 			$(this).ColorPickerSetColor(this.value);
