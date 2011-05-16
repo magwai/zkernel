@@ -64,7 +64,7 @@ zuf.init = function(o) {
 
 	hh.uploadify($.extend(oo, o));
 	zuf.inited = true;
-	
+
 	/*e.find('>a').click(function() {
 		if (h.hasClass('zuf_deleted')) {
 			e.find('span').css({

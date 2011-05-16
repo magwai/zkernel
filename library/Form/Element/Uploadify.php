@@ -12,16 +12,16 @@ class Zkernel_Form_Element_Uploadify extends Zend_Form_Element_Hidden {
 
 	public function render(Zend_View_Interface $view = null) {
     	$o = array(
-    		'fileDataName' => $this->getName(),
+			'fileDataName' => $this->getName(),
 	    	'folder' => '/'.$this->destination,
 	    	'scriptData' => array(
     			'old' => $this->getAttrib('multi') ? 'multi' : $this->getValue(),
     			'sid' => session_id()
     		)
     	);
-    	
+
     	$o = array_merge($o,$this->getAttribs());
-    	
+
     	if ($this->getAttrib('multi')) $o['multi'] = 1;
     	$s = new Zend_Session_Namespace();
     	$js =
