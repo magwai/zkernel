@@ -2,7 +2,7 @@
 /**
  * jqGrid extension for custom methods
  * Tony Tomov tony@trirand.com
- * http://trirand.com/blog/ 
+ * http://trirand.com/blog/
  * Dual licensed under the MIT and GPL licenses:
  * http://www.opensource.org/licenses/mit-license.php
  * http://www.gnu.org/licenses/gpl-2.0.html
@@ -59,7 +59,7 @@ $.jgrid.extend({
 	},
 	GridDestroy : function () {
 		return this.each(function(){
-			if ( this.grid ) { 
+			if ( this.grid ) {
 				if ( this.p.pager ) { // if not part of grid
 					$(this.p.pager).remove();
 				}
@@ -148,7 +148,7 @@ $.jgrid.extend({
 					switch (this.stype) {
 						case 'select' :
 							so  = (this.searchoptions && this.searchoptions.sopt) ? this.searchoptions.sopt[0] : 'eq';
-							v = $("#gs_"+$.jgrid.jqID(nm),$t.grid.hDiv).val();
+							v = $("#gs_"+$.jgrid.jqID(this.name),$t.grid.hDiv).val();
 							if(v) {
 								sdata[nm] = v;
 								sopt[nm] = so;
@@ -161,7 +161,7 @@ $.jgrid.extend({
 							break;
 						case 'text':
 							so  = (this.searchoptions && this.searchoptions.sopt) ? this.searchoptions.sopt[0] : p.defaultSearch;
-							v = $("#gs_"+$.jgrid.jqID(nm), $t.grid.hDiv).val();
+							v = $("#gs_"+$.jgrid.jqID(this.name), $t.grid.hDiv).val();
 							if(v) {
 								sdata[nm] = v;
 								sopt[nm] = so;
@@ -350,7 +350,7 @@ $.jgrid.extend({
 							} else if(cm.editoptions && cm.editoptions.value) {
 								oSv = cm.editoptions.value;
 							}
-							if (oSv) {	
+							if (oSv) {
 								var elem = document.createElement("select");
 								elem.style.width = "100%";
 								$(elem).attr({name:cm.index || cm.name, id: "gs_"+cm.name});

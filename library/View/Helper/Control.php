@@ -409,6 +409,8 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
     			$this->config->field_link => $this->config->param['cid']
     		));
     	}
+
+		$this->config->orderby = str_replace('list_', '', $this->config->orderby);
     	return $this;
 	}
 
