@@ -60,14 +60,23 @@ gmap.init = function(id, value, opt) {
 		);
 	});
 	if (value) {
-		var ll = [];
+            if(opt.type == 'point'){
+                var ll = new google.maps.LatLng(value[0], value[1]);
+		google.maps.event.trigger(gmap[id], 'click', {
+			latLng: ll
+		});
+		gmap[id].setCenter(ll);
+
+            }else{
+		var pp = [];
 		for (var i = 0; i < value.length; i+=2) {
-			ll.push(new google.maps.LatLng(value[i], value[i + 1]));
+			pp.push(new google.maps.LatLng(value[i], value[i + 1]));
 			google.maps.event.trigger(gmap[id], 'click', {
-				latLng: ll[ll.length - 1]
+				latLng: pp[pp.length - 1]
 			});
 		}
-		gmap[id].setCenter(ll[0]);
+		gmap[id].setCenter(pp[0]); 
+            }
 	}
 };
 
