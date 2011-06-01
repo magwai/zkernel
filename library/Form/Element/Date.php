@@ -21,7 +21,7 @@ class Zkernel_Form_Element_Date extends Zend_Form_Element_Text
     	unset($a['helper']);
 		unset($a['regional']);
 		$o = array(
-    		//'dateFormat' => 'dd/mm/yy',
+    		'dateFormat' => 'dd.mm.yy',
 			'firstDay' => '1'
     	);
     	if ($a) $o = array_merge($o, $a);

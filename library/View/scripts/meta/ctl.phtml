@@ -19,6 +19,13 @@ if ($this->control()->config->action == 'ctlshow') {
 	}
 }
 
+if ($this->control()->config->action == 'ctledit') {
+	$model = new Default_Model_Meta();
+	$card = $model->fetchRow(array('`id` = ?' => (int)$this->control()->config->param->id));
+	$active = $card->oid ? false : true;
+}
+else $active = true;
+
 $t = '';
 $this->control(array(
 	'field_title' => 'id',
@@ -31,7 +38,7 @@ $this->control(array(
 			'formatoptions' => 'if (data.oid) { var d = '.Zend_Json::encode($titles).'; return d[data.oid]; } else return value;',
 			'description' => 'Адрес должен быть внутренним. Напимер: /news/*, /page/about',
 			'order' => 1,
-			'active' => $this->control()->config->action != 'ctledit'
+			'active' => $active
 		),
 		'title' => array(
 			'title' => 'TITLE',

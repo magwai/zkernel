@@ -41,6 +41,43 @@ class Zkernel_Common {
 		return $ret;
 	}
 
+
+	static function strtolower($str) {
+		return mb_strtolower($str, 'UTF-8');
+	}
+
+
+
+	static function strtoupper($str) {
+	    return mb_strtoupper($str, 'UTF-8');
+
+	}
+
+
+	static function ucfirst($str) {
+	    $f = @mb_substr($str, 0, 1, 'UTF-8');
+	    $l = @mb_substr($str, 1, 99999, 'UTF-8');
+	    return self::strtoupper($f).self::strtolower($l);
+	}
+
+	/*static function strtolower($str) {
+
+     return iconv('windows-1251', 'utf-8', strtolower(strtr(
+
+       iconv('utf-8', 'windows-1251', $str),
+
+       iconv('utf-8', 'windows-1251', 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'),
+
+@@ -75,7 +62,8 @@ class Zkernel_Common {
+
+     $f = @substr($s, 0, 1);
+
+     $l = @substr($s, 1);
+
+     return strtoupper(self::strtoupper(iconv('windows-1251', 'utf-8', $f))).strtolower(self::strtolower(iconv('windows-1251', 'utf-8', $l)));
+
+-  }
+
 	static function strtolower($str) {
 		return iconv('windows-1251', 'utf-8', strtolower(strtr(
 			iconv('utf-8', 'windows-1251', $str),
@@ -63,7 +100,7 @@ class Zkernel_Common {
 		$l = @substr($s, 1);
 		return strtoupper(self::strtoupper(iconv('windows-1251', 'utf-8', $f))).strtolower(self::strtolower(iconv('windows-1251', 'utf-8', $l)));
 	}
-
+*/
 	static function hex2rgb ($hex , $asString = false) {
 		if ( 0 === strpos ( $hex , '#' )) {
 		$hex = substr ( $hex , 1 );

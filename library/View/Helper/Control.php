@@ -215,13 +215,19 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 	    		'finish' => array()
 	    	),
 	    	'data' => array(),
-	    	'static_field' => false
+	    	'static_field' => false,
+	    	'zk_meta' => 0
 		);
 		if ($data !== null) $d = array_merge($d, $data);
 		$this->config = new Zkernel_Config_Control($d);
 		$this->config->request_cancel->controller = $this->config->controller;
 		$this->config->request_ok->controller = $this->config->controller;
-
+		
+		if ($this->config->controller) {
+			$db = Zkernel_Common::getDocblock(ucfirst($this->config->controller).'Controller');
+			$this->config->zk_meta = isset($db['zk_meta']) && $db['zk_meta'] ? 1 : 0;
+		}
+		
 		$this->config->control_lang_current = $this->config->control_lang_data[$this->config->control_lang];
 		
 		$this->_config_inited = true;
@@ -373,7 +379,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 			}
 			else if ($this->config->navpane->middle !== false) $navpane = array_merge($navpane, $this->config->navpane->middle->toArray());
 			if (count($this->config->navpane->finish)) $navpane = array_merge($navpane, $this->config->navpane->finish->toArray());
-			$navpane[] = array('t' => $this->config->control_lang_current['view_place']);
+			$navpane[] = array('t' => $this->config->place);
 			$this->view->layout()->navpane = $navpane;
 		}
 		$this->config->control_lang_current = $this->config->control_lang_data[$this->config->control_lang];
@@ -529,7 +535,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 	}
 
 	function configFromRequest() {
-		if ($this->config->param['orderby']) $this->config->orderby = $this->config->param['orderby'];
+		if ($this->config->param['orderby']) $this->config->orderby = str_replace('list_','',$this->config->param['orderby']);
     	if ($this->config->param['orderdir']) $this->config->orderdir = $this->config->param['orderdir'];
     	if ($this->config->param['page']) $this->config->pager_page = $this->config->param['page'];
     	if ($this->config->param['rows']) $this->config->pager_perpage = $this->config->param['rows'];
@@ -555,6 +561,8 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
     			$this->config->field_link => $this->config->param['cid']
     		));
     	}
+    	
+    	$this->config->orderby = str_replace('list_', '', $this->config->orderby);
     	
     	$this->config->control_lang_current = $this->config->control_lang_data[$this->config->control_lang];
     	return $this;
@@ -622,12 +630,14 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 				foreach ($menus as $num => $el) {
 					if(!$this->view->user()->isAllowed($this->view->user('role'), $el->resource)) continue;
 					$cl_0 = stripos($el->param, 'cl=0');
+					$cl_1 = stripos($el->param, 'cl=1');
 					$this->config->button_top[] = array(
 						'inner' => $num == 0 ? 1 : 0,
 						'controller' => $el->controller,
 						'action' => $el->action ? $el->action : 'ctlshow',
 						'field' => 'cid',
 						'title' => $el->title,
+						'cl' => $cl_0 !== false ? 'f' : ($cl_1 !== false ? 'a' : 't')
 						'cl' => $cl_0 !== false ? 'f' : 't'
 					);
 				}
@@ -667,7 +677,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
     		'id' => 'c_form'
     	));
     	if ($this->config->field) {
-			if ($this->config->field) {
+
 			$d = array();
 			$d1 = $this->config->field->toArray();
                         foreach ($d1 as $k => $v) {
@@ -676,13 +686,11 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 			}
 			array_multisort($d, SORT_ASC, SORT_NUMERIC, $d1);
 			$this->config->field->set($d1);
-                        }
 
-                        $fields = $this->config->field;
-
-                        $db = Zkernel_Common::getDocblock(ucfirst($this->config->controller).'Controller');
-			$meta = isset($db['zk_meta']) && $db['zk_meta'];
-			if ($meta) {
+            $fields = $this->config->field;
+                        
+			if ($this->config->zk_meta) {
+                       
 				$fields['meta_title'] = array(
 					'title' => 'Title',
 					'description' => $this->config->control_lang_current['meta_title'],
@@ -742,7 +750,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 				$form->addElement($el->type, $el->name, $p->toArray());
 			}
 
-			if ($meta) {
+			if ($this->config->zk_meta && !@(int)$this->config->post['sposted']) {
 				$form->addDisplayGroup(array('meta_title', 'meta_keywords', 'meta_description'), 'meta', array('legend' => $this->config->control_lang_current['more'], 'class' => 'c_collapse'));
 			}
 		}
@@ -751,17 +759,28 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 		    'label' => $this->config->oac_ok_title,
     		'class' => 'c_button'
 		));
-		if ($this->config->oac_cancel) $form->addElement('submit', 'oac_cancel', array(
-		    'label' => $this->config->control_lang_current['cancel'],
-			'onclick' => 'return c.go("'.$this->config->request_cancel->controller.'", "'.$this->config->request_cancel->action.'", '.Zend_Json::encode(Zkernel_Common::url2array($this->config->request_cancel->param)).')',
-    		'class' => 'c_button'
-		));
-		if ($this->config->oac_apply) $form->addElement('submit', 'oac_apply', array(
-		    'label' => $this->config->control_lang_current['submit'],
-    		'onclick' => 'return c.submit(1)',
-    		'class' => 'c_button'
-		));
-    	$form->addDisplayGroup(array('oac_ok', 'oac_cancel', 'oac_apply'), 'oac');
+		
+		$oac_array = array('oac_ok');
+		if ($this->config->oac_cancel) {
+			$oac_array[] = 'oac_cancel';
+			$form->addElement('submit', 'oac_cancel', array(
+				'label' => $this->config->control_lang_current['cancel'],
+				'onclick' => 'return c.go("'.$this->config->request_cancel->controller.'", "'.$this->config->request_cancel->action.'", '.Zend_Json::encode(Zkernel_Common::url2array($this->config->request_cancel->param)).')',
+				'class' => 'c_button'
+			));
+		}
+		
+		if ($this->config->oac_apply) {
+			$oac_array[] = 'oac_apply';
+			$form->addElement('submit', 'oac_apply', array(
+				'label' => $this->config->control_lang_current['submit'],
+				'onclick' => 'return c.submit(1)',
+				'class' => 'c_button'
+			));
+		}
+		
+		$form->addDisplayGroup($oac_array, 'oac');
+		
     	return $form;
     }
 
@@ -853,8 +872,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 						}
 					}
 
-					$db = Zkernel_Common::getDocblock(ucfirst($this->config->controller).'Controller');
-					if (isset($db['zk_meta']) && $db['zk_meta']) {
+					if ($this->config->zk_meta) {
 						$empty = !$this->config->data->meta_title && !$this->config->data->meta_keywords && !$this->config->data->meta_description;
 						$md = array(
 							'title' => $this->config->data->meta_title,
@@ -953,8 +971,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 						}
 					}
 
-					$db = Zkernel_Common::getDocblock(ucfirst($this->config->controller).'Controller');
-					if (isset($db['zk_meta']) && $db['zk_meta']) {
+					if ($this->config->zk_meta) {
 						$mm = new Default_Model_Meta();
 						$md = $mm->fetchRow(array('`oid` = "'.$this->config->controller.'_'.$id.'"'));
 						if ($md) {
