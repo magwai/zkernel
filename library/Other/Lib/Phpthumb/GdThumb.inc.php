@@ -1038,7 +1038,7 @@ class GdThumb extends ThumbBase
 			}
 			else
 			{
-				//$this->triggerError('File is not a valid image: ' . $this->fileName);
+				$this->triggerError('File is not a valid image: ' . $this->fileName);
 			}
 
 			// make sure we really stop execution

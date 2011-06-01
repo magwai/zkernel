@@ -21,27 +21,27 @@ if ($item) {
 $this->control(array(
 	'field' => array(
 		'controller' => array(
-			'title' => 'Контроллер',
+			'title' => $this->control()->config->control_lang_current['controller'],
 			'sortable' => true,
 			'order' => 1
 		),
 		'action' => array(
-			'title' => 'Действие',
+			'title' => $this->control()->config->control_lang_current['action'],
 			'sortable' => true,
 			'order' => 2
 		),
 		'key' => array(
-			'title' => 'Ключ',
+			'title' => $this->control()->config->control_lang_current['key'],
 			'sortable' => true,
 			'order' => 3
 		),
 		'value' => array(
-			'title' => 'Значение',
+			'title' => $this->control()->config->control_lang_current['value'],
 			'sortable' => true,
 			'order' => 5
 		),
 		'type' => array(
-			'title' => 'Тип значения',
+			'title' => $this->control()->config->control_lang_current['value_type'],
 			'sortable' => true,
 			'order' => 4
 		)
@@ -53,13 +53,13 @@ $this->control(array(
 				'edit',
 				'delete',
 				array(
-					'title' => 'Мастер',
+					'title' => $this->control()->config->control_lang_current['master'],
 					'controller' => 'cconf',
 					'action' => 'ctlwizard',
 					'param' => 'step=default'
 				),
 				array(
-					'title' => 'Генератор',
+					'title' => $this->control()->config->control_lang_current['generator'],
 					'controller' => 'cconf',
 					'action' => 'ctlbuilder'
 				)
@@ -70,11 +70,11 @@ $this->control(array(
 				),
 				'controller' => array(
 					'formatter' => 'function',
-					'formatoptions' => 'return value.length ? value : "Все";'
+					'formatoptions' => 'return value.length ? value : "'.$this->control()->config->control_lang_current['all'].'";'
 				),
 				'action' => array(
 					'formatter' => 'function',
-					'formatoptions' => 'return value.length ? value : "Все";'
+					'formatoptions' => 'return value.length ? value : "'.$this->control()->config->control_lang_current['all'].'";'
 				)
 			)
 		),
@@ -93,7 +93,7 @@ $this->control(array(
 		),
 		'ctledit' => array(
 			'button_top' => array(array(
-				'title' => 'Удалить',
+				'title' => $this->control()->config->control_lang_current['delete'],
 				'controller' => 'cconf',
 				'action' => 'ctldelete',
 				'param' => 'id='.(int)$this->control()->config->param['id']

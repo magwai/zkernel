@@ -3,7 +3,7 @@
 $s = new Zend_Session_Namespace();
 
 echo $this->json(array(
-	'title' => 'Панель управления',
+	'title' => $this->control()->config->control_lang_current['control_panel'],
 	//'multilang' => Zend_Registry::isRegistered('Zkernel_Multilang') ? 1 : 0,
 	'def_controller' => 'cindex',
 	'def_action' => 'ctlshow',

@@ -12,7 +12,7 @@ class Zkernel_View_Helper_Mail extends Zkernel_View_Helper_Override  {
 		$mail = new Zend_Mail('utf-8');
 		$mail->setType(Zend_Mime::MULTIPART_RELATED);
 		$body = $this->view->partial('mail/frame.phtml', array(
-			'message' => @$data['body'] ? $data['body'] : $this->view->partial('mail/'.$data['view'].'.phtml', $data)
+			'message' => $this->view->partial('mail/'.$data['view'].'.phtml', $data)
 		));
 		preg_match_all('/src\=\"\/(img|upload\/mce\/image)\/([^\"]+)\"/si', $body, $res);
 		if (@$res[1]) {

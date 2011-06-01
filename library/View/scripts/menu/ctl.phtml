@@ -1,6 +1,6 @@
 <?php
 
-$tt = array('' => '[ не указан ]');
+$tt = array('' => '[ '.$this->control()->config->control_lang_current['not_specified'].' ]');
 $data = Zkernel_Common::getControllerDocblock();
 if ($data) {
 	foreach ($data as $n => $db) {
@@ -23,15 +23,7 @@ if ($data) {
 					$ci->init();
 					$rs = $ci->_getRoutes();
 					if ($rs) foreach ($rs as $k_1 => $el_1) {
-						$is_route = strpos($k_1, '|');
-						$ap = 'index';
-						$pp = explode('@', $k_1);
-						if (count($pp) == 2) {
-							$ap = $pp[0];
-							$k_1 = $pp[1];
-						}
-						else $k_1 = $pp[0];
-						$inner[$n.'|'.($is_route === false ? $k_1 : $ap.'|'.$k_1)] = $el_1;
+						$inner[$n.'|index|'.$k_1] = $el_1;
 					}
 					break;
 				}
@@ -63,12 +55,12 @@ $this->control(array(
 	'tree' => 1,
 	'field' => array(
 		'title' => array(
-			'title' => 'Название',
+			'title' => $this->control()->config->control_lang_current['title'],
 			'required' => true,
 			'order' => 1
 		),
 		'key' => array(
-			'title' => 'Ключ',
+			'title' => $this->control()->config->control_lang_current['key'],
 			'order' => 2,
 			'active' => $this->user()->isAllowed(
 				$this->user('role'),
@@ -81,8 +73,8 @@ $this->control(array(
 			)
 		),
 		'cap' => array(
-			'title' => 'Раздел',
-			'description' => 'Выберите либо раздел, либо введите URL в следующем поле. Если вы выберите раздел и введете URL одновременно, то будет использован URL',
+			'title' => $this->control()->config->control_lang_current['partition'],
+			'description' => $this->control()->config->control_lang_current['partition_desc'],
 			'type' => 'select',
 			'param' => array(
 				'multioptions' => $tt,
