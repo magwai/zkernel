@@ -27,7 +27,7 @@ c = {
 	xhr: null,
 	loading_timer: null,
 	loading_ticks: 0
-};
+}; 
 
 c.init = function(p, l) {
 	c.cfg = $.extend(c.cfg, p);
@@ -37,7 +37,7 @@ c.init = function(p, l) {
 	$('.c_tline .h').css('display', 'block');
 	document.title = c.cfg.title;
 	c.tpl['c_auth'] = $('#c_login').html();
-	c.build_auth();
+	c.build_auth(c.cfg.logout);
 	$('#c_mlink').click(function() {
 		var o = $('#c_menu_frame');
 		$('#c_menu_frame:visible').length
@@ -247,10 +247,10 @@ c.load_auth = function(success) {
 	});
 };
 
-c.build_auth = function() {
+c.build_auth = function(lo) {
 	var login = c.cfg.login;
 	$('#c_login').empty();
-	if (login.length && login != 'none') $('#c_login').append(login + ' &nbsp;&nbsp;<span><input class="c_l_button" type="button" value="Выйти" /></span>').find('input').click(c.logout);
+	if (login.length && login != 'none') $('#c_login').append(login + ' &nbsp;&nbsp;<span><input class="c_l_button" type="button" value="'+lo+'" /></span>').find('input').click(c.logout);
 	else {
 		$('#c_login').append(c.tpl['c_auth']).find('form input[type="submit"]').click(function() {
 			return c.login($('#c_login').find('form').serialize(), c.cfg.controller, c.cfg.action);
@@ -356,7 +356,7 @@ c.do_action = function(obj, parent, post) {
 	var l = $('#list');
 	if (l.length) {
 		var id = obj.id ? obj.id : l.getGridParam('selrow');
-		if (cl == 't' && c.cfg.controller != controller && l.find('tr[id=' + id + '] .treeclick').length > 0 && l.find('tr[id=' + id + '] .tree-leaf').length == 0) {
+		if (cl == 't' && c.cfg.controller != controller && l.find('tr[id=' + id + '] .treeclick').length != 0) {
 			c.info('Разрешено переходить только в концевые рубрики');
 			return false;
 		}
@@ -461,7 +461,7 @@ c.table_height = function() {
 		th += $(this).get(0).offsetHeight;
 	});
 	if ($('#list_pager').html().length) th += $('#list_pager')[0].offsetHeight;
-
+	
 	return $(window).height() - th - 105;
 };
 

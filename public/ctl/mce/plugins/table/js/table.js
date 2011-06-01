@@ -12,7 +12,7 @@ function insertTable() {
 	tinyMCEPopup.restoreSelection();
 
 	if (!AutoValidator.validate(formObj)) {
-		tinyMCEPopup.alert(AutoValidator.getErrorMessages(formObj).join('. ') + '.');
+		tinyMCEPopup.alert(inst.getLang('invalid_data'));
 		return false;
 	}
 
@@ -21,7 +21,7 @@ function insertTable() {
 	// Get form data
 	cols = formObj.elements['cols'].value;
 	rows = formObj.elements['rows'].value;
-	border = formObj.elements['border'].value != "" ? formObj.elements['border'].value : 0;
+	border = formObj.elements['border'].value != "" ? formObj.elements['border'].value  : 0;
 	cellpadding = formObj.elements['cellpadding'].value != "" ? formObj.elements['cellpadding'].value : "";
 	cellspacing = formObj.elements['cellspacing'].value != "" ? formObj.elements['cellspacing'].value : "";
 	align = getSelectValue(formObj, "align");
@@ -58,6 +58,8 @@ function insertTable() {
 
 	// Update table
 	if (action == "update") {
+		inst.execCommand('mceBeginUndoLevel');
+
 		dom.setAttrib(elm, 'cellPadding', cellpadding, true);
 		dom.setAttrib(elm, 'cellSpacing', cellspacing, true);
 		dom.setAttrib(elm, 'border', border);
@@ -80,7 +82,7 @@ function insertTable() {
 			capEl = elm.ownerDocument.createElement('caption');
 
 			if (!tinymce.isIE)
-				capEl.innerHTML = '<br data-mce-bogus="1"/>';
+				capEl.innerHTML = '<br _mce_bogus="1"/>';
 
 			elm.insertBefore(capEl, elm.firstChild);
 		}
@@ -149,7 +151,7 @@ function insertTable() {
 	html += makeAttrib('border', border);
 	html += makeAttrib('cellpadding', cellpadding);
 	html += makeAttrib('cellspacing', cellspacing);
-	html += makeAttrib('data-mce-new', '1');
+	html += makeAttrib('_mce_new', '1');
 
 	if (width && inst.settings.inline_styles) {
 		if (style)
@@ -185,7 +187,7 @@ function insertTable() {
 
 	if (caption) {
 		if (!tinymce.isIE)
-			html += '<caption><br data-mce-bogus="1"/></caption>';
+			html += '<caption><br _mce_bogus="1"/></caption>';
 		else
 			html += '<caption></caption>';
 	}
@@ -195,7 +197,7 @@ function insertTable() {
 
 		for (var x=0; x<cols; x++) {
 			if (!tinymce.isIE)
-				html += '<td><br data-mce-bogus="1"/></td>';
+				html += '<td><br _mce_bogus="1"/></td>';
 			else
 				html += '<td></td>';
 		}
@@ -204,6 +206,8 @@ function insertTable() {
 	}
 
 	html += "</table>";
+
+	inst.execCommand('mceBeginUndoLevel');
 
 	// Move table
 	if (inst.settings.fix_table_elements) {
@@ -227,7 +231,7 @@ function insertTable() {
 	} else
 		inst.execCommand('mceInsertContent', false, html);
 
-	tinymce.each(dom.select('table[data-mce-new]'), function(node) {
+	tinymce.each(dom.select('table[_mce_new]'), function(node) {
 		var td = dom.select('td', node);
 
 		try {
@@ -238,7 +242,7 @@ function insertTable() {
 			// Ignore
 		}
 
-		dom.setAttrib(node, 'data-mce-new', '');
+		dom.setAttrib(node, '_mce_new', '');
 	});
 
 	inst.addVisual();
