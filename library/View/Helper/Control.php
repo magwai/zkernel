@@ -379,7 +379,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 			}
 			else if ($this->config->navpane->middle !== false) $navpane = array_merge($navpane, $this->config->navpane->middle->toArray());
 			if (count($this->config->navpane->finish)) $navpane = array_merge($navpane, $this->config->navpane->finish->toArray());
-			$navpane[] = array('t' => $this->config->place);
+			$navpane[] = array('t' => $this->config->control_lang_current['view_place']);
 			$this->view->layout()->navpane = $navpane;
 		}
 		$this->config->control_lang_current = $this->config->control_lang_data[$this->config->control_lang];
@@ -638,7 +638,6 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 						'field' => 'cid',
 						'title' => $el->title,
 						'cl' => $cl_0 !== false ? 'f' : ($cl_1 !== false ? 'a' : 't')
-						'cl' => $cl_0 !== false ? 'f' : 't'
 					);
 				}
 			}
