@@ -12,34 +12,32 @@ jQuery.fn.textPlaceholder = function () {
 		var placeholder = that.getAttribute('placeholder');
 		var input = jQuery(that);
 
-		if(placeholder) {
-			if (that.value === '' || that.value == placeholder) {
-				input.addClass('text-placeholder');
-				that.value = placeholder;
-			}
-
-			input.focus(function(){
-				if (input.hasClass('text-placeholder')) {
-					this.value = '';
-					input.removeClass('text-placeholder')
-				}
-			});
-
-			input.blur(function(){
-				if (this.value === '') {
-					input.addClass('text-placeholder');
-					this.value = placeholder;
-				} else {
-					input.removeClass('text-placeholder');
-				}
-			});
-
-			that.form && jQuery(that.form).submit(function(){
-				if (input.hasClass('text-placeholder')) {
-					that.value = '';
-				}
-			});
+		if (that.value === '' || that.value == placeholder) {
+			input.addClass('text-placeholder');
+			that.value = placeholder;
 		}
+
+		input.focus(function(){
+			if (input.hasClass('text-placeholder')) {
+				this.value = '';
+				input.removeClass('text-placeholder')
+			}
+		});
+
+		input.blur(function(){
+			if (this.value === '') {
+				input.addClass('text-placeholder');
+				this.value = placeholder;
+			} else {
+				input.removeClass('text-placeholder');
+			}
+		});
+
+		that.form && jQuery(that.form).submit(function(){
+			if (input.hasClass('text-placeholder')) {
+				that.value = '';
+			}
+		});
 
 	});
 
