@@ -33,7 +33,7 @@ class Zkernel_Form_Element_Date extends Zend_Form_Element_Text
 			}
 		}
 		$js = $o['type'] == 'multyrange' ?
-			'$.include(["/zkernel/js/jquery/ui/ui.datepicker.js", "/zkernel/js/jquery/ui/i18n/jquery.ui.datepicker-'.$regional.'.js", "/js/jquery-ui.multidatespicker.js"], function() {$("input[name='.$this->getName().']").multiDatesPicker('.Zend_Json::encode($o).');});'
+			'$.include(["/zkernel/js/jquery/ui/ui.datepicker.js", "/zkernel/js/jquery/ui/i18n/jquery.ui.datepicker-'.$regional.'.js", "/zkernel/js/jquery/ui/ui.multidatespicker.js"], function() {$("input[name='.$this->getName().']").multiDatesPicker('.Zend_Json::encode($o).');});'
 			:
 			'$.include(["/zkernel/js/jquery/ui/ui.datepicker.js", "/zkernel/js/jquery/ui/i18n/jquery.ui.datepicker-'.$regional.'.js"], function() {$("input[name='.$this->getName().']").datepicker('.Zend_Json::encode($o, false, array('enableJsonExprFinder' => true)).');});';
     	$this->getView()->inlineScript('script', $js);
