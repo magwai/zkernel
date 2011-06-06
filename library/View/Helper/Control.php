@@ -383,7 +383,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 	}
 
 	function configFromRequest() {
-		if ($this->config->param['orderby']) $this->config->orderby = str_replace('list_','',$this->config->param['orderby']);
+		if ($this->config->param['orderby']) $this->config->orderby = str_replace('list_', '', $this->config->param['orderby']);
     	if ($this->config->param['orderdir']) $this->config->orderdir = $this->config->param['orderdir'];
     	if ($this->config->param['page']) $this->config->pager_page = $this->config->param['page'];
     	if ($this->config->param['rows']) $this->config->pager_perpage = $this->config->param['rows'];
