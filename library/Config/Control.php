@@ -101,13 +101,13 @@ class Zkernel_Config_Control implements Countable, Iterator, ArrayAccess {
 			if (is_object($v) && $v->title) $title = $v->title;
 			else switch ($action) {
 				case 'ctladd':
-					$title = 'Добавить';
+					$title = '_lang_add';
 					break;
 				case 'ctledit':
-					$title = 'Изменить';
+					$title = '_lang_edit';
 					break;
 				case 'ctldelete':
-					$title = 'Удалить';
+					$title = '_lang_delete';
 					break;
 			}
 			$v = new Zkernel_Config_Control(array(

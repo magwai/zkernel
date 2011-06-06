@@ -40,7 +40,6 @@ if ($this->coord) {
 		$rgb = Zkernel_Common::hex2rgb($this->color);
 		$color = imagecolorallocate($i, $rgb[0], $rgb[1], $rgb[2]);
 		$trans = imagecolorallocate($i, 255, 255, 0);
-		
 		imagecolortransparent($i, $trans);
 		imagefilledrectangle($i, 0, 0, $x_max - 1, $y_max - 1, $trans);
 		imagefilledpolygon($i, $arr, count($this->coord), $color);

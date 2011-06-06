@@ -15,7 +15,7 @@ class Zkernel_Form_Element_Mce extends Zend_Form_Element_Textarea {
 			$o = array(
 				'script_url' => "/zkernel/ctl/mce/tiny_mce.js",
 				'theme' => "advanced",
-				'language' => "ru",
+				'language' => $this->lang,
 				'content_css' => "/img/style.css",
 				'remove_script_host' => true,
 				'relative_urls' => false,

@@ -25,13 +25,13 @@ class Zkernel_Form_Element_Gmap extends Zend_Form_Element_Text {
 window.cb_gmap_'.$this->getName().' = function(a1, a2) {
 	window.cb_gmap_'.$this->getName().'_loaded = true;
 	gmap.init("'.$this->getName().'", '.($value ? '["'.str_replace(array('|', ' '), array('","', '","'), $value).'"]' : 'null').', {'.
-		'"type": "'.($type ? $type : 'point').'",'.
+	'"type": "'.($type ? $type : 'point').'",'.
 		($width ? '"width": '.$width.',' : '').
 	    ($height ? '"height": '.$height.',' : '').
 	    ($scrollwheel ? '"scrollwheel": '.$scrollwheel.',' : '').
 		($maptypeid ? '"mapTypeId": "'.$maptypeid.'",' : '').
 		($zoom ? '"zoom": '.$zoom.',' : '').
-		($center ? '"center": ["'.str_replace('|', '","', $center).'"],' : '').
+		($center ? '"center": ["'.str_replace('|', ', ', $center).'"],' : '').
 	'});
 };
 $.include([

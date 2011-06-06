@@ -15,7 +15,7 @@ class Zkernel_View_Helper_Zlist extends Zend_View_Helper_Abstract  {
 		$reg = Zend_Registry::isRegistered('Zkernel_Multilang') ? Zend_Registry::get('Zkernel_Multilang') : '';
 
 		$data['fetch_data'] = isset($data['fetch_data']) ? $data['fetch_data'] : array();
-
+		
 		$data['fetch_model'] = @$data['fetch_model'] ? (class_exists($data['fetch_model']) ? $data['fetch_model'] : 'Default_Model_'.ucfirst($data['fetch_model'])) : '';
 
 		$data['fetch_param'] = @$data['fetch_param'] ? (is_array($data['fetch_param']) ? $data['fetch_param'] : array($data['fetch_param'])) : array();

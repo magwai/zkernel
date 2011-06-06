@@ -28,6 +28,14 @@ if (count($this->control()->config->button_top)) {
 	}
 	foreach ($this->control()->config->button_top as $el) {
 		if (!$el->title) continue;
+		if ($el->title == '_lang_add'){
+			$el->title = $this->control()->config->control_lang_current['add'];	
+		} elseif ($el->title == '_lang_edit'){
+			$el->title = $this->control()->config->control_lang_current['edit'];	
+		} elseif ($el->title == '_lang_delete'){
+			$el->title = $this->control()->config->control_lang_current['delete'];	
+		}
+		
 ?>
 <input inner="<?php echo (int)$el->inner; ?>" default="<?php echo (int)$el->default; ?>" type="button" value="<?php echo $el->title; ?>" onclick="c.do_action({controller:'<?php echo $el->controller; ?>',action:'<?php echo $el->action; ?>',param:'<?php echo $el->param ?>',confirm:'<?php echo (int)$el->confirm; ?>'<?php echo $el->field ? ',field:\''.$el->field.'\'' : ''; ?>,cl:'<?php echo $el->cl ?>'}, this)" />
 <?php

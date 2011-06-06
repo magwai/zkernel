@@ -15,6 +15,148 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 	private function configInit($data = null) {
 		if ($this->_config_inited) return;
 		$d = array(
+			'control_lang'			=> 'ru',
+			'control_lang_current'	=> array(),
+			'control_lang_data'		=> array(
+				'en' => array(
+					'login_exit' 		=> 'Logout',
+					'login_enter'		=> 'Login',
+					'login_password' 	=> 'password',
+					'login_username' 	=> 'login',
+					'login_login' 		=> 'Login',
+					'login_exit' 		=> 'Logout',
+					'reload' 			=> 'Reload',
+					'admin_panel' 		=> 'Control panel',
+					'visit' 			=> 'Visit homepage',
+					'no_connect' 		=> 'No connect to server',
+					'no_template' 		=> 'Template loading error',
+					'no_config' 		=> 'Configuration loading error',
+					'no_lang' 			=> 'Language loading error',
+					'try_again' 		=> 'Try again?',
+					'no_menu' 			=> 'Menu loading error',
+					'txt_alert_title' 	=> 'Info',
+					'no_login' 			=> 'Authorization data error',
+					'no_logout' 		=> 'Logout error',
+					'no_loggin' 		=> 'Login error',
+					'no_login_err' 		=> 'Login / password are uncorrect',
+					'no_sel' 			=> 'You should select an element',
+					'no_response' 		=> 'Module loading error',
+					'no_filter' 		=> 'Enter a request',
+					'file_error' 		=> 'File uploading error',
+					'no_multi' 			=> 'Language loading error',
+					'no_multi_change' 	=> 'Language change error',
+					'menu' 				=> 'Menu',					
+					'panel_loading' 	=> 'Control panel loading',
+					'old_browser' 		=> 'Your browser is too old. The control panel works uncorrectly',
+					'load_stop'			=> 'Abort loading',
+					'error_javascript' 	=> 'Your browser doesn`t support JavaScript or its usage is restricted by security policy. You need to enable JavaScript to operate the control panel.',
+					'generator' 		=> 'Generator',
+					'action' 			=> 'Action',
+					'controller' 		=> 'Controller',
+					'key' 				=> 'Key',
+					'value' 			=> 'Value',
+					'value_type' 		=> 'Value type',
+					'master' 			=> 'Master',
+					'all' 				=> 'All',
+					'delete' 			=> 'Delete',
+					'add' 				=> 'Add',
+					'edit' 				=> 'Edit',
+					'add_place' 		=> 'Add',
+					'edit_place' 		=> 'Edit',
+					'no_controller' 	=> 'Controller not found',
+					'access_error' 		=> 'You have no access this partition',
+					'meta_title' 		=> 'Is shown in browser title',
+					'meta_keywords' 	=> 'Separate keywords with comma',
+					'meta_description' 	=> 'Description has to describe page content',
+					'cancel' 			=> 'Cancel',
+					'submit' 			=> 'Apply',
+					'data_saved'		=> 'Data saved',
+					'element_moved' 	=> 'Element moved',
+					'element_not_moved' => 'Element didn\'t move',
+					'element_deleted' 	=> 'Elements deleted: ',
+					'home' 				=> 'Homepage',
+					'home_page' 		=> '<p><strong>Control panel</strong> is specified for editing your site.</p><p>&nbsp;</p><p>You can change static and dinamic pages content here and upload files to server. All changes are applied in on-line mode.</p>',
+					'loading' 			=> 'Loading',
+					'not_specified'		=> 'Not specified',
+					'title'				=> 'Title',
+					'description'		=> 'Description',
+					'message'			=> 'Message',
+					'partition'			=> 'Partition',
+					'partition_desc'	=> 'Choose a partition or input URL into the next field. If you fill both fields site uses URL link',
+					'back' 				=> 'Back',
+					'view_place' 		=> 'View',
+                                        'button'            => 'Browse...'
+				),
+				'ru' => array(
+					'login_enter' 		=> 'Войти',
+					'login_password'	=> 'Пароль',
+					'login_username' 	=> 'Имя пользователя',
+					'login_login'		=> 'Войти',
+					'login_exit' 		=> 'Выйти',
+					'reload' 			=> 'Перезагрузить',
+					'admin_panel' 		=> 'Панель управления',
+					'visit' 			=> 'Перейти на сайт',
+					'menu' 				=> 'Меню',
+					'no_connect' 		=> 'Сервер не отвечает',
+					'no_template' 		=> 'Ошибка загрузки шаблона',
+					'no_config' 		=> 'Ошибка загрузки конфигурации',
+					'no_lang' 			=> 'Ошибка загрузки языка',
+					'try_again' 		=> 'Повторить попытку?',
+					'no_menu' 			=> 'Ошибка загрузки меню',
+					'txt_alert_title' 	=> 'Информация',
+					'no_login' 			=> 'Ошибка получения сведений об авторизации',
+					'no_logout' 		=> 'Ошибка выхода',
+					'no_loggin' 		=> 'Ошибка входа',
+					'no_login_err' 		=> 'Логин / пароль неверны',
+					'no_sel' 			=> 'Элемент не выбран',
+					'no_response' 		=> 'Ошибка загрузки модуля',
+					'no_filter' 		=> 'Укажите запрос',
+					'file_error' 		=> 'Ошибка загрузки файла',
+					'no_multi' 			=> 'Ошибка загрузки языка',
+					'no_multi_change' 	=> 'Ошибка смены языка',
+					'panel_loading' 	=> 'загрузка панели управления',	
+					'old_browser' 		=> 'Вы используете устаревший браузер. Панель управления может работать некорректно',
+					'load_stop' 		=> 'Отменить загрузку',
+					'error_javascript' 	=> 'Ваш браузер не поддерживает JavaScript, либо их использование ограничено политикой безопасности. Для работы панели управления необходимо разрешить использование JavaScript.',
+					'generator' 		=> 'Генератор',
+					'action' 			=> 'Действие',
+					'controller' 		=> 'Контроллер',
+					'key' 				=> 'Ключ',
+					'value' 			=> 'Значение',
+					'value_type' 		=> 'Тип значения',
+					'master' 			=> 'Мастер',
+					'all' 				=> 'Все',
+					'delete' 			=> 'Удалить',
+					'add'	 			=> 'Добавить',
+					'edit' 				=> 'Изменить',
+					'add_place' 		=> 'Добавление',
+					'edit_place' 		=> 'Изменение',
+					'no_controller' 	=> 'Контроллер не найден',
+					'access_error' 		=> 'У вас нет доступа в этот раздел',
+					'meta_title' 		=> 'Отображается в заголовке окна браузера',
+					'meta_keywords' 	=> 'Ключевые слова перечисляются через запятую',
+					'meta_description' 	=> 'Описание должно характеризовать содержимое страницы',
+					'cancel' 			=> 'Отменить',
+					'submit' 			=> 'Применить',
+					'data_saved' 		=> 'Данные сохранены',
+					'element_moved' 	=> 'Элемент перемещен',
+					'element_not_moved' => 'Элемент не был перемещен',
+					'element_deleted' 	=> 'Элементов удалено: ',
+					'home' 				=> 'Главная',
+					'home_page' 		=> '<p><strong>Панель управления</strong> предназначена для редактирования содержимого вашего сайта.</p><p>&nbsp;</p><p>С ее помощью Вы можете вносить изменения в содержимое статических и динамических страниц, загружать файлы на сервер. Все изменения производятся в режиме on-line и вступают в силу как только запрос на изменение был обработан на сервере.</p>',
+					'loading' 			=> 'Загрузка',
+					'not_specified'		=> 'Не указан',
+					'title'				=> 'Название',
+					'description'		=> 'Описание',
+					'message'			=> 'Сообщение',
+					'partition'			=> 'Раздел',
+					'partition_desc'	=> 'Выберите либо раздел, либо введите URL в следующем поле. Если вы выберите раздел и введете URL одновременно, то будет использован URL',
+					'back' => 'Назад',
+					'view_place' => 'Просмотр',
+                                        'button'    => 'Обзор...'
+					
+				)
+			),
 			'wysiwyg'				=> 'mce',
 			'post'					=> array(),
 			'param'					=> array(),
@@ -39,13 +181,12 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 			'button_bottom' 		=> array(),
 			'scroll_top' 			=> true,
 			'use_db' 				=> true,
-			'place'					=> 'Просмотр',
-			'request_ok' 				=> array(
+			'request_ok' 			=> array(
 				'controller' => '',
 				'action' => '',
 				'param' => ''
 			),
-	    	'request_cancel' 			=> array(
+	    	'request_cancel' 		=> array(
 				'controller' => '',
 				'action' => '',
 				'param' => ''
@@ -75,16 +216,20 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 	    	),
 	    	'data' => array(),
 	    	'static_field' => false,
-			'zk_meta' => 0
+	    	'zk_meta' => 0
 		);
 		if ($data !== null) $d = array_merge($d, $data);
 		$this->config = new Zkernel_Config_Control($d);
 		$this->config->request_cancel->controller = $this->config->controller;
 		$this->config->request_ok->controller = $this->config->controller;
+		
 		if ($this->config->controller) {
 			$db = Zkernel_Common::getDocblock(ucfirst($this->config->controller).'Controller');
 			$this->config->zk_meta = isset($db['zk_meta']) && $db['zk_meta'] ? 1 : 0;
 		}
+		
+		$this->config->control_lang_current = $this->config->control_lang_data[$this->config->control_lang];
+		
 		$this->_config_inited = true;
 
 		ini_set('session.cookie_lifetime', 86400 * 30);
@@ -141,6 +286,9 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 		$error = '';
 		if ($this->config->controller == 'cindex' || $menu) {
 			if ($this->config->controller == 'cindex' || $this->view->user()->isAllowed($this->view->user('role'), $menu->resource)) {
+			
+				$this->config->control_lang_current = $this->config->control_lang_data[$this->config->control_lang];
+			
 				if ($this->config->post) {
 					foreach ($this->config->post as $k => $v) if (substr($k, 0, 1) == '_') $this->config->param[substr($k, 1)] = $v;
 				}
@@ -191,18 +339,19 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 		    	}
 		    	$type = $type == 'show' ? 'list' : $type;
 		    	$func = 'route'.ucfirst($func);
-
+		
+				
 				$this->config->type = $type;
 				$this->configFromType();
-				$this->configFromDb();
-				$this->configFromRequest();
+      				$this->configFromDb();
+            			$this->configFromRequest();
 				$this->$func();
 
 
 			}
-			else $error = 'У вас нет доступа в этот раздел';
+			else $error = $this->config->control_lang_current['access_error'];
 		}
-		else $error = 'Контроллер не найден';
+		else $error = $this->config->control_lang_current['no_controller'];
 		if ($error) {
 			$this->view->inlineScript('script', 'c.load_menu();c.load_auth();c.go(c.cfg.def_controller);');
 			$this->config->stop_frame = true;
@@ -230,9 +379,10 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 			}
 			else if ($this->config->navpane->middle !== false) $navpane = array_merge($navpane, $this->config->navpane->middle->toArray());
 			if (count($this->config->navpane->finish)) $navpane = array_merge($navpane, $this->config->navpane->finish->toArray());
-			$navpane[] = array('t' => $this->config->place);
+			$navpane[] = array('t' => $this->config->control_lang_current['view_place']);
 			$this->view->layout()->navpane = $navpane;
 		}
+		$this->config->control_lang_current = $this->config->control_lang_data[$this->config->control_lang];
 		return $this;
 	}
 
@@ -262,12 +412,12 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 			switch ($this->config->type) {
 				case 'add':
 					$this->config->oac_apply = false;
-					$this->config->place = 'Добавление';
+					$this->config->place = $this->config->control_lang_current['add'];
 					$view = 'form';
 					break;
 				case 'edit':
 					$view = 'form';
-					$this->config->place = 'Изменение';
+					$this->config->place = $this->config->control_lang_current['Edit'];
 					break;
 				case 'list':
 					$view = 'jqgrid';
@@ -367,7 +517,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 		if ($this->config->field) {
 			$d = array();
 			$d1 = $this->config->field->toArray();
-			foreach ($d1 as $k => $v) {
+                        foreach ($d1 as $k => $v) {
 				$d[$k] = @$v['order'];
 				unset($this->config->field->$k);
 			}
@@ -379,6 +529,8 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 
 		if ($this->config->drag || $this->config->tree) $this->config->pager_scroll = false;
 
+
+		$this->config->control_lang_current = $this->config->control_lang_data[$this->config->control_lang];
     	return $this;
 	}
 
@@ -409,8 +561,10 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
     			$this->config->field_link => $this->config->param['cid']
     		));
     	}
-
-		$this->config->orderby = str_replace('list_', '', $this->config->orderby);
+    	
+    	$this->config->orderby = str_replace('list_', '', $this->config->orderby);
+    	
+    	$this->config->control_lang_current = $this->config->control_lang_data[$this->config->control_lang];
     	return $this;
 	}
 
@@ -492,7 +646,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 				if (strlen($this->config->param['cid']) && !$this->config->param['cid']) {
 					$this->config->stop_frame = 1;
 					$this->view->inlineScript('script', 'c.go("'.$menu->controller.'", "'.$menu->action.'");');
-					$this->config->info[] = 'Элемент не выбран';
+					$this->config->info[] = $this->config->control_lang_current['no_sel'];
 				}
 				else {
 					$s = new Zend_Session_Namespace();
@@ -502,7 +656,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 						$this->config->button_bottom[] = array(
 							'controller' => $menu->controller,
 							'action' => $menu->action ? $menu->action : 'ctlshow',
-							'title' => 'Назад',
+							'title' => $this->config->control_lang_current['back'],
 							'cl' => $cl_0 !== false ? 'f' : 't'
 						);
 					}
@@ -522,22 +676,33 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
     		'id' => 'c_form'
     	));
     	if ($this->config->field) {
-			$fields = $this->config->field;
 
+			$d = array();
+			$d1 = $this->config->field->toArray();
+                        foreach ($d1 as $k => $v) {
+				$d[$k] = @$v['order'];
+				unset($this->config->field->$k);
+			}
+			array_multisort($d, SORT_ASC, SORT_NUMERIC, $d1);
+			$this->config->field->set($d1);
+
+            $fields = $this->config->field;
+                        
 			if ($this->config->zk_meta) {
+                       
 				$fields['meta_title'] = array(
 					'title' => 'Title',
-					'description' => 'Отображается в заголовке окна браузера',
+					'description' => $this->config->control_lang_current['meta_title'],
 					'order' => 2000
 				);
 				$fields['meta_keywords'] = array(
 					'title' => 'Keywords',
-					'description' => 'Ключевые слова перечисляются через запятую',
+					'description' => $this->config->control_lang_current['meta_keywords'],
 					'order' => 2001
 				);
 				$fields['meta_description'] = array(
 					'title' => 'Description',
-					'description' => 'Описание должно характеризовать содержимое страницы',
+					'description' => $this->config->control_lang_current['meta_description'],
 					'order' => 2002
 				);
 			}
@@ -567,12 +732,16 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 				if ($el->type == 'textarea') $p->rows = 10;
 				if ($el->type == 'editarea') $p->rows = 15;
 				if ($el->type == 'uploadify') {
+                                        if (!isset($p->button)) $p->button = $this->config->control_lang_current['button'];
 					if (!isset($p->destination)) $p->destination = PUBLIC_PATH.'/upload/'.$this->config->controller.'_'.$el->name;
 					if (!isset($p->fn)) {
 						$where = $this->config->where ? $this->config->where->toArray() : array();
 						$where['`id` = ?'] = $id;
 						if ($this->config->use_db) $p->fn = $this->config->model->fetchOne($el->name, $where);
 					}
+				}
+                                if ($el->type == 'mce') {
+                                        if (!isset($p->lang)) $p->lang = $this->config->control_lang;
 				}
 				if ($el->type == 'select') $p->class = 'c_select';
 				else if ($el->type == 'textarea') $p->class = 'ui-state-default ui-corner-all c_textarea';
@@ -581,7 +750,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 			}
 
 			if ($this->config->zk_meta && !@(int)$this->config->post['sposted']) {
-				$form->addDisplayGroup(array('meta_title', 'meta_keywords', 'meta_description'), 'meta', array('legend' => 'Дополнительно', 'class' => 'c_collapse'));
+				$form->addDisplayGroup(array('meta_title', 'meta_keywords', 'meta_description'), 'meta', array('legend' => $this->config->control_lang_current['more'], 'class' => 'c_collapse'));
 			}
 		}
 
@@ -589,24 +758,28 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 		    'label' => $this->config->oac_ok_title,
     		'class' => 'c_button'
 		));
+		
 		$oac_array = array('oac_ok');
 		if ($this->config->oac_cancel) {
 			$oac_array[] = 'oac_cancel';
 			$form->addElement('submit', 'oac_cancel', array(
-				'label' => 'Отмена',
+				'label' => $this->config->control_lang_current['cancel'],
 				'onclick' => 'return c.go("'.$this->config->request_cancel->controller.'", "'.$this->config->request_cancel->action.'", '.Zend_Json::encode(Zkernel_Common::url2array($this->config->request_cancel->param)).')',
 				'class' => 'c_button'
 			));
 		}
+		
 		if ($this->config->oac_apply) {
 			$oac_array[] = 'oac_apply';
 			$form->addElement('submit', 'oac_apply', array(
-				'label' => 'Применить',
+				'label' => $this->config->control_lang_current['submit'],
 				'onclick' => 'return c.submit(1)',
 				'class' => 'c_button'
 			));
 		}
-    	$form->addDisplayGroup($oac_array, 'oac');
+		
+		$form->addDisplayGroup($oac_array, 'oac');
+		
     	return $form;
     }
 
@@ -614,7 +787,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
     	$id = $id_old = $this->config->param['id'];
 
     	if ($this->config->type == 'edit' && !$id) {
-			$this->config->info[] = 'Элемент не выбран';
+			$this->config->info[] = $this->config->control_lang_current['no_sel'];
 			$this->config->stop_frame = true;
 		}
     	else {
@@ -707,7 +880,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 						);
 						$mm = new Default_Model_Meta();
 						$me = (int)$mm->fetchOne('id', array('`oid` = "'.$this->config->controller.'_'.$id.'"'));
-
+						
 						if ($me) {
 							if ($empty) $mm->delete(array('`id` = ?' => $me));
 							else $mm->update($md, array('`id` = ?' => $me));
@@ -717,7 +890,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 							$mm->insert($md);
 						}
 					}
-
+					
 					$ok = false;
 					$this->config->func_override;
 					$this->config->func_check;
@@ -746,7 +919,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 						else $ok = $this->config->data->id =  $this->config->model->insertControl($data_db);
 					}
 					if ($ok || $m2m_changed) {
-						$this->config->info[] = 'Данные сохранены';
+						$this->config->info[] = $this->config->control_lang_current['data_saved'];
 						$this->config->func_success;
 					}
 					else {
@@ -838,10 +1011,10 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
     	}
 
     	if ($ok) {
-    		$this->config->info[] = 'Элемент перемещен';
+    		$this->config->info[] = $this->config->control_lang_current['element_moved'];
     		$this->config->func_success;
     	}
-    	else $this->config->info[] = 'Элемент не был перемещен';
+    	else $this->config->info[] = $this->config->control_lang_current['element_not_moved'];
     	$this->config->stop_frame = true;
     	echo $this->view->render($this->config->view);
 		return $this;
@@ -888,9 +1061,9 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 		    		}
 	    		}
 	    	}
-	    	if ($cnt) $this->config->info[] = 'Удалено элементов: '.$cnt;
+	    	if ($cnt) $this->config->info[] = $this->config->control_lang_current['element_deleted'].$cnt;
 		}
-		else $this->config->info[] = 'Элемент не выбран';
+		else $this->config->info[] = $this->config->control_lang_current['no_sel'];
 		if ($cnt) {
 			$this->config->func_success;
 			$this->view->inlineScript('script', 'c.go("'.$this->config->request_ok->controller.'", "'.$this->config->request_ok->action.'", '.Zend_Json::encode(Zkernel_Common::url2array($this->config->request_ok->param)).');');
