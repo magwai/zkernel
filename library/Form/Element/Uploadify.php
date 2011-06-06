@@ -12,7 +12,7 @@ class Zkernel_Form_Element_Uploadify extends Zend_Form_Element_Hidden {
 
 	public function render(Zend_View_Interface $view = null) {
     	$o = array(
-                'buttonText' => $this->button ? $this->button : 'Browse...',
+            'buttonText' => /*$this->button ? $this->button : */'Browse...',
     		'fileDataName' => $this->getName(),
 	    	'folder' => '/'.$this->destination,
 	    	'scriptData' => array(
@@ -20,9 +20,9 @@ class Zkernel_Form_Element_Uploadify extends Zend_Form_Element_Hidden {
     			'sid' => session_id()
     		)
     	);
-    	
+
     	$o = array_merge($o,$this->getAttribs());
-    	
+
     	if ($this->getAttrib('multi')) $o['multi'] = 1;
     	$s = new Zend_Session_Namespace();
     	$js =
