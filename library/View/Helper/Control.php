@@ -45,7 +45,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 					'file_error' 		=> 'File uploading error',
 					'no_multi' 			=> 'Language loading error',
 					'no_multi_change' 	=> 'Language change error',
-					'menu' 				=> 'Menu',					
+					'menu' 				=> 'Menu',
 					'panel_loading' 	=> 'Control panel loading',
 					'old_browser' 		=> 'Your browser is too old. The control panel works uncorrectly',
 					'load_stop'			=> 'Abort loading',
@@ -85,7 +85,10 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 					'partition_desc'	=> 'Choose a partition or input URL into the next field. If you fill both fields site uses URL link',
 					'back' 				=> 'Back',
 					'view_place' 		=> 'View',
-                                        'button'            => 'Browse...'
+                    'button'            => 'Browse...',
+					'meta_show_title_title' => 'Show website title',
+					'meta_show_title' => 'Switch on/off website title before TITLE',
+					'more' => 'More'
 				),
 				'ru' => array(
 					'login_enter' 		=> 'Войти',
@@ -114,7 +117,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 					'file_error' 		=> 'Ошибка загрузки файла',
 					'no_multi' 			=> 'Ошибка загрузки языка',
 					'no_multi_change' 	=> 'Ошибка смены языка',
-					'panel_loading' 	=> 'загрузка панели управления',	
+					'panel_loading' 	=> 'загрузка панели управления',
 					'old_browser' 		=> 'Вы используете устаревший браузер. Панель управления может работать некорректно',
 					'load_stop' 		=> 'Отменить загрузку',
 					'error_javascript' 	=> 'Ваш браузер не поддерживает JavaScript, либо их использование ограничено политикой безопасности. Для работы панели управления необходимо разрешить использование JavaScript.',
@@ -153,8 +156,10 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 					'partition_desc'	=> 'Выберите либо раздел, либо введите URL в следующем поле. Если вы выберите раздел и введете URL одновременно, то будет использован URL',
 					'back' => 'Назад',
 					'view_place' => 'Просмотр',
-                                        'button'    => 'Обзор...'
-					
+                    'button'    => 'Обзор...',
+					'meta_show_title_title' => 'Показывать название сайта',
+					'meta_show_title' => 'Включить/выключить отображения названия сайта в самом начале TITLE страницы',
+					'more' => 'Дополнительно'
 				)
 			),
 			'wysiwyg'				=> 'mce',
@@ -222,14 +227,14 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 		$this->config = new Zkernel_Config_Control($d);
 		$this->config->request_cancel->controller = $this->config->controller;
 		$this->config->request_ok->controller = $this->config->controller;
-		
+
 		if ($this->config->controller) {
 			$db = Zkernel_Common::getDocblock(ucfirst($this->config->controller).'Controller');
 			$this->config->zk_meta = isset($db['zk_meta']) && $db['zk_meta'] ? 1 : 0;
 		}
-		
+
 		$this->config->control_lang_current = $this->config->control_lang_data[$this->config->control_lang];
-		
+
 		$this->_config_inited = true;
 
 		ini_set('session.cookie_lifetime', 86400 * 30);
@@ -286,9 +291,9 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 		$error = '';
 		if ($this->config->controller == 'cindex' || $menu) {
 			if ($this->config->controller == 'cindex' || $this->view->user()->isAllowed($this->view->user('role'), $menu->resource)) {
-			
+
 				$this->config->control_lang_current = $this->config->control_lang_data[$this->config->control_lang];
-			
+
 				if ($this->config->post) {
 					foreach ($this->config->post as $k => $v) if (substr($k, 0, 1) == '_') $this->config->param[substr($k, 1)] = $v;
 				}
@@ -339,8 +344,8 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 		    	}
 		    	$type = $type == 'show' ? 'list' : $type;
 		    	$func = 'route'.ucfirst($func);
-		
-				
+
+
 				$this->config->type = $type;
 				$this->configFromType();
       				$this->configFromDb();
@@ -561,9 +566,9 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
     			$this->config->field_link => $this->config->param['cid']
     		));
     	}
-    	
+
     	$this->config->orderby = str_replace('list_', '', $this->config->orderby);
-    	
+
     	$this->config->control_lang_current = $this->config->control_lang_data[$this->config->control_lang];
     	return $this;
 	}
@@ -687,9 +692,9 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 			$this->config->field->set($d1);
 
             $fields = $this->config->field;
-                        
+
 			if ($this->config->zk_meta) {
-                       
+
 				$fields['meta_title'] = array(
 					'title' => 'Title',
 					'description' => $this->config->control_lang_current['meta_title'],
@@ -704,6 +709,15 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 					'title' => 'Description',
 					'description' => $this->config->control_lang_current['meta_description'],
 					'order' => 2002
+				);
+				$fields['meta_show_title'] = array(
+					'title' => $this->config->control_lang_current['meta_show_title_title'],
+					'description' => $this->config->control_lang_current['meta_show_title'],
+					'type' => 'select',
+					'param' => array(
+						'multiOptions' => array('1' => 'Да', '0' => 'Нет')
+					),
+					'order' => 2003
 				);
 			}
 
@@ -750,7 +764,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 			}
 
 			if ($this->config->zk_meta && !@(int)$this->config->post['sposted']) {
-				$form->addDisplayGroup(array('meta_title', 'meta_keywords', 'meta_description'), 'meta', array('legend' => $this->config->control_lang_current['more'], 'class' => 'c_collapse'));
+				$form->addDisplayGroup(array('meta_title', 'meta_keywords', 'meta_description', 'meta_show_title'), 'meta', array('legend' => $this->config->control_lang_current['more'], 'class' => 'c_collapse'));
 			}
 		}
 
@@ -758,7 +772,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 		    'label' => $this->config->oac_ok_title,
     		'class' => 'c_button'
 		));
-		
+
 		$oac_array = array('oac_ok');
 		if ($this->config->oac_cancel) {
 			$oac_array[] = 'oac_cancel';
@@ -768,7 +782,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 				'class' => 'c_button'
 			));
 		}
-		
+
 		if ($this->config->oac_apply) {
 			$oac_array[] = 'oac_apply';
 			$form->addElement('submit', 'oac_apply', array(
@@ -777,9 +791,9 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 				'class' => 'c_button'
 			));
 		}
-		
+
 		$form->addDisplayGroup($oac_array, 'oac');
-		
+
     	return $form;
     }
 
@@ -872,15 +886,16 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 					}
 
 					if ($this->config->zk_meta) {
-						$empty = !$this->config->data->meta_title && !$this->config->data->meta_keywords && !$this->config->data->meta_description;
+						$empty = !$this->config->data->meta_title && !$this->config->data->meta_keywords && !$this->config->data->meta_description/* && !$this->config->data->meta_show_title*/;
 						$md = array(
 							'title' => $this->config->data->meta_title,
 							'keywords' => $this->config->data->meta_keywords,
-							'description' => $this->config->data->meta_description
+							'description' => $this->config->data->meta_description,
+							'show_title' => $this->config->data->meta_show_title
 						);
 						$mm = new Default_Model_Meta();
 						$me = (int)$mm->fetchOne('id', array('`oid` = "'.$this->config->controller.'_'.$id.'"'));
-						
+
 						if ($me) {
 							if ($empty) $mm->delete(array('`id` = ?' => $me));
 							else $mm->update($md, array('`id` = ?' => $me));
@@ -890,7 +905,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 							$mm->insert($md);
 						}
 					}
-					
+
 					$ok = false;
 					$this->config->func_override;
 					$this->config->func_check;
