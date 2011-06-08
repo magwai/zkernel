@@ -61,7 +61,8 @@ else {
 		'def_controller' => 'cindex',
 		'def_action' => 'ctlshow',
 		'controller' => @$s->control['last']['controller'] ? $s->control['last']['controller'] : 'cindex',
-		'action' => @$s->control['last']['action'] ? $s->control['last']['action'] : 'ctlshow'
+		'action' => @$s->control['last']['action'] ? $s->control['last']['action'] : 'ctlshow',
+		'title' => 'Панель управления'
 	);
 	$reg = Zend_Registry::isRegistered('Zkernel_Multilang') ? Zend_Registry::get('Zkernel_Multilang') : '';
 	if ($reg && !@$reg->domain) $p['lang'] = $reg->stitle;

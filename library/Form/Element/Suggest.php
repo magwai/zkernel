@@ -32,7 +32,7 @@ class Zkernel_Form_Element_Suggest extends Zend_Form_Element_Text {
 			'.($add_param ?
 			'var ap = '.Zend_Json::encode($add_param).';
 			for (k in ap) {
-				if (ap[k].slice(0, 3) == "jq:") {
+				if (String(ap[k]).slice(0, 3) == "jq:") {
 					var o = $(ap[k].slice(3));
 					if (o.length && o.val()) add += "/" + k + "/" + o.val();
 				}
