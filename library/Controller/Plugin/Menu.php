@@ -48,7 +48,7 @@ class Zkernel_Controller_Plugin_Menu extends Zend_Controller_Plugin_Abstract {
 					$pp = explode(',', $el->param);
 					if ($map) {
 						$mp = explode(',', $map);
-						
+
 						if ($mp && $pp) foreach ($mp as $n => $mp1) $p[$mp1] = $pp[$n];
 					}
 					else if ($pp) foreach ($pp as $mp1) {

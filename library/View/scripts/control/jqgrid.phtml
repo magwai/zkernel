@@ -48,7 +48,6 @@ else {
 	$is_fmatter = false;
 	$is_search = false;
 	$reg = Zend_Registry::isRegistered('Zkernel_Multilang') ? Zend_Registry::get('Zkernel_Multilang') : '';
-
 	if ($c->field) foreach ($c->field as $el) {
 	    if (!$el->active) continue;
 	    if ($el->live) {
@@ -56,6 +55,10 @@ else {
 	    	if ($el->single) $opt['single'] = 1;
 			$live[] = 'c.live_init("'.$el->name.'"'.($opt ? ', '.Zend_Json::encode($opt) : '').');';
 	    }
+		if ($el->search && count($c->param->search) && isset($c->param->search[$el->name]) && !isset($el->searchoptions['defaultValue'])) {
+			$el->searchoptions = isset($el->searchoptions) ? $el->searchoptions : array();
+			$el->searchoptions['defaultValue'] = $c->param->search[$el->name];
+		}
 	    $field_title[] = $el->title;
 	    $dt = array(
 	    	'name' => $el->name
@@ -69,6 +72,7 @@ else {
 	    if ($el->hidden) $dt['hidden'] = true;
 	    if ($el->stype) $dt['stype'] = $el->stype;
 	    if ($el->editoptions) $dt['editoptions'] = $el->editoptions->toArray();
+	    if ($el->searchoptions) $dt['searchoptions'] = $el->searchoptions->toArray();
 	    if ($el->formatter) {
 			if ($el->formatter == 'function') {
 				$dt['formatter'] = 'fmt_'.$el->name;
@@ -170,9 +174,9 @@ $.include([
 			$(".c_fancy").fancybox();
 		},
 		'.($c->pager_scroll ? 'scroll: true,' : ($c->pager_perpage ? 'pager: "#list_pager",' : '')).'
-		prmNames: {page: "_page", rows: "rows", sort: "_orderby", order: "_orderdir", search:"search", nd: "nd"}
+		prmNames: {page: "_page", rows: "rows", sort: "_orderby", order: "_orderdir", search:"_search", nd: "nd"}
 	});
-	'.($is_search ? '$("#list").jqGrid("filterToolbar");$("#list").setGridHeight(c.table_height());' : '').'
+	'.($is_search ? '$("#list").jqGrid("filterToolbar", {beforeSearch: function() { $(this).jqGrid("setGridParam",{search:true}).trigger("reloadGrid",[{page:1}]); return true;}});$("#list").setGridHeight(c.table_height());' : '').'
 	'.($c->drag ? '$("#list").jqGrid("sortableRows", {
 		helper: "clone",
 		distance: 2,

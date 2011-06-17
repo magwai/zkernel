@@ -605,6 +605,7 @@ class GdThumb extends ThumbBase
 
 		if (!in_array($format, $validFormats))
 		{
+			return $this;
 			throw new InvalidArgumentException ('Invalid format type specified in save function: ' . $format);
 		}
 
@@ -619,12 +620,14 @@ class GdThumb extends ThumbBase
 				// throw an exception if not writeable
 				if (!is_writeable(dirname($fileName)))
 				{
+					return $this;
 					throw new RuntimeException ('File is not writeable, and could not correct permissions: ' . $fileName);
 				}
 			}
 			// throw an exception if not writeable
 			else
 			{
+				return $this;
 				throw new RuntimeException ('File not writeable: ' . $fileName);
 			}
 		}

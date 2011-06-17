@@ -221,7 +221,9 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 	    	),
 	    	'data' => array(),
 	    	'static_field' => false,
-	    	'zk_meta' => 0
+	    	'zk_meta' => 0,
+			'search' => array(),
+			'delete_mode' => 'db'
 		);
 		if ($data !== null) $d = array_merge($d, $data);
 		$this->config = new Zkernel_Config_Control($d);
@@ -295,6 +297,14 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 				$this->config->control_lang_current = $this->config->control_lang_data[$this->config->control_lang];
 
 				if ($this->config->post) {
+					if ($this->config->post['_search'] == 'true') {
+						$ss = array();
+						foreach ($this->config->post as $k => $v) {
+							if (substr($k, 0, 1) != '_' && $k != 'nd' && $k != 'rows') $ss[$k] = $v;
+						}
+						$this->config->post['_search'] = $ss;
+					}
+					else unset($this->config->post['_search']);
 					foreach ($this->config->post as $k => $v) if (substr($k, 0, 1) == '_') $this->config->param[substr($k, 1)] = $v;
 				}
 				$s = new Zend_Session_Namespace();
@@ -579,9 +589,9 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
     	if ($this->config->post['nd']) {
 			$rows = array();
 			$where = $this->config->where ? $this->config->where->toArray() : array();
-			if ($this->config->post['search'] != 'false') {
-				foreach ($this->config->field as $el) {
-					if (isset($_POST[$el->name])) $where['`'.$el->name.'` LIKE ?'] = '%'.$_POST[$el['name']].'%';
+			if (count($this->config->param->search)) {
+				foreach ($this->config->param->search as $k => $v) {
+					if (isset($this->config->field[$k])) $where['`'.$k.'` LIKE ?'] = '%'.$v.'%';
 				}
 			}
 			if ($this->config->tree) {
@@ -710,7 +720,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 					'description' => $this->config->control_lang_current['meta_description'],
 					'order' => 2002
 				);
-				$fields['meta_show_title'] = array(
+				/*$fields['meta_show_title'] = array(
 					'title' => $this->config->control_lang_current['meta_show_title_title'],
 					'description' => $this->config->control_lang_current['meta_show_title'],
 					'type' => 'select',
@@ -718,7 +728,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 						'multiOptions' => array('1' => 'Да', '0' => 'Нет')
 					),
 					'order' => 2003
-				);
+				);*/
 			}
 
 			foreach ($fields as $el) {
@@ -748,11 +758,11 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 				if ($el->type == 'uploadify') {
                                         if (!isset($p->button)) $p->button = $this->config->control_lang_current['button'];
 					if (!isset($p->destination)) $p->destination = PUBLIC_PATH.'/upload/'.$this->config->controller.'_'.$el->name;
-					if (!isset($p->fn)) {
+					/*if (!isset($p->fn)) {
 						$where = $this->config->where ? $this->config->where->toArray() : array();
 						$where['`id` = ?'] = $id;
 						if ($this->config->use_db) $p->fn = $this->config->model->fetchOne($el->name, $where);
-					}
+					}*/
 				}
                                 if ($el->type == 'mce') {
                                         if (!isset($p->lang)) $p->lang = $this->config->control_lang;
@@ -1061,7 +1071,16 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 				$this->config->skip = false;
 	    		$this->config->func_check;
 	    		if (!$this->config->skip) {
-		    		$ok = $this->config->use_db ? $this->config->model->deleteControl($where) : true;
+		    		if ($this->config->use_db) {
+						if ($this->config->delete_mode == 'db') $ok = $this->config->model->deleteControl($where);
+						else {
+							$this->config->model->updateControl(array(
+								$this->config->delete_mode => 0
+							), $where);
+							$ok = true;
+						}
+					}
+					else $ok = true;
 		    		if ($ok) {
 		    			$form = $this->buildForm();
 		    			$els = $form->getElements();
