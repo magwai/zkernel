@@ -165,7 +165,7 @@ class Zkernel_User {
 		$meta = $this->_models['user']->info('metadata');
 		if ($data) foreach ($data as $k => $v) if (!array_key_exists($k, $meta)) unset($data[$k]);
 		if (!$data) return false;
-		$same = $id === null || $id == $this->_data->id;
+		$same = $id === null || $id == @$this->_data->id;
 		if ($same) $id = $this->_data->id;
 		if ($id) {
 			if (isset($data['password'])) $data['password'] = sha1($data['password']);
@@ -173,8 +173,65 @@ class Zkernel_User {
 				'`id` = ?' => $id
 			));
 			if ($same) $this->login(@$data['login'] ? $data['login'] : $this->_data->login);
+			if ($ok) $ok = $id;
 			return $ok;
 		}
 		return false;
+	}
+
+	function loginza($token, $match = array()) {
+		$res = @file_get_contents('http://loginza.ru/api/authinfo?token='.$token);
+		$res_decoded = $this->loginzaParse($res);
+		if ($res_decoded && isset($res_decoded['mail'])) {
+			$ex = (int)$this->_models['user']->fetchOne('id', array(
+				'`login` = ?' => $res_decoded['login']
+			));
+			$data = array(
+				'token' => $token,
+				'token_last' => date('Y-m-d H:i:s'),
+				'loginza' => $res
+			);
+			if ($ex) {
+				$ok = $this->update($data, $ex);
+			}
+			else {
+				$data['login'] = $res_decoded['login'];
+				$data['password'] = md5(time().rand(0, 9999999));
+				if ($match) {
+					$meta = $this->_models['user']->info('metadata');
+					foreach ($match as $k => $v) {
+						if (isset($meta[$v]) && isset($res_decoded[$k])) {
+							$data[$v] = $res_decoded[$k];
+						}
+					}
+				}
+				$ok = $this->register($data);
+			}
+			if ($ok) {
+				$this->login($res_decoded['login']);
+			}
+		}
+		else $ok = false;
+		return $ok;
+	}
+
+	function loginzaParse($data) {
+		$ret = array();
+		$res = @json_decode($data);
+		if ($res) {
+			$ret = array(
+				'nick' => isset($res->nickname) ? $res->nickname : '',
+				'name' => isset($res->name->first_name) ? $res->name->first_name : '',
+				'family' => isset($res->name->last_name) ? $res->name->last_name : '',
+				'login' =>	isset($res->identity) ? $res->identity : '',
+				'full' => isset($res->name->full_name) ? $res->name->full_name : '',
+				'mail' =>	isset($res->email) ? $res->email : ''
+			);
+			if (!$ret['full']) $ret['full'] = ($ret['name'] || $ret['family']
+				? $ret['name'].($ret['name'] && $ret['family'] ? ' ' : '').$ret['family']
+				: ($ret['nick'] ? $ret['nick'] : ($ret['mail'] ? $ret['mail'] : preg_replace('/(http\:\/\/openid\.yandex\.ru\/|\/)/i', '', $ret['login'])))
+			);
+		}
+		return $ret;
 	}
 }

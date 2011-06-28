@@ -15,8 +15,8 @@ class Zkernel_View_Helper_Zlist extends Zend_View_Helper_Abstract  {
 		$reg = Zend_Registry::isRegistered('Zkernel_Multilang') ? Zend_Registry::get('Zkernel_Multilang') : '';
 
 		$data['fetch_data'] = isset($data['fetch_data']) ? $data['fetch_data'] : array();
-		
-		$data['fetch_model'] = @$data['fetch_model'] ? (class_exists($data['fetch_model']) ? $data['fetch_model'] : 'Default_Model_'.ucfirst($data['fetch_model'])) : '';
+
+		$data['fetch_model'] = is_object(@$data['fetch_model']) ? $data['fetch_model'] : (@$data['fetch_model'] ? (class_exists($data['fetch_model']) ? $data['fetch_model'] : 'Default_Model_'.ucfirst($data['fetch_model'])) : '');
 
 		$data['fetch_param'] = @$data['fetch_param'] ? (is_array($data['fetch_param']) ? $data['fetch_param'] : array($data['fetch_param'])) : array();
 
@@ -36,7 +36,7 @@ class Zkernel_View_Helper_Zlist extends Zend_View_Helper_Abstract  {
 		if (!@$data['pager'] && (@$data['pager_url'] || @$data['pager_page'] || @$data['pager_perpage'] || @$data['pager_style'] || @$data['pager_script'] || @$data['pager_param'])) $data['pager'] = true;
 
 		$data['pager_url'] = @$data['pager_url'];
-		if (!$data['pager_url']) $data['pager_url'] = ($reg ? '/'.$reg->stitle : '').'/'.strtolower(str_ireplace('Default_Model_', '', $data['fetch_model']));
+		if (!$data['pager_url']) $data['pager_url'] = ($reg ? '/'.$reg->stitle : '').(is_object($data['fetch_model']) ? '' : '/'.strtolower(str_ireplace('Default_Model_', '', $data['fetch_model'])));
 
 		$data['pager_page'] = @$data['pager_page'];
 		if (!$data['pager_page']) $data['pager_page'] = @$this->view->page ? $this->view->page : 1;
@@ -54,7 +54,7 @@ class Zkernel_View_Helper_Zlist extends Zend_View_Helper_Abstract  {
 
 		if (!$data['fetch_data'] && $data['fetch_model']) {
 			$class = $data['fetch_model'];
-			$class = new $class();
+			$class = is_object($class) ? $class : new $class();
 		}
 		else $class = '';
 
@@ -111,8 +111,12 @@ class Zkernel_View_Helper_Zlist extends Zend_View_Helper_Abstract  {
 				$pager_param
 			);
 		}
-		return $this->view->data || $data['view_empty']
-			? $this->view->render($data['view_script'])
-			: '';
+		$ret = '';
+		if ($this->view->data || $data['view_empty']) {
+			if (@$data['view_param']) foreach ($data['view_param'] as $k => $v) $this->view->$k = $v;
+			$ret = $this->view->render($data['view_script']);
+			if (@$data['view_param']) foreach ($data['view_param'] as $k => $v) unset($this->view->$k);
+		}
+		return $ret;
 	}
 }

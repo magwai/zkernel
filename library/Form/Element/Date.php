@@ -18,25 +18,47 @@ class Zkernel_Form_Element_Date extends Zend_Form_Element_Text
 	public function render(Zend_View_Interface $view = null) {
 		$a = $this->getAttribs();
 		$regional = @$a['regional'] ? $a['regional'] : 'ru';
-    	unset($a['helper']);
 		unset($a['regional']);
-		$o = array(
-    		'dateFormat' => 'dd.mm.yy',
-			'firstDay' => '1'
-    	);
-    	if ($a) $o = array_merge($o, $a);
-
-		$callbacks = array('create', 'beforeShow', 'beforeShowDay', 'onChangeMonthYear', 'onClose', 'onSelect');
-		foreach ($o as $k=>$val){
-			if (in_array($k, $callbacks)){
-				$o[$k] = new Zend_Json_Expr($val);
-			}
+		unset($a['helper']);
+		if (@$a['type'] == 'birth') {
+			$lang = array(
+				'en' => array(),
+				'ru' => array(
+					'months' => array(
+						'short' => array('Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'),
+						'long' => array('Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь')
+					),
+					'titles' => array('Год:', 'Месяц:', 'День:')
+				)
+			);
+			$o = array(
+				'maxAge' => '90',
+				'maxYear' => date('Y') - 5,
+				'monthFormat' => 'long',
+				'dateFormat' => 'littleEndian'
+			);
+			$o = array_merge($o, $lang[$regional]);
+			$js = '$.include(["/zkernel/js/jquery/jquery.birthdaypicker.js"], function() {$("input[name='.$this->getName().']").birthdaypicker('.Zend_Json::encode($o, false, array('enableJsonExprFinder' => true)).');});';
 		}
-		$js = @$o['type'] == 'multyrange' ?
-			'$.include(["/zkernel/js/jquery/ui/ui.datepicker.js", "/zkernel/js/jquery/ui/i18n/jquery.ui.datepicker-'.$regional.'.js", "/zkernel/js/jquery/ui/ui.multidatespicker.js"], function() {$("input[name='.$this->getName().']").multiDatesPicker('.Zend_Json::encode($o).');});'
-			:
-			'$.include(["/zkernel/js/jquery/ui/ui.datepicker.js", "/zkernel/js/jquery/ui/i18n/jquery.ui.datepicker-'.$regional.'.js"], function() {$("input[name='.$this->getName().']").datepicker('.Zend_Json::encode($o, false, array('enableJsonExprFinder' => true)).');});';
-    	$this->getView()->inlineScript('script', $js);
+		else {
+			$o = array(
+				'dateFormat' => 'dd.mm.yy',
+				'firstDay' => '1'
+			);
+			if ($a) $o = array_merge($o, $a);
+
+			$callbacks = array('create', 'beforeShow', 'beforeShowDay', 'onChangeMonthYear', 'onClose', 'onSelect');
+			foreach ($o as $k=>$val){
+				if (in_array($k, $callbacks)){
+					$o[$k] = new Zend_Json_Expr($val);
+				}
+			}
+			$js = @$o['type'] == 'multyrange' ?
+				'$.include(["/zkernel/js/jquery/ui/ui.datepicker.js", "/zkernel/js/jquery/ui/i18n/jquery.ui.datepicker-'.$regional.'.js", "/zkernel/js/jquery/ui/ui.multidatespicker.js"], function() {$("input[name='.$this->getName().']").multiDatesPicker('.Zend_Json::encode($o).');});'
+				:
+				'$.include(["/zkernel/js/jquery/ui/ui.datepicker.js", "/zkernel/js/jquery/ui/i18n/jquery.ui.datepicker-'.$regional.'.js"], function() {$("input[name='.$this->getName().']").datepicker('.Zend_Json::encode($o, false, array('enableJsonExprFinder' => true)).');});';
+		}
+		$this->getView()->inlineScript('script', $js);
     	return parent::render($view);
 	}
 

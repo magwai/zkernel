@@ -30,7 +30,8 @@ class Zkernel_Form extends Zend_Form {
 			'recordFound' => 'Дублирующееся значение',
 			'emailAddressInvalidFormat' => 'неверный e-mail адрес',
 			'stringLengthTooShort' => 'слишком коротко',
-			'stringLengthTooLong' => 'слишком длинно'
+			'stringLengthTooLong' => 'слишком длинно',
+			'badCaptcha' => 'неверный код с картинки'
 		);
 		return is_numeric($e) ? $v : (isset($d[$e]) ? $d[$e] : $e);
 	}
