@@ -478,6 +478,7 @@ class GdThumb extends ThumbBase
 
 		$this->preserveAlpha();
 
+		if (!$this->workingImage || !$this->oldImage) return $this;
 		imagecopyresampled
 		(
 			$this->workingImage,
