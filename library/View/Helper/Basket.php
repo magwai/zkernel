@@ -16,15 +16,41 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 		return $this;
 	}
 
+	function basket2Sid($uid) {
+		if (!$uid) return false;
+		$sid = Zend_Session::getId();
+		return $this->_model_order->update(array('author' => $sid), array(
+			'`author` = ?' => $uid,
+			'`finished` = 0',
+			'`active` = 1'
+		));
+	}
+
 	function basketId($create = false) {
 		$uid = $this->view->user('id');
 		$sid = Zend_Session::getId();
 		if ($uid) {
-			$id = (int)$this->_model_order->fetchOne('id', array('`author` = ?' => $sid, '`finished` = 0'), 'date desc');
-			if ($id) $this->_model_order->update(array('author' => $uid), array('`id` = ?' => $id));
+			$id = (int)$this->_model_order->fetchOne('id', array(
+				'`author` = ?' => $sid,
+				'`finished` = 0',
+				'`active` = 1'
+			), 'date desc');
+			if ($id) {
+				$this->_model_order->update(array('author' => $uid), array('`id` = ?' => $id));
+				$this->_model_order->update(array('active' => 0), array(
+					'`author` = ?' => $uid,
+					'`finished` = 0',
+					'`active` = 1',
+					'`id` != ?' => $id
+				));
+			}
 		}
 		else $uid = $sid;
-		$id = (int)$this->_model_order->fetchOne('id', array('`author` = ?' => $uid, '`finished` = 0'), 'date desc');
+		$id = (int)$this->_model_order->fetchOne('id', array(
+			'`author` = ?' => $uid,
+			'`finished` = 0',
+			'`active` = 1'
+		), 'date desc');
 		if (!$id && $create) {
 			$mp = new Default_Model_Pay();
 			$ms = new Default_Model_Orderstatus();
