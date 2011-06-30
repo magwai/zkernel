@@ -4,12 +4,14 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 	protected $_model_item = null;
 	protected $_model_order = null;
 	protected $_model_order_item = null;
+	protected $_model_discount = null;
 	protected $_field_order_item_id = 'itemid';
 
 	function __construct() {
 		if ($this->_model_item === null) $this->_model_item = new Default_Model_Catalogitem;
 		if ($this->_model_order === null) $this->_model_order = new Default_Model_Order;
 		if ($this->_model_order_item === null) $this->_model_order_item = new Default_Model_Orderitem;
+		if ($this->_model_discount === null && class_exists('Default_Model_Discount')) $this->_model_discount = new Default_Model_Discount;
 	}
 
 	function basket() {
@@ -164,20 +166,29 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 		return $ok ? $oid : false;
 	}
 
+	function basketDiscount($uid = null) {
+		$uid = $uid ? $uid : $this->view->user('id');
+		$total = $this->finishedPrice(null, null, $uid, true);
+		return $this->_model_discount->fetchBasketDiscount($total);
+	}
+
 	function finishedCard($oid) {
 		$res = $this->_model_order->fetchRow(array('`id` = ?' => (int)$oid, '`finished` = ?' => 1));
 		return $res ? new Zkernel_View_Data($res) : null;
 	}
 
-	function finishedPrice($oid, $id = null) {
+	function finishedPrice($oid = null, $id = null, $uid = null, $payed = null) {
 		$s = $this->_model_order->getAdapter()->select()
 			->from(array('i' => $this->_model_order->info('name')), '')
 			->joinLeft(array('m' => $this->_model_order_item->info('name')), 'i.id = m.parentid', array(
 				'price' => 'SUM(m.price * m.quant)'
 			))
-			->where('i.id = ?', $oid)
+			->where('i.active = ?', 1)
 			->where('i.finished = ?', 1)
 			->group('i.id');
+		if ($payed != null) $s->where('i.payed = ?', (int)$payed);
+		if ($uid != null) $s->where('i.author = ?', $uid);
+		if ($oid != null) $s->where('i.id = ?', $oid);
 		if ($id != null) $s->where('m.id = ?', $id);
 		$ret = (int)$this->_model_order->getAdapter()->fetchOne($s, 'SUM(`price`)');
 		return $ret;
