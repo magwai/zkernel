@@ -36,23 +36,23 @@ $this->control(array(
 			'required' => true,
 			'formatter' => 'function',
 			'formatoptions' => 'if (data.oid) { var d = '.Zend_Json::encode($titles).'; return d[data.oid]; } else return value;',
-			'description' => $this->config->control_lang_current['meta_url'],
+			'description' => $this->control()->config->control_lang_current['meta_url'],
 			'order' => 1,
 			'active' => $active
 		),
 		'title' => array(
 			'title' => 'TITLE',
-			'description' => $this->config->control_lang_current['meta_title'],
+			'description' => $this->control()->config->control_lang_current['meta_title'],
 			'order' => 2
 		),
 		'keywords' => array(
 			'title' => 'META: KEYWORDS',
-			'description' => $this->config->control_lang_current['meta_keywords'],
+			'description' => $this->control()->config->control_lang_current['meta_keywords'],
 			'order' => 3
 		),
 		'description' => array(
 			'title' => 'META: DESCRIPTION',
-			'description' => $this->config->control_lang_current['meta_description'],
+			'description' => $this->control()->config->control_lang_current['meta_description'],
 			'order' => 4
 		),
 		'oid' => array(
@@ -60,11 +60,11 @@ $this->control(array(
 		),
 		'show_title' => array(
 			'active' => $meta['show_title'],
-			'title' => $this->config->control_lang_current['meta_show_title'],
-			'description' => $this->config->control_lang_current['meta_show_desc'],
+			'title' => $this->control()->config->control_lang_current['meta_show_title'],
+			'description' => $this->control()->config->control_lang_current['meta_show_desc'],
 			'type' => 'select',
 			'param' => array(
-				'multiOptions' => array('1' => $this->config->control_lang_current['yes'], '0' => $this->config->control_lang_current['no'])
+				'multiOptions' => array('1' => $this->control()->config->control_lang_current['yes'], '0' => $this->control()->config->control_lang_current['no'])
 			),
 			'order' => 5
 		),
