@@ -88,7 +88,8 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
                     'button'            => 'Browse...',
 					'meta_show_title_title' => 'Show website title',
 					'meta_show_title' => 'Switch on/off website title before TITLE',
-					'more' => 'More'
+					'more' => 'More',
+					'control_panel' => 'Control panel'
 				),
 				'ru' => array(
 					'login_enter' 		=> 'Войти',
@@ -159,7 +160,8 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
                     'button'    => 'Обзор...',
 					'meta_show_title_title' => 'Показывать название сайта',
 					'meta_show_title' => 'Включить/выключить отображения названия сайта в самом начале TITLE страницы',
-					'more' => 'Дополнительно'
+					'more' => 'Дополнительно',
+                    'control_panel' => 'Панель управления'
 				)
 			),
 			'wysiwyg'				=> 'mce',
@@ -323,6 +325,8 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 					))
 				);
 
+   				$this->configFromDb();
+				
 				try {
 					$this->view->render($this->config->controller.'/'.$this->config->action.'.phtml');
 				}
@@ -427,12 +431,12 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 			switch ($this->config->type) {
 				case 'add':
 					$this->config->oac_apply = false;
-					$this->config->place = $this->config->control_lang_current['add'];
+					$this->config->place = $this->config->control_lang_current['add_place'];
 					$view = 'form';
 					break;
 				case 'edit':
 					$view = 'form';
-					$this->config->place = $this->config->control_lang_current['Edit'];
+					$this->config->place = $this->config->control_lang_current['edit_place'];
 					break;
 				case 'list':
 					$view = 'jqgrid';

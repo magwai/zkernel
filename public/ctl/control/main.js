@@ -238,7 +238,7 @@ c.load_auth = function(success) {
 		dataType: 'json',
 		success: function(data) {
 			c.cfg.login = data.login;
-			c.build_auth();
+			c.build_auth(c.cfg.logout);
 			if (typeof success != 'undefined') success();
 		},
 		error: function() {
