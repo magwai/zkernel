@@ -34,23 +34,23 @@ if ($ajax) {
 else {
 	$s = new Zend_Session_Namespace();
 	$l = array(
-		'no_connect' => 'Сервер не отвечает',
-		'no_template' => 'Ошибка загрузки шаблона',
-		'no_config' => 'Ошибка загрузки конфигурации',
-		'no_lang' => 'Ошибка загрузки языка',
-		'try_again' => 'Повторить попытку?',
-		'no_menu' => 'Ошибка загрузки меню',
-		'txt_alert_title' => 'Информация',
-		'no_login' => 'Ошибка получения сведений об авторизации',
-		'no_logout' => 'Ошибка выхода',
-		'no_loggin' => 'Ошибка входа',
-		'no_login_err' => 'Логин / пароль неверны',
-		'no_sel' => 'Элемент не выбран',
-		'no_response' => 'Ошибка загрузки модуля',
-		'no_filter' => 'Укажите запрос',
-		'file_error' => 'Ошибка загрузки файла',
-		'no_multi' => 'Ошибка загрузки языка',
-		'no_multi_change' => 'Ошибка смены языка',
+		'no_connect' => $this->control()->config->control_lang_current['no_connect'],
+		'no_template' => $this->control()->config->control_lang_current['no_template'],
+		'no_config' => $this->control()->config->control_lang_current['no_config'],
+		'no_lang' => $this->control()->config->control_lang_current['no_lang'],
+		'try_again' => $this->control()->config->control_lang_current['try_again'],
+		'no_menu' => $this->control()->config->control_lang_current['no_menu'],
+		'txt_alert_title' => $this->control()->config->control_lang_current['txt_alert_title'],
+		'no_login' => $this->control()->config->control_lang_current['no_login'],
+		'no_logout' => $this->control()->config->control_lang_current['no_logout'],
+		'no_loggin' => $this->control()->config->control_lang_current['no_loggin'],
+		'no_login_err' => $this->control()->config->control_lang_current['no_login_err'],
+		'no_sel' => $this->control()->config->control_lang_current['no_sel'],
+		'no_response' => $this->control()->config->control_lang_current['no_response'],
+		'no_filter' => $this->control()->config->control_lang_current['no_filter'],
+		'file_error' => $this->control()->config->control_lang_current['file_error'],
+		'no_multi' => $this->control()->config->control_lang_current['no_multi'],
+		'no_multi_change' => $this->control()->config->control_lang_current['no_multi_change'],
 	);
 	$p = array(
 		'menu' => $this->control()->buldMenu(),
@@ -61,8 +61,8 @@ else {
 		'def_controller' => 'cindex',
 		'def_action' => 'ctlshow',
 		'controller' => @$s->control['last']['controller'] ? $s->control['last']['controller'] : 'cindex',
-		'action' => @$s->control['last']['action'] ? $s->control['last']['action'] : 'ctlshow',
-		'title' => 'Панель управления'
+		'action' => @$s->control['last']['action'] ? $s->control['last']['action'] : 'ctlshow'
+		//'title' => 'Панель управления'
 	);
 	$reg = Zend_Registry::isRegistered('Zkernel_Multilang') ? Zend_Registry::get('Zkernel_Multilang') : '';
 	if ($reg && !@$reg->domain) $p['lang'] = $reg->stitle;
@@ -80,6 +80,7 @@ else {
 			->headScript('file', '/zkernel/js/jquery/ui/ui.core.js')
 			->headScript('file', '/zkernel/js/jquery/ui/ui.widget.js')
 			->headScript('file', '/zkernel/js/jquery/ui/ui.mouse.js')
+			->headScript('file', '/zkernel/js/jquery/ui/ui.slider.js')
 			->headScript('file', '/zkernel/js/jquery/ui/ui.sortable.js')
 			->headScript('file', '/zkernel/js/jquery/ui/ui.button.js')
 			->headScript('file', '/zkernel/js/jquery/ui/ui.datepicker.js')

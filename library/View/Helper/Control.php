@@ -65,9 +65,12 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 					'edit_place' 		=> 'Edit',
 					'no_controller' 	=> 'Controller not found',
 					'access_error' 		=> 'You have no access this partition',
-					'meta_title' 		=> 'Is shown in browser title',
+					'meta_title' 		=> 'Is shown in browser title. By default TITLE changes all the content. If start with +, it`ll be added to the content, if -, wil be inserted before content',
 					'meta_keywords' 	=> 'Separate keywords with comma',
 					'meta_description' 	=> 'Description has to describe page content',
+					'meta_url'			=> 'Address should be inner. Example: /news/*, /page/about',
+					'meta_show_title'	=> 'Show site title',
+					'meta_show_desc'	=> 'Turn On/Off site title visibility at start of page`s TITLE',
 					'cancel' 			=> 'Cancel',
 					'submit' 			=> 'Apply',
 					'data_saved'		=> 'Data saved',
@@ -88,7 +91,10 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
                     'button'            => 'Browse...',
 					'meta_show_title_title' => 'Show website title',
 					'meta_show_title' => 'Switch on/off website title before TITLE',
-					'more' => 'More'
+					'more' => 'More',
+					'control_panel' => 'Control panel',
+					'yes' 				=> 'Yes',
+                    'no' 				=> 'No'
 				),
 				'ru' => array(
 					'login_enter' 		=> 'Войти',
@@ -136,9 +142,12 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 					'edit_place' 		=> 'Изменение',
 					'no_controller' 	=> 'Контроллер не найден',
 					'access_error' 		=> 'У вас нет доступа в этот раздел',
-					'meta_title' 		=> 'Отображается в заголовке окна браузера',
+					'meta_title' 		=> 'Отображается в заголовке окна браузера, По-умолчанию TITLE заменяет все содержимое. Если вначале +, то добавит к содержимому, если -, то вставит перед содержимым',
 					'meta_keywords' 	=> 'Ключевые слова перечисляются через запятую',
 					'meta_description' 	=> 'Описание должно характеризовать содержимое страницы',
+					'meta_url'			=> 'Адрес должен быть внутренним. Напимер: /news/*, /page/about',
+					'meta_show_title'	=> 'Показывать название сайта',
+					'meta_show_desc'	=> 'Включить/выключить отображения названия сайта в самом начале TITLE страницы',
 					'cancel' 			=> 'Отменить',
 					'submit' 			=> 'Применить',
 					'data_saved' 		=> 'Данные сохранены',
@@ -154,12 +163,15 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 					'message'			=> 'Сообщение',
 					'partition'			=> 'Раздел',
 					'partition_desc'	=> 'Выберите либо раздел, либо введите URL в следующем поле. Если вы выберите раздел и введете URL одновременно, то будет использован URL',
-					'back' => 'Назад',
-					'view_place' => 'Просмотр',
-                    'button'    => 'Обзор...',
+					'back' 				=> 'Назад',
+					'view_place'		=> 'Просмотр',
+                    'button'    		=> 'Обзор...',
 					'meta_show_title_title' => 'Показывать название сайта',
-					'meta_show_title' => 'Включить/выключить отображения названия сайта в самом начале TITLE страницы',
-					'more' => 'Дополнительно'
+					'meta_show_title' 	=> 'Включить/выключить отображения названия сайта в самом начале TITLE страницы',
+					'more' 				=> 'Дополнительно',
+                    'control_panel' 	=> 'Панель управления',
+                    'yes' 				=> 'Да',
+                    'no' 				=> 'Нет'
 				)
 			),
 			'wysiwyg'				=> 'mce',
@@ -323,6 +335,8 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 					))
 				);
 
+   				$this->configFromDb();
+				
 				try {
 					$this->view->render($this->config->controller.'/'.$this->config->action.'.phtml');
 				}
@@ -427,12 +441,12 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 			switch ($this->config->type) {
 				case 'add':
 					$this->config->oac_apply = false;
-					$this->config->place = $this->config->control_lang_current['add'];
+					$this->config->place = $this->config->control_lang_current['add_place'];
 					$view = 'form';
 					break;
 				case 'edit':
 					$view = 'form';
-					$this->config->place = $this->config->control_lang_current['Edit'];
+					$this->config->place = $this->config->control_lang_current['edit_place'];
 					break;
 				case 'list':
 					$view = 'jqgrid';
