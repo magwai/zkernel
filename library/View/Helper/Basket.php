@@ -5,6 +5,7 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 	protected $_model_order = null;
 	protected $_model_order_item = null;
 	protected $_model_discount = null;
+	protected $_model_delivery = null;
 	protected $_field_order_item_id = 'itemid';
 
 	function __construct() {
@@ -12,6 +13,7 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 		if ($this->_model_order === null) $this->_model_order = new Default_Model_Order;
 		if ($this->_model_order_item === null) $this->_model_order_item = new Default_Model_Orderitem;
 		if ($this->_model_discount === null && class_exists('Default_Model_Discount')) $this->_model_discount = new Default_Model_Discount;
+		if ($this->_model_delivery === null && class_exists('Default_Model_Delivery')) $this->_model_delivery = new Default_Model_Delivery;
 	}
 
 	function basket() {
@@ -94,6 +96,25 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 			->group('i.id');
 		if ($id != null) $s->where('m.id = ?', $id);
 		$ret = (int)$this->_model_order->getAdapter()->fetchOne($s, 'SUM(`price`)');
+		$ret += $this->fetchDelivery($oid);
+		return $ret;
+	}
+
+	function fetchDelivery($oid) {
+		$ret = 0;
+		if ($this->_model_delivery) {
+			$card = $this->_model_order->fetchRow(array(
+				'`id` = ?' => $oid
+			));
+			if ($card) {
+				$delivery = $this->_model_delivery->fetchRow(array(
+					'`id` = ?' => $card->delivery
+				));
+				if ($delivery && $delivery->price) {
+					if (!$delivery->price_from || $delivery->price_from >= $ret) $ret = $delivery->price;
+				}
+			}
+		}
 		return $ret;
 	}
 
@@ -191,6 +212,7 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 		if ($oid != null) $s->where('i.id = ?', $oid);
 		if ($id != null) $s->where('m.id = ?', $id);
 		$ret = (int)$this->_model_order->getAdapter()->fetchOne($s, 'SUM(`price`)');
+		if ($oid) $ret += $this->fetchDelivery($oid);
 		return $ret;
 	}
 
