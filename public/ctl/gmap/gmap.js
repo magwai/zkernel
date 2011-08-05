@@ -6,14 +6,16 @@
  * http://www.opensource.org/licenses/mit-license.php
  */
 
-var gmap = {};
+var gmap = {
+		type: 'point'
+};
 
 gmap.init = function(id, value, opt) {
 	var o = $('#gmap_' + id);
 	if (!opt.mapTypeId) opt.mapTypeId = 'ROADMAP';
 	if (!opt.zoom) opt.zoom = 15;
 	if (!opt.center) opt.center = [48.712688, 44.513394];
-	if (!opt.type) opt.type = 'point';
+	if (!opt.type) gmap.type = opt.type = 'point';
 	opt.mapTypeId = google.maps.MapTypeId[opt.mapTypeId];
 	opt.center = new google.maps.LatLng(opt.center[0], opt.center[1]);
 	if (opt.width) o.width(opt.width);
@@ -82,6 +84,7 @@ gmap.init = function(id, value, opt) {
 
 gmap.value_add = function(id, v) {
 	var old = $('#' + id).val();
+	if(gmap.type == 'point') old = '';
 	old = old.length == 0 ? [] : old.split(' ');
 	for (var i = 0; i < old.length; i++) {
 		if (old[i] == v) return;
