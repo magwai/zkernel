@@ -15,7 +15,7 @@ class Zkernel_View_Helper_User extends Zend_View_Helper_Abstract  {
 	);
 
 	public function init() {
-		$this->_user = Zend_Registry::get('Zkernel_User');
+		$this->_user = Zend_Registry::isRegistered('Zkernel_User') ? Zend_Registry::get('Zkernel_User') : null;
 	}
 
 	public function isLogged() {

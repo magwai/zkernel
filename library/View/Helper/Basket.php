@@ -96,11 +96,11 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 			->group('i.id');
 		if ($id != null) $s->where('m.id = ?', $id);
 		$ret = (int)$this->_model_order->getAdapter()->fetchOne($s, 'SUM(`price`)');
-		$ret += $this->fetchDelivery($oid);
+		$ret += $this->fetchDelivery($oid, $ret);
 		return $ret;
 	}
 
-	function fetchDelivery($oid) {
+	function fetchDelivery($oid, $price) {
 		$ret = 0;
 		if ($this->_model_delivery) {
 			$card = $this->_model_order->fetchRow(array(
@@ -111,7 +111,7 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 					'`id` = ?' => $card->delivery
 				));
 				if ($delivery && $delivery->price) {
-					if (!$delivery->price_from || $delivery->price_from >= $ret) $ret = $delivery->price;
+					if (!$delivery->price_from || $delivery->price_from > $price) $ret = $delivery->price;
 				}
 			}
 		}
@@ -212,7 +212,7 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 		if ($oid != null) $s->where('i.id = ?', $oid);
 		if ($id != null) $s->where('m.id = ?', $id);
 		$ret = (int)$this->_model_order->getAdapter()->fetchOne($s, 'SUM(`price`)');
-		if ($oid) $ret += $this->fetchDelivery($oid);
+		if ($oid) $ret += $this->fetchDelivery($oid, $ret);
 		return $ret;
 	}
 
