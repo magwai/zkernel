@@ -189,7 +189,7 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 
 	function basketDiscount($uid = null) {
 		$uid = $uid ? $uid : $this->view->user('id');
-		$total = $this->finishedPrice(null, null, $uid, true);
+		$total = $this->basketPrice();
 		return $this->_model_discount->fetchBasketDiscount($total);
 	}
 
