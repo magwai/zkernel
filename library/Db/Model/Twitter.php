@@ -30,7 +30,7 @@ class Zkernel_Db_Model_Twitter {
 			if ($consumer_key) $opt['consumerKey'] = $consumer_key;
 			if ($consumer_secret) $opt['consumerSecret'] = $consumer_secret;
 			if ($callback_url) $opt['callbackUrl'] = $callback_url;
-			$this->_service = new Zend_Service_Twitter($opt);
+			$this->_service = new Zkernel_Service_Twitter($opt);
 			$this->_twitter[$this->_name]['service'] = $this->_service;
 			Zend_Registry::set('Zkernel_Twitter', $this->_twitter);
 		}
@@ -54,11 +54,32 @@ class Zkernel_Db_Model_Twitter {
 		return $res ? new Zkernel_View_Data($res) : array();
 	}
 
+	function _searchStatuses($q, $_param = array()) {
+		$res = array();
+		$k = 'status_search_'.md5($q);
+		if (isset($this->_twitter[$this->_name][$k])) $statuses = $this->_twitter[$this->_name][$k];
+		else {
+			$statuses = $this->_service->status->statusSearchTimeline($q, $_param);
+			$this->_twitter[$this->_name][$k] = $statuses;
+			Zend_Registry::set('Zkernel_Twitter', $this->_twitter);
+		}
+		if ($statuses && $statuses->results && count($statuses) > 0) {
+			foreach ($statuses->results as $el) {
+				$d = $this->_parseStatus($el);
+				$res[] = $d;
+				$this->_twitter[$this->_name]['status_card'][$d['id']] = $d;
+			}
+		}
+		return $res ? new Zkernel_View_Data($res) : array();
+
+	}
+
 	function _parseStatus($el) {
 		return array(
 			'id' => (string)$el->id,
 			'date' => date('Y-m-d H:i:s', strtotime((string)$el->created_at)),
-			'message' => (string)$el->text
+			'message' => (string)$el->text,
+			'from_user' => (string)$el->from_user
 		);
 	}
 
