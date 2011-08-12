@@ -41,6 +41,8 @@ class Zkernel_View_Helper_Mail extends Zkernel_View_Helper_Override  {
 		$fm = $this->view->txt('site_mail');
 		$from = @$data['from'] ? $data['from'] : $this->view->txt('site_mail');
 		$to = @$data['to'] ? $data['to'] : $this->view->txt('site_mail');
+		$to = preg_split('/(\;|\,)/i', $to);
+
 		$reply_to = @$data['reply_to'];
 		$from_name = @$data['from_name'] ? $data['from_name'] : ($from == $fm ? $this->view->txt('site_title') : $from);
 		if ($reply_to) $mail->setReplyTo(
@@ -51,10 +53,16 @@ class Zkernel_View_Helper_Mail extends Zkernel_View_Helper_Override  {
 			$from,
 			$from_name
 		);
-		$mail->addTo(
-			$to,
-			@$data['to_name'] ? $data['to_name'] : $to
-		);
+		$tn = @$data['to_name'] ? $data['to_name'] : $to;
+		foreach ($to as $n => $el) {
+			$el = trim($el);
+			if (!$el) continue;
+			$tn_el = is_array($tn) ? (isset($tn[$n]) ? $tn[$n] : @$tn[0]) : $tn;
+			$mail->addTo(
+				$el,
+				$tn_el
+			);
+		}
 		if (@$data['subject_full']) $mail->setSubject(
 			$data['subject_full']
 		);
