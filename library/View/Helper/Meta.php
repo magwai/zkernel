@@ -22,9 +22,12 @@ class Zkernel_View_Helper_Meta extends Zend_View_Helper_Abstract  {
 
 	private function _set_meta($key, $str) {
 		$f = substr($str, 0, 1);
-		$data = $this->view->escape(trim($str, ' +-'));
+		$data = trim($str, ' +-');
 		if ($key == 'title') $this->view->headTitle($data, ($f == '+' ? 'APPEND' : ($f == '-' ? 'PREPEND' : 'SET')));
-		else $this->view->headMeta($data, $key, 'name', array(), 'SET');
+		else {
+			$data = $this->view->escape($data);
+			$this->view->headMeta($data, $key, 'name', array(), 'SET');
+		}
 	}
 
 	public function meta($oid = null, $param = array()) {

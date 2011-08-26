@@ -26,6 +26,7 @@
 	  "titles"		  : ["Year:", "Month:", "Day:"],
       "maxAge"        : 120,
       "futureDates"   : false,
+      "minYear"       : 0,
       "maxYear"       : curYear,
       "dateFormat"    : "middleEndian",
       "monthFormat"   : "short",
@@ -87,7 +88,12 @@
       // Build the initial option sets
       var startYear = curYear;
       var endYear = curYear - settings["maxAge"];
-      if(settings["futureDates"] && settings["maxYear"] != curYear) {
+
+	  if(settings["minYear"] && settings["maxYear"]) {
+        startYear = settings["maxYear"];
+		endYear = settings["minYear"];
+      }
+	  else if(settings["futureDates"] && settings["maxYear"] != curYear) {
         if (settings["maxYear"] > 1000) { startYear = settings["maxYear"]; }
         else { startYear = curYear + settings["maxYear"]; }
       }

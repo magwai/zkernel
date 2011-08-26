@@ -45,7 +45,7 @@ class Zkernel_View_Helper_Override extends Zend_View_Helper_Abstract  {
 	public function overrideSingle($data, $type = null, $options = null) {
 		$r = $data instanceof Zkernel_View_Data ? $data : new Zkernel_View_Data($data);
 		$reg = Zend_Registry::isRegistered('Zkernel_Multilang') ? Zend_Registry::get('Zkernel_Multilang') : '';
-		if ($reg) {
+		if ($reg && isset($reg->id)) {
 			foreach ($r as $k => $v) if (preg_match('/^ml\_([^\_]+)\_'.$reg->id.'$/i', $k, $f)) {
 				if ($v === null && !@$options['multilang_nofall']) {
 					if (@$r->{'ml_'.$f[1].'_'.$reg->_default->id} !== null) $r->{$f[1]} = $r->{'ml_'.$f[1].'_'.$reg->_default->id};
