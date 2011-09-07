@@ -336,7 +336,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 				);
 
    				$this->configFromDb();
-				
+
 				try {
 					$this->view->render($this->config->controller.'/'.$this->config->action.'.phtml');
 				}
