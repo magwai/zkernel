@@ -274,7 +274,7 @@ $.jgrid.extend({
 			var $t = this;
 			if(!$t.grid) { return; }
 			// Currently we disable a treeGrid sortable
-			//if($t.p.treeGrid) { return; }
+			if($t.p.treeGrid) { return; }
 			if($.fn.sortable) {
 				opts = $.extend({
 					"cursor":"move",
@@ -308,20 +308,8 @@ $.jgrid.extend({
 				opts.update = function (ev,ui) {
 					$(ui.item).css("border-width","");
 					if($t.p.rownumbers === true) {
-						var r = ui.item.get(0);
-						var pos_r = $t.p._index[r.id];
-						var cnt = 0;
-						var parent_id = $t.p.treeReader.parent_id_field;
-						$("td.jqgrid-rownum",$t.rows).each(function(){
-							var oo = $(this).parent('tr')[0];
-							var pos_oo = $t.p._index[oo.id];
-							if (typeof parent_id == 'undefined' || $t.p.data[pos_r][parent_id] === $t.p.data[pos_oo][parent_id]) {
-								var s = $(this).find('span');
-								s.length
-									? s.html(cnt + 1)
-									: $(this).html(cnt + 1);
-								cnt++;
-							}
+						$("td.jqgrid-rownum",$t.rows).each(function(i){
+							$(this).html(i+1);
 						});
 					}
 					if(opts._update_) {

@@ -65,13 +65,13 @@ $.jgrid.extend({
 					lf="";
 				}
 				ldat[expanded] = ((ldat[expanded] == "true" || ldat[expanded] === true) ? true : false) && ldat[loaded];
-				if(ldat[expanded] === true) {
-					twrap += $t.p.treeIcons.minus+" tree-minus treeclick'";
+				if(ldat[expanded] === false) {
+					twrap += ((ldat[isLeaf] === true) ? "'" : $t.p.treeIcons.plus+" tree-plus treeclick'");
 				} else {
-					twrap += $t.p.treeIcons.plus+" tree-plus treeclick'";
+					twrap += ((ldat[isLeaf] === true) ? "'" : $t.p.treeIcons.minus+" tree-minus treeclick'");
 				}
 				
-				twrap += "</div></div>";
+				twrap += "></div></div>";
 				$($t.rows[i].cells[expCol]).wrapInner("<span class='cell-wrapper"+lf+"'></span>").prepend(twrap);
 
 				if(curLevel !== parseInt($t.p.tree_root_level,10)) {
@@ -81,16 +81,6 @@ $.jgrid.extend({
 						$($t.rows[i]).css("display","none");
 					}
 				}
-                
-                var nw = ident*22 + 22;
-                if (nw > $t.grid.headers[0].width) {
-                    $t.grid.resizing = {
-                        idx: 0
-                    };
-                    $t.grid.headers[0].newWidth = nw;
-                    $t.grid.dragEnd();
-                }
-                
 				$($t.rows[i].cells[expCol])
 					.find("div.treeclick")
 					.bind("click",function(e){
@@ -142,6 +132,7 @@ $.jgrid.extend({
 			$t.p.subGrid = false;$t.p.altRows =false;
 			$t.p.pgbuttons = false;$t.p.pginput = false;
 			$t.p.gridview =  true;
+			if($t.p.rowTotal === null ) { $t.p.rowNum = 10000; }
 			$t.p.multiselect = false;$t.p.rowList = [];
 			$t.p.expColInd = 0;
 			pico = 'ui-icon-triangle-1-' + ($t.p.direction=="rtl" ? 'w' : 'e');
