@@ -68,7 +68,7 @@ class Zkernel_Image_Preview {
 
 				$image = $thumb->getOldImage();
 				$new_image = imagecreatetruecolor($n_w, $n_h);
-				if (!$new_image) return false;
+				if (!$new_image || !$image) return false;
 				$color = imagecolorallocate($new_image, $bg_color[0], $bg_color[1], $bg_color[2]);
 				imagefilledrectangle($new_image, 0, 0, $n_w - 1, $n_h - 1, $color);
 				imagecopyresampled($new_image, $image, $new_x, $new_y, 0, 0, $dim['width'], $dim['height'], $dim['width'], $dim['height']);

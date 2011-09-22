@@ -11,7 +11,10 @@ class Zkernel_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstrac
 	protected $_default = null;
 
 	public function __construct($options = array()) {
-		if (isset($options['domain'])) $this->_domain = $options['domain'];
+		if (isset($options['domain'])) {
+			$this->_domain = $options['domain'];
+			if ($this->_domain && @$options['controlnodomain'] && (strpos($_SERVER['REQUEST_URI'], '/ctl') !== false || strpos($_SERVER['REQUEST_URI'], '/control') !== false)) $this->_domain = false;
+		}
 		$class = isset($options['model']) ? $options['model'] : self::DEFAULT_MODEL;
 		$this->_model = new $class();
 		$this->_session = new Zend_Session_Namespace();
@@ -19,28 +22,6 @@ class Zkernel_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstrac
     }
 
 	public function routeStartup(Zend_Controller_Request_Abstract $request) {
-		/*
-		$front = Zend_Controller_Front::getInstance();
-		$router = $front->getRouter();
-		$routes = $router->getRoutes();
-		$router->removeDefaultRoutes();
-		if ($routes) foreach ($routes as $k => $el) $router->removeRoute($k);
-		$langRoute = new Zend_Controller_Router_Route(
-			':lang',
-			array(
-				'lang' => $this->getDefault()->stitle
-			)
-	    );
-		$router->addRoute('default', $langRoute->chain(new Zend_Controller_Router_Route_Module(
-            array(),
-            $front->getDispatcher(),
-            $front->getRequest()
-		)));
-		$router->addRoute('lang', $langRoute);
-		if ($routes) foreach ($routes as $k => $el)  $router->addRoute($k, $k == 'fu' || $k == 'minify' ? $el : $langRoute->chain($el));
-		*/
-
-
 		$front = Zend_Controller_Front::getInstance();
 		$router = $front->getRouter();
 
@@ -90,7 +71,10 @@ class Zkernel_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstrac
 		if (!$this->_domain) {
 			if ($request->getParam('lang')) $this->_session->lang = $this->_model->fetchOne('id', array('`stitle` = ?' => $request->getParam('lang')));
 			$this->_lang = $this->_model->fetchRow(null, '(`id` = '.(int)$this->_session->lang.') DESC, (`default` = 1) DESC', 1);
-			if ($this->_lang) $this->_lang = new Zkernel_View_Data($this->_lang);
+			if ($this->_lang) {
+				$this->_lang = new Zkernel_View_Data($this->_lang);
+				if (!$this->_domain) unset($this->_lang->domain);
+			}
 			$this->_lang->_default = $this->getDefault();
 			$this->_lang->_ids = $this->_model->fetchIds();
 
@@ -99,6 +83,11 @@ class Zkernel_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstrac
 			$router->setGlobalParam('lang', $this->_lang->stitle);
 
 			$this->save();
+		}
+
+		if (!$this->_domain && substr($_SERVER['REQUEST_URI'], 0, 8) == '/control') {
+			header('Location: /'.$this->_lang->_default->stitle.$_SERVER['REQUEST_URI'], true, 301);
+			exit();
 		}
 	}
 
@@ -110,8 +99,10 @@ class Zkernel_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstrac
 	public function getDefault() {
 		if ($this->_default === null) {
 			$this->_default = $this->_model->fetchRow('`default` = 1');
-			if ($this->_default) $this->_default = new Zkernel_View_Data($this->_default);
-
+			if ($this->_default) {
+				$this->_default = new Zkernel_View_Data($this->_default);
+				if (!$this->_domain) unset($this->_default->domain);
+			}
 		}
 		return $this->_default;
 	}
