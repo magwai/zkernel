@@ -69,7 +69,11 @@ class Zkernel_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstrac
 
 	public function routeShutdown(Zend_Controller_Request_Abstract $request) {
 		if (!$this->_domain) {
-			if ($request->getParam('lang')) $this->_session->lang = $this->_model->fetchOne('id', array('`stitle` = ?' => $request->getParam('lang')));
+			$error = false;
+			if ($request->getParam('lang')) {
+				$this->_session->lang = $this->_model->fetchOne('id', array('`stitle` = ?' => $request->getParam('lang')));
+				if (!$this->_session->lang) $error = true;
+			}
 			$this->_lang = $this->_model->fetchRow(null, '(`id` = '.(int)$this->_session->lang.') DESC, (`default` = 1) DESC', 1);
 			if ($this->_lang) {
 				$this->_lang = new Zkernel_View_Data($this->_lang);
@@ -83,6 +87,7 @@ class Zkernel_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstrac
 			$router->setGlobalParam('lang', $this->_lang->stitle);
 
 			$this->save();
+			if ($error) throw new Zend_Controller_Action_Exception('Not Found', 404);
 		}
 
 		if (!$this->_domain && substr($_SERVER['REQUEST_URI'], 0, 8) == '/control') {

@@ -6,23 +6,65 @@
  * http://www.opensource.org/licenses/mit-license.php
  */
 
-zuf = {
+if(jQuery) (
+	function(jQuery) {
+		jQuery.extend(jQuery.fn, {
+			zuploadify: function(o) {
+				var n = o.fileObjName;
+				if (typeof window.zuploadify == 'undefined') window.zuploadify = {
+					queue: {},
+					response: []
+				};
+				var opt = $.extend({
+					'swf': '/zkernel/ctl/uploadify3/uploadify.swf',
+					'cancelImage': '/zkernel/ctl/uploadify3/uploadify-cancel.png',
+					'checkExisting': false,
+					'uploader': '/z/fu',
+					'onDialogClose': function(queue) {
+						alert(queue.queueLength);
+						if (queue.queueLength > 1) {
+							for (k in queue.files) {
+								if (k && queue.files[k]) {
+									$('#' + n).uploadifyCancel(queue.files[k].id);
+									break;
+								}
+							}
+						}
+						if (queue.filesQueued) {
+							window.zuploadify[n] = queue.filesQueued;
+						}
+					}
+				}, o);
+				this.uploadify(opt);
+				$('#' + n).addClass('uploadify3');
+			}
+		})
+	}
+)(jQuery);
+
+
+		/*
+
+zuf3 = {
 	uploads: {},
 	results: {},
 	inited: false
 };
 
-zuf.init = function(o) {
-	var n = o.fileDataName;
-	var hh = $('input[name=' + n + '][type=file]');
-	var h = $('input[name=' + n + '][type=hidden]');
-	h.data('old_val', h.val());
-	var e = h.prevAll('em');
+zuf3.init = function(o) {
+	var n = o.fileObjName;
+	var f = $('input[name=' + n + '][type=file]');
 	var oo = {
-		'multi': typeof o.multi == 'undefined' ? false : true,
-		'uploader': '/zkernel/ctl/uploadify/uploadify.swf',
-		'cancelImg': '/zkernel/ctl/uploadify/cancel.png',
-		'script': '/z/fu',
+		'swf': '/zkernel/ctl/uploadify3/uploadify.swf',
+		'cancelImage': '/zkernel/ctl/uploadify3/uploadify-cancel.png',
+		'checkExisting': false,
+		'uploader': '/z/fu'
+
+
+
+
+
+
 		'onComplete': function(e, queueID, fileObj, response, data) {
 			if (response && response.slice(0, 2) == "u|") {
 				var v = response.slice(2);
@@ -67,9 +109,9 @@ zuf.init = function(o) {
 	window.setTimeout(function() {
 		h.val(h.data('old_val'));
 	}, 10);
-};
-
-zuf.add = function(n, title, url, required) {
+};*/
+/*
+zuf3.add = function(n, title, url, required) {
 	if (!zuf.inited) {
 		window.setTimeout(function() {
 			zuf.add(n, title, url, required);
@@ -108,16 +150,9 @@ zuf.add = function(n, title, url, required) {
 		</div>');
 	}
 	i.val(zuf.implode('*', v));
-	/*var h = $('input[name=' + n + '][type=hidden]');
-	var e = h.prevAll('em');
-	e.find('span>a').attr('href', url).html(title);
-	e.show();
-	h.val(h.val().slice(2));
-	if (!required) e.find('>a').show();
-	if (h.hasClass('zuf_deleted')) e.find('>a').click();*/
 };
 
-zuf.remove = function(n, k) {
+zuf3.remove = function(n, k) {
 	var i = $('input[name=' + n + '][type=hidden]');
 	var o = i.prev('div.uploadifyQueue').find('div[rel="' + k + '"]');
 	o.remove();
@@ -127,7 +162,7 @@ zuf.remove = function(n, k) {
 	i.val(zuf.implode('*', v));
 };
 
-zuf.del = function(n, k) {
+zuf3.del = function(n, k) {
 	var i = $('input[name=' + n + '][type=hidden]');
 	var o = i.prev('div.uploadifyQueue').find('div[rel="' + k + '"]');
 	var v = zuf.explode('*', i.val());
@@ -149,13 +184,13 @@ zuf.del = function(n, k) {
 	i.val(zuf.implode('*', v));
 };
 
-zuf.implode = function(g, arr) {
+zuf3.implode = function(g, arr) {
 	var str = '';
 	for (k in arr) str += arr[k].length ? ((str.length ? g : '') + arr[k]) : '';
 	return str;
 };
 
-zuf.explode = function(d, str) {
+zuf3.explode = function(d, str) {
 	str += d;
 	var dt = [];
 	var ln = 0;
@@ -167,4 +202,4 @@ zuf.explode = function(d, str) {
 	}
 	return dt;
 };
-
+*/

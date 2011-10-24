@@ -70,7 +70,7 @@ $.jgrid.extend({
 				} else {
 					twrap += ((ldat[isLeaf] === true) ? "'" : $t.p.treeIcons.minus+" tree-minus treeclick'");
 				}
-				
+
 				twrap += "></div></div>";
 				$($t.rows[i].cells[expCol]).wrapInner("<span class='cell-wrapper"+lf+"'></span>").prepend(twrap);
 
@@ -81,6 +81,16 @@ $.jgrid.extend({
 						$($t.rows[i]).css("display","none");
 					}
 				}
+
+				var nw = ident*22 + 22;
+                if (nw > $t.grid.headers[0].width) {
+                    $t.grid.resizing = {
+                        idx: 0
+                    };
+                    $t.grid.headers[0].newWidth = nw;
+                    $t.grid.dragEnd();
+                }
+				
 				$($t.rows[i].cells[expCol])
 					.find("div.treeclick")
 					.bind("click",function(e){
@@ -180,7 +190,7 @@ $.jgrid.extend({
 					$t.p.colNames.push(n);
 					$t.p.colModel.push({name:n,width:1,hidden:true,sortable:false,resizable:false,hidedlg:true,editable:true,search:false});
 				}
-			});			
+			});
 		});
 	},
 	expandRow: function (record){
@@ -357,7 +367,7 @@ $.jgrid.extend({
 			}
 		});
 		return result;
-	},	
+	},
 	// End NS, adjacency Model
 	getNodeAncestors : function(rc) {
 		var ancestors = [];
@@ -366,7 +376,7 @@ $.jgrid.extend({
 			var parent = $(this).jqGrid("getNodeParent",rc);
 			while (parent) {
 				ancestors.push(parent);
-				parent = $(this).jqGrid("getNodeParent",parent);	
+				parent = $(this).jqGrid("getNodeParent",parent);
 			}
 		});
 		return ancestors;
@@ -437,7 +447,7 @@ $.jgrid.extend({
 					if(this.p.treeGridModel == 'nested') {
 						$(this).jqGrid("setGridParam",{postData:{nodeid:'',n_left:'',n_right:'',n_level:''}});
 					} else {
-						$(this).jqGrid("setGridParam",{postData:{nodeid:'',parentid:'',n_level:''}}); 
+						$(this).jqGrid("setGridParam",{postData:{nodeid:'',parentid:'',n_level:''}});
 					}
 				}
 			}
@@ -490,11 +500,11 @@ $.jgrid.extend({
 			for (i = 0, len = children.length; i < len; i++) {
 				child = children[i];
 				records.push(child);
-				$(this).jqGrid("collectChildrenSortTree",records, child, sortname, newDir, st, datefmt); 
+				$(this).jqGrid("collectChildrenSortTree",records, child, sortname, newDir, st, datefmt);
 			}
 		});
 	},
-	// experimental 
+	// experimental
 	setTreeRow : function(rowid, data) {
 		var success=false;
 		this.each(function(){

@@ -19,8 +19,10 @@ class Zkernel_Image_Preview {
 	}
 
 	function create($name, $param = array()) {
-		global $m;
+		//$bg_fade = isset($param['bg_fade']) ? $param['bg_fade'] : 0;
 		$bg_color = isset($param['bg_color']) ? $param['bg_color'] : array(255, 255, 255);
+		$bg_adaptive = isset($param['bg_adaptive']) ? $param['bg_adaptive'] : false;
+		$fd_r = isset($param['bg_adaptive_width']) ? $param['bg_adaptive_width'] : 10;
 		if (!is_array($bg_color)) $bg_color = $m->f_hex2rgb($bg_color);
 		$fit = isset($param['fit']) ? $param['fit'] : false;
 		$mark = @$param['mark'];
@@ -69,16 +71,74 @@ class Zkernel_Image_Preview {
 				$image = $thumb->getOldImage();
 				$new_image = imagecreatetruecolor($n_w, $n_h);
 				if (!$new_image || !$image) return false;
-				$color = imagecolorallocate($new_image, $bg_color[0], $bg_color[1], $bg_color[2]);
-				imagefilledrectangle($new_image, 0, 0, $n_w - 1, $n_h - 1, $color);
+
+				if ($bg_adaptive && ($n_w > $dim['width'] || $n_h > $dim['height'])) {
+					$rgb = imagecolorat($image, 0, 0);
+					$colors_lt = imagecolorsforindex($image, $rgb);
+
+					$rgb = imagecolorat($image, $dim['width']- 1, 0);
+					$colors_rt = imagecolorsforindex($image, $rgb);
+
+					$rgb = imagecolorat($image, $dim['width']- 1, $dim['height']- 1);
+					$colors_rb = imagecolorsforindex($image, $rgb);
+
+					$rgb = imagecolorat($image, 0, $dim['height']- 1);
+					$colors_lb = imagecolorsforindex($image, $rgb);
+
+					$bg_color = array(
+						(int)(array_sum(array($colors_lt['red'], $colors_rt['red'], $colors_rb['red'], $colors_lb['red'])) / 4),
+						(int)(array_sum(array($colors_lt['green'], $colors_rt['green'], $colors_rb['green'], $colors_lb['green'])) / 4),
+						(int)(array_sum(array($colors_lt['blue'], $colors_rt['blue'], $colors_rb['blue'], $colors_lb['blue'])) / 4),
+					);
+
+					$color = imagecolorallocate($new_image, $bg_color[0], $bg_color[1], $bg_color[2]);
+					imagefilledrectangle($new_image, 0, 0, $n_w - 1, $n_h - 1, $color);
+				}
+
 				imagecopyresampled($new_image, $image, $new_x, $new_y, 0, 0, $dim['width'], $dim['height'], $dim['width'], $dim['height']);
+
+				if ($bg_adaptive == 'image' && ($n_w > $dim['width'] || $n_h > $dim['height'])) {
+					$dx = $n_w - $dim['width'];
+					$dy = $n_h - $dim['height'];
+					if ($dx) {
+						$fd_width = ceil($dx / 2);
+						$fd_height = $n_h;
+					}
+					else {
+						$fd_width = $n_w;
+						$fd_height = ceil($dy / 2);
+					}
+
+					for ($i = 0; $i < $fd_r; $i++) {
+						$color = imagecolorallocatealpha($new_image, $bg_color[0], $bg_color[1], $bg_color[2], floor(($i / $fd_r) * 127));
+						imageline(
+							$new_image,
+							$dx ? ($new_x + $i) : 0,
+							$dx ? 0 : ($new_y + $i),
+							$dx ? ($new_x + $i) : $n_w - 1,
+							$dx ? $n_h - 1 : ($new_y + $i),
+							$color
+						);
+
+						$color = imagecolorallocatealpha($new_image, $bg_color[0], $bg_color[1], $bg_color[2], floor(127 - ($i / $fd_r) * 127));
+						imageline(
+							$new_image,
+							$dx ? ($n_w - $dx / 2 - $fd_r + $i) : 0,
+							$dx ? 0 : ($n_h - $dy / 2 - $fd_r + $i),
+							$dx ? ($n_w - $dx / 2 - $fd_r + $i) : $n_w - 1,
+							$dx ? $n_h - 1 : ($n_h - $dy / 2 - $fd_r + $i),
+							$color
+						);
+					}
+				}
+
 				$thumb->setOldImage($new_image);
 			}
 		}
 
 		if ($mark) {
 			$image = $thumb->getOldImage();
-			$this->mark($image, $param['mark']);
+			$this->mark($image, $mark);
 			$thumb->setOldImage($image);
 		}
 
@@ -96,29 +156,51 @@ class Zkernel_Image_Preview {
 	}
 
 	private function mark($image, $param) {
-		$width = imagesx($image);
-		$height = imagesy($image);
-		$param['padding_h'] = @(int)$param['padding_h'];
-		$param['padding_v'] = @(int)$param['padding_v'];
-		$align = isset($param['align']) ? $param['align'] : 'cc';
-		$align = array(strtolower(substr($align, 0, 1)), strtolower(substr($align, 1, 1)));
-
-		$png = @imagecreatefrompng($param['file']);
-		$p_width = imagesx($png);
-		$p_height = imagesy($png);
-
-		if ($align[0] == 'l') $x = $param['padding_h'];
-		else if ($align[0] == 'c') $x = floor(($width - $p_width) / 2);
-		else if ($align[0] == 'r') $x = $width - $p_width - $param['padding_h'];
-
-		if ($align[1] == 't') $y = $param['padding_v'];
-		else if ($align[1] == 'c') $y = floor(($height - $p_height) / 2);
-		else if ($align[1] == 'b') $y = $height - $p_height - $param['padding_v'];
-
-		if ($x >= 0 && $x <= ($width - 1) && $y >= 0 && $y <= ($height - 1)) {
-			@imagecopy($image, $png, $x, $y, 0, 0, $p_width, $p_height);
+		$k = is_array($param) ? array_keys($param) : array();
+		if ($k) {
+			$num = true;
+			foreach ($k as $kk) {
+				if (!is_numeric($kk)) {
+					$num = false;
+					break;
+				}
+			}
+			if (!$num) $param = array($param);
 		}
-		@imagedestroy($png);
+
+		if ($param) {
+			foreach ($param as $param1) {
+				$width = imagesx($image);
+				$height = imagesy($image);
+				$param1['padding_h'] = @(int)$param1['padding_h'];
+				$param1['padding_v'] = @(int)$param1['padding_v'];
+				$align = isset($param1['align']) ? $param1['align'] : 'cc';
+				$align = array(strtolower(substr($align, 0, 1)), strtolower(substr($align, 1, 1)));
+
+				$png = isset($param1['image']) ? $param1['image'] : @imagecreatefrompng($param1['file']);
+				$p_width = imagesx($png);
+				$p_height = imagesy($png);
+
+				if (isset($param1['x']) && isset($param1['y'])) {
+					$x = $param1['x'];
+					$y = $param1['y'];
+				}
+				else {
+					if ($align[0] == 'l') $x = $param1['padding_h'];
+					else if ($align[0] == 'c') $x = floor(($width - $p_width) / 2);
+					else if ($align[0] == 'r') $x = $width - $p_width - $param1['padding_h'];
+
+					if ($align[1] == 't') $y = $param1['padding_v'];
+					else if ($align[1] == 'c') $y = floor(($height - $p_height) / 2);
+					else if ($align[1] == 'b') $y = $height - $p_height - $param1['padding_v'];
+				}
+
+				if ($x >= 0 && $x <= ($width - 1) && $y >= 0 && $y <= ($height - 1)) {
+					@imagecopy($image, $png, $x, $y, 0, 0, $p_width, $p_height);
+				}
+				@imagedestroy($png);
+			}
+		}
 	}
 
 	private function corner($image, $param) {

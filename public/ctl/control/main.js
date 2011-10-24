@@ -385,8 +385,24 @@ c.submit = function(apply) {
 		return false;
 	}
 	c.loading_start(true);
-	var i = $('#c_form .uploadifyQueueItem').not('#c_form .uploadifyQueueLoaded');
-	if (i.length == 0) c.sumbit_full(apply);
+	var i = $('#c_form .uploadifyQueueItem').not('#c_form .uploadifyQueueLoaded').not('#c_form .uploadify3 .uploadifyQueueItem');
+	if (i.length == 0) {
+		var arr = [];
+		$('#c_form .uploadify3').each(function() {
+			var t = $(this);
+			var swfuploadify = window['uploadify_' + t.attr('id')];
+			if (swfuploadify && swfuploadify.queue.queueLength) arr.push(t);
+		});
+		if (arr.length) {
+			for (var i = 0; i < arr.length; i++) arr[i]
+				.unbind('complete')
+				.bind('complete', function() {
+					c.sumbit_full(apply);
+				})
+				.uploadifyUpload();
+		}
+		else c.sumbit_full(apply);
+	}
 	else {
 		i.each(function() {
 			var n = $(this).attr('id');

@@ -22,6 +22,7 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 
 	function basket2Sid($uid) {
 		if (!$uid) return false;
+		if (!Zend_Session::isStarted()) Zend_Session::start();
 		$sid = Zend_Session::getId();
 		return $this->_model_order->update(array('author' => $sid), array(
 			'`author` = ?' => $uid,
@@ -32,6 +33,7 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 
 	function basketId($create = false) {
 		$uid = $this->view->user('id');
+		if (!Zend_Session::isStarted()) Zend_Session::start();
 		$sid = Zend_Session::getId();
 		if ($uid) {
 			$id = (int)$this->_model_order->fetchOne('id', array(
@@ -56,9 +58,6 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 			'`active` = 1'
 		), 'date desc');
 		if (!$id && $create) {
-			$mp = new Default_Model_Pay();
-			$ms = new Default_Model_Orderstatus();
-			$mc = new Default_Model_Card();
 			$d = array(
 				'author' => $uid
 			);
@@ -80,7 +79,7 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 			))
 			->where('i.id = ?', $oid)
 			->group('i.id');
-		if ($id != null) $s->where('m.id = ?', $id);
+		if ($id != null) $s->where('m.'.$this->_field_order_item_id.' = ?', $id);
 		$ret = (int)$this->_model_order->getAdapter()->fetchOne($s, 'SUM(`quant`)');
 		return $ret;
 	}
@@ -94,7 +93,7 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 			))
 			->where('i.id = ?', $oid)
 			->group('i.id');
-		if ($id != null) $s->where('m.id = ?', $id);
+		if ($id != null) $s->where('m.'.$this->_field_order_item_id.' = ?', $id);
 		$ret = (int)$this->_model_order->getAdapter()->fetchOne($s, 'SUM(`price`)');
 		$ret += $this->fetchDelivery($oid, $ret);
 		return $ret;
@@ -142,6 +141,27 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 				'orderid' => (int)$this->_model_order_item->fetchMax('orderid') + 1
 			));
 		}
+		return $ok;
+	}
+
+	function basketRemove($id, $quant = 1) {
+		$oid = $this->basketId(true);
+		$item = $this->_model_item->fetchBasketCard($id);
+		if (!$item || !$item->price || !$quant) return false;
+		$ex = $this->_model_order_item->fetchRow(array(
+			'`parentid` = ?' => $oid,
+			'`'.$this->_field_order_item_id.'` = ?' => $id
+		));
+		if (!$ex) return false;
+		$q = $ex->quant - $quant;
+		if ($q <= 0) $ok = $this->_model_order_item->delete(array(
+			'`id` = ?' => $ex->id
+		));
+		else $ok = $this->_model_order_item->update(array(
+			'quant' => $q
+		), array(
+			'`id` = ?' => $ex->id
+		));
 		return $ok;
 	}
 
