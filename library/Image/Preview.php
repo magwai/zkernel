@@ -91,9 +91,11 @@ class Zkernel_Image_Preview {
 						(int)(array_sum(array($colors_lt['blue'], $colors_rt['blue'], $colors_rb['blue'], $colors_lb['blue'])) / 4),
 					);
 
-					$color = imagecolorallocate($new_image, $bg_color[0], $bg_color[1], $bg_color[2]);
-					imagefilledrectangle($new_image, 0, 0, $n_w - 1, $n_h - 1, $color);
+
 				}
+
+				$color = imagecolorallocate($new_image, $bg_color[0], $bg_color[1], $bg_color[2]);
+				imagefilledrectangle($new_image, 0, 0, $n_w - 1, $n_h - 1, $color);
 
 				imagecopyresampled($new_image, $image, $new_x, $new_y, 0, 0, $dim['width'], $dim['height'], $dim['width'], $dim['height']);
 
