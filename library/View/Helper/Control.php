@@ -196,6 +196,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 			'text' 					=> '',
 			'button_top' 			=> array(),
 			'button_bottom' 		=> array(),
+			'button_top_ex' 		=> true,
 			'scroll_top' 			=> true,
 			'use_db' 				=> true,
 			'request_ok' 			=> array(
@@ -654,20 +655,22 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 			//}
 		}
 		else {
+			if ($this->config->button_top_ex) {
 			$menus = $menu_model->fetchAll(array('`parentid` = ?' => @(int)$menu->id, '`show_it` = 0', 'orderid'));
-			if ($menus) {
-				foreach ($menus as $num => $el) {
-					if(!$this->view->user()->isAllowed($this->view->user('role'), $el->resource)) continue;
-					$cl_0 = stripos($el->param, 'cl=0');
-					$cl_1 = stripos($el->param, 'cl=1');
-					$this->config->button_top[] = array(
-						'inner' => $num == 0 ? 1 : 0,
-						'controller' => $el->controller,
-						'action' => $el->action ? $el->action : 'ctlshow',
-						'field' => 'cid',
-						'title' => $el->title,
-						'cl' => $cl_0 !== false ? 'f' : ($cl_1 !== false ? 'a' : 't')
-					);
+				if ($menus) {
+					foreach ($menus as $num => $el) {
+						if(!$this->view->user()->isAllowed($this->view->user('role'), $el->resource)) continue;
+						$cl_0 = stripos($el->param, 'cl=0');
+						$cl_1 = stripos($el->param, 'cl=1');
+						$this->config->button_top[] = array(
+							'inner' => $num == 0 ? 1 : 0,
+							'controller' => $el->controller,
+							'action' => $el->action ? $el->action : 'ctlshow',
+							'field' => 'cid',
+							'title' => $el->title,
+							'cl' => $cl_0 !== false ? 'f' : ($cl_1 !== false ? 'a' : 't')
+						);
+					}
 				}
 			}
 			$menu = $menu_model->fetchRow(array('`id` = ?' => @(int)$menu->parentid));
@@ -1032,7 +1035,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
     }
 
     public function routeDrag() {
-    	$cur = $this->config->model->fetchRow(array('`id` = ?' => (int)$this->config->param['id']));
+		$cur = $this->config->model->fetchRow(array('`id` = ?' => (int)$this->config->param['id']));
     	$prev = $this->config->model->fetchRow(array('`id` = ?' => (int)$this->config->param['prev']));
     	$ok = false;
     	$s = new Zend_Session_Namespace();
@@ -1043,9 +1046,9 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 	    	if ($ok) {
 	    		$w = array('`id` != ?' => $cur->id);
 	    		if ($this->config->tree) $w['`'.$this->config->tree_field.'` = ?'] = $cur->{$this->config->tree_field};
-		    	if ($prev) $w['`'.$this->config->orderby.'` > ?'] = $prev->{$this->config->orderby};
+		    	if ($prev) $w['`'.$this->config->field_orderid.'` > ?'] = $prev->{$this->config->field_orderid};
 	    		$next = $this->config->model->fetchCol('id', $w);
-	    		if ($next) $ok = $this->config->model->update(array($this->config->orderby => new Zend_Db_Expr('`'.$this->config->orderby.'` + 1')), '`id` IN ('.implode(',', $next).')');
+	    		if ($next) $ok = $this->config->model->update(array($this->config->field_orderid => new Zend_Db_Expr('`'.$this->config->field_orderid.'` + 1')), '`id` IN ('.implode(',', $next).')');
 	    	}
     	}
 
