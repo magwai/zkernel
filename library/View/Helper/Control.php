@@ -833,6 +833,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 		}
     	else {
 		    $this->config->form = $this->buildForm();
+			$this->config->data = array();
 
 			if (@(int)$this->config->post['cposted'] || @(int)$this->config->post['sposted']) {
 				if ($this->config->form->isValid($this->config->post->toArray())) {
@@ -1019,11 +1020,9 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 							foreach ($md as $k => $v) $this->config->data['meta_'.$k] = $v;
 						}
 					}
-
-					//$this->config->data->set($this->config->data->toArray());
-					$this->config->func_preset;
-					$this->config->form->setDefaults($this->config->data->toArray());
 				}
+				$this->config->func_preset;
+				$this->config->form->setDefaults($this->config->data->toArray());
 			}
     		if ($this->config->tree && $id) {
 				$s = new Zend_Session_Namespace();

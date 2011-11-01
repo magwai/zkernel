@@ -22,7 +22,19 @@ class Zkernel_View_Data implements Countable, Iterator, ArrayAccess {
     }
 
     function set($k, $v = null) {
-		$this->_data[(string)$k] = $v;
+		if (strpos((string)$k, '.')) {
+			$kk = explode('.', (string)$k);
+			if ($this->__isset($kk[0])) {
+				$this->_data[$kk[0]]->set($kk[1], $v);
+			}
+			else{
+				$this->_data[$kk[0]] = new Zkernel_View_Data();
+				$this->_data[$kk[0]]->set($kk[1], $v);
+			}
+		}
+		else {
+			$this->_data[(string)$k] = $v;
+		}
 		$this->_count = count($this->_data);
 		return $this;
 	}

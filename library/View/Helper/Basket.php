@@ -230,6 +230,7 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 		if ($uid != null) $s->where('i.author = ?', $uid);
 		if ($oid != null) $s->where('i.id = ?', $oid);
 		if ($id != null) $s->where('m.id = ?', $id);
+
 		$ret = (int)$this->_model_order->getAdapter()->fetchOne($s, 'SUM(`price`)');
 		if ($oid) $ret += $this->fetchDelivery($oid, $ret);
 		return $ret;
