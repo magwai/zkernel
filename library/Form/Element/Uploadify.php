@@ -28,7 +28,7 @@ class Zkernel_Form_Element_Uploadify extends Zend_Form_Element_Hidden {
     	$js =
 '$.include("/zkernel/ctl/uploadify/uploadify.css|link");
 $.include(["/zkernel/js/swfobject.js", "/zkernel/ctl/uploadify/jquery.uploadify.js", "/zkernel/ctl/uploadify/zuploadify.js"], function() {
-	zuf.init('.Zend_Json::encode($o).');
+	zuf.init('.Zend_Json::encode($o, false, array('enableJsonExprFinder' => true)).');
 });';
     	if (!isset($this->url)) $this->url = str_ireplace(PUBLIC_PATH, '', $this->destination);
 		$this->required = $this->isRequired();
