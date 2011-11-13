@@ -13,7 +13,8 @@ class Zkernel_Application_Resource_Menu extends Zend_Application_Resource_Resour
 	public function init () {
 		if (null === $this->_inited) {
 			$options = $this->getOptions();
-			Zend_Controller_Front::getInstance()->registerPlugin(new Zkernel_Controller_Plugin_Menu($options));
+			$class = class_exists('Default_Plugin_Menu') ? 'Default_Plugin_Menu' : 'Zkernel_Controller_Plugin_Menu';
+			Zend_Controller_Front::getInstance()->registerPlugin(new $class($options));
 			$this->_inited = true;
 		}
 		return $this;

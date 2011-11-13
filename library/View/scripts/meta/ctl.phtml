@@ -14,7 +14,7 @@ if ($this->control()->config->action == 'ctlshow') {
 			$model = 'Default_Model_'.ucfirst($oid);
 			$m = new $model();
 			$titles[$el->oid] = $m->fetchOne('title', array('`id` = ?' => $id));
-			$titles[$el->oid] = (@$db[$oid]['zk_title'] ? $db[$oid]['zk_title'] : $oid).': '.(@$titles[$el->oid] ? $titles[$el->oid] : $el->id);
+			$titles[$el->oid] = (@$db[$oid]['zk_title'] ? trim($db[$oid]['zk_title']) : $oid).': '.(@$titles[$el->oid] ? $titles[$el->oid] : $el->id);
 		}
 	}
 }

@@ -32,7 +32,7 @@ class Zkernel_Controller_Plugin_Menu extends Zend_Controller_Plugin_Abstract {
 		$view = Zend_Controller_Action_HelperBroker::getStaticHelper('viewRenderer')->view;
 		if ($m) foreach ($m as $el) {
 			//print_r($el->route);
-			if (!$el->route || $router->hasRoute($el->route) && !(isset($el->show_it) && !$el->show_it)) {
+			if ($this->funcElCheck($el)) {
 				$el = $view->override()->overrideSingle($el, 'menu');
 				$p = $reg && !@$reg->_default->domain ? array('lang' => $reg->stitle) : array();
 				if ($el->route && $el->param && ($el->route == 'default' || strpos($el->route, 'dbroute') !== false)) {
@@ -83,5 +83,11 @@ class Zkernel_Controller_Plugin_Menu extends Zend_Controller_Plugin_Abstract {
 
 	public function save() {
 		Zend_Registry::set($this->_key, $this->_menu);
+	}
+
+	function funcElCheck($el) {
+		$front = Zend_Controller_Front::getInstance();
+		$router = $front->getRouter();
+		return !$el->route || $router->hasRoute($el->route) && !(isset($el->show_it) && !$el->show_it);
 	}
 }
