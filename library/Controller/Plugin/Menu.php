@@ -35,7 +35,7 @@ class Zkernel_Controller_Plugin_Menu extends Zend_Controller_Plugin_Abstract {
 			if ($this->funcElCheck($el)) {
 				$el = $view->override()->overrideSingle($el, 'menu');
 				$p = $reg && !@$reg->_default->domain ? array('lang' => $reg->stitle) : array();
-				if ($el->route && $el->param && ($el->route == 'default' || strpos($el->route, 'dbroute') !== false)) {
+				if ($el->route && $el->param && $el->route/* && ($el->route == 'default' || strpos($el->route, 'dbroute') !== false)*/) {
 					if ($el->route == 'default') $map = '';
 					else {
 						$mk = substr($el->route, 7);
