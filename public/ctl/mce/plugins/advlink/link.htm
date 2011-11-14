@@ -18,7 +18,7 @@
 				<li id="popup_tab" aria-controls="popup_panel" ><span><a href="javascript:mcTabs.displayTab('popup_tab','popup_panel');" onmousedown="return false;">{#advlink_dlg.popup_tab}</a></span></li>
 				<li id="events_tab" aria-controls="events_panel"><span><a href="javascript:mcTabs.displayTab('events_tab','events_panel');" onmousedown="return false;">{#advlink_dlg.events_tab}</a></span></li>
 				<li id="advanced_tab" aria-controls="advanced_panel"><span><a href="javascript:mcTabs.displayTab('advanced_tab','advanced_panel');" onmousedown="return false;">{#advlink_dlg.advanced_tab}</a></span></li>
-				<li id="mlink_tab"><span><a href="javascript:mcTabs.displayTab('mlink_tab','mlink_panel');" onmousedown="return false;">{#advlink_dlg.mlink}</a></span></li>
+				<li id="mlink_tab"><span><a href="javascript:mcTabs.displayTab('mlink_tab','mlink_panel');" onclick="document.getElementById('iframe').src = (window.top.c.cfg.lang ? '/' + window.top.c.cfg.lang : '') + '/menu/mce';" onmousedown="return false;">{#advlink_dlg.mlink}</a></span></li>
 			</ul>
 		</div>
 
@@ -342,7 +342,7 @@
 		</div>
 	</form>
 	<script type="text/javascript">
-		document.getElementById('iframe').src = (window.top.c.cfg.lang ? '/' + window.top.c.cfg.lang : '') + '/menu/mce';
+		//document.getElementById('iframe').src = (window.top.c.cfg.lang ? '/' + window.top.c.cfg.lang : '') + '/menu/mce';
 	</script>
 </body>
 </html>
