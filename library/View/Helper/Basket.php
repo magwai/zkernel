@@ -1,6 +1,7 @@
 <?php
 
 class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
+	protected $_uid = null;
 	protected $_model_item = null;
 	protected $_model_order = null;
 	protected $_model_order_item = null;
@@ -14,6 +15,11 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 		if ($this->_model_order_item === null) $this->_model_order_item = new Default_Model_Orderitem;
 		if ($this->_model_discount === null && class_exists('Default_Model_Discount')) $this->_model_discount = new Default_Model_Discount;
 		if ($this->_model_delivery === null && class_exists('Default_Model_Delivery')) $this->_model_delivery = new Default_Model_Delivery;
+	}
+
+	function setUid($uid) {
+		$this->_uid = $uid;
+		return $this;
 	}
 
 	function basket() {
@@ -32,26 +38,29 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 	}
 
 	function basketId($create = false) {
-		$uid = $this->view->user('id');
-		if (!Zend_Session::isStarted()) Zend_Session::start();
-		$sid = Zend_Session::getId();
-		if ($uid) {
-			$id = (int)$this->_model_order->fetchOne('id', array(
-				'`author` = ?' => $sid,
-				'`finished` = 0',
-				'`active` = 1'
-			), 'date desc');
-			if ($id) {
-				$this->_model_order->update(array('author' => $uid), array('`id` = ?' => $id));
-				$this->_model_order->update(array('active' => 0), array(
-					'`author` = ?' => $uid,
+		if ($this->_uid === null) {
+			$uid = $this->view->user('id');
+			if (!Zend_Session::isStarted()) Zend_Session::start();
+			$sid = Zend_Session::getId();
+			if ($uid) {
+				$id = (int)$this->_model_order->fetchOne('id', array(
+					'`author` = ?' => $sid,
 					'`finished` = 0',
-					'`active` = 1',
-					'`id` != ?' => $id
-				));
+					'`active` = 1'
+				), 'date desc');
+				if ($id) {
+					$this->_model_order->update(array('author' => $uid), array('`id` = ?' => $id));
+					$this->_model_order->update(array('active' => 0), array(
+						'`author` = ?' => $uid,
+						'`finished` = 0',
+						'`active` = 1',
+						'`id` != ?' => $id
+					));
+				}
 			}
+			else $uid = $sid;
 		}
-		else $uid = $sid;
+		else $uid = $this->_uid;
 		$id = (int)$this->_model_order->fetchOne('id', array(
 			'`author` = ?' => $uid,
 			'`finished` = 0',
@@ -215,6 +224,25 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 	function finishedCard($oid) {
 		$res = $this->_model_order->fetchRow(array('`id` = ?' => (int)$oid, '`finished` = ?' => 1));
 		return $res ? new Zkernel_View_Data($res) : null;
+	}
+
+	function finishedQuant($oid = null, $id = null, $uid = null, $payed = null) {
+		$s = $this->_model_order->getAdapter()->select()
+			->from(array('i' => $this->_model_order->info('name')), '')
+			->joinLeft(array('m' => $this->_model_order_item->info('name')), 'i.id = m.parentid', array(
+				'quant' => 'SUM(m.quant)'
+			))
+			->where('i.active = ?', 1)
+			->where('i.finished = ?', 1)
+			->group('i.id');
+
+		if ($payed != null) $s->where('i.payed = ?', (int)$payed);
+		if ($uid != null) $s->where('i.author = ?', $uid);
+		if ($oid != null) $s->where('i.id = ?', $oid);
+		if ($id != null) $s->where('m.id = ?', $id);
+
+		$ret = (int)$this->_model_order->getAdapter()->fetchOne($s, 'SUM(`quant`)');
+		return $ret;
 	}
 
 	function finishedPrice($oid = null, $id = null, $uid = null, $payed = null) {

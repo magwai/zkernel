@@ -66,7 +66,7 @@ class Zkernel_Controller_Plugin_Menu extends Zend_Controller_Plugin_Abstract {
 						'uri' => $el->url,
 						'pages' => $this->getDeeper($el->id)
 					);
-					$menu[] = array_merge($el->toArray(), $md);
+					$menu[] = array_merge($el->toArray(), $this->funcElArray($el, $md));
 				}else{
 					$md = array(
 						'label' => $el->title,
@@ -74,7 +74,7 @@ class Zkernel_Controller_Plugin_Menu extends Zend_Controller_Plugin_Abstract {
 						'pages' => $this->getDeeper($el->id),
 						'key' => $el->key
 					);
-					$menu[] = $md;
+					$menu[] = $this->funcElArray($el, $md);
 				}
 			}
 		}
@@ -89,5 +89,9 @@ class Zkernel_Controller_Plugin_Menu extends Zend_Controller_Plugin_Abstract {
 		$front = Zend_Controller_Front::getInstance();
 		$router = $front->getRouter();
 		return !$el->route || $router->hasRoute($el->route) && !(isset($el->show_it) && !$el->show_it);
+	}
+
+	function funcElArray($el, $md) {
+		return $md;
 	}
 }

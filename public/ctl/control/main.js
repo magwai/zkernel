@@ -362,7 +362,7 @@ c.do_action = function(obj, parent, post) {
 		}
 		else if (cl == 'f' && c.cfg.controller != controller) {
 			var tdds = l.find('tr[id=' + id + ']>td');
-			if (Number(tdds.eq(tdds.length - 4).text()) != 0) {
+			if (Number(tdds.eq(tdds.length - 5).text()) != 0) {
 				c.info('Разрешено переходить только в рубрики верхнего уровня');
 				return false;
 			}
