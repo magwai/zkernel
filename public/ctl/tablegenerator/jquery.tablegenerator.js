@@ -29,8 +29,9 @@
 			_t.undelegate('.tg-add-col', 'click').delegate('.tg-add-col', 'click', _t.add_col);
 			_t.undelegate('.tg-del-col', 'click').delegate('.tg-del-col', 'click', _t.del_col);
 			_t.undelegate('.tg-del-row', 'click').delegate('.tg-del-row', 'click', _t.del_row);
-
-			_t.find('.tg-cell').live('hover', function(ev) {
+			_t.undelegate('.tg-input', 'keyup').delegate('.tg-input', 'keyup', _t.save);
+			_t.undelegate('.tg-input', 'change').delegate('.tg-input', 'change', _t.save);
+			_t.undelegate('.tg-del-row', 'hover').delegate('.tg-cell', 'hover', function(ev) {
 				var tr = $(this).parents('.tg-row');
 				var tr_ind = tr.parents('.tg-table').find('.tg-row').index(tr);
 				var td_ind = tr.find('.tg-cell').index($(this));
@@ -38,7 +39,7 @@
 				var td_right = tr.find('.tg-cell:last');
 
 				var cur_col = opt.col[td_ind];
-				var next_col = opt.col[cur_col + 1];
+				var next_col = opt.col[td_ind + 1];
 
 				if (cur_col) {
 					if (ev.type == 'mouseenter') {
@@ -57,7 +58,6 @@
 					}
 				}
 			});
-			_t.find('.tg-input').live('keyup', _t.save).live('change', _t.save);
 			_t.build();
 		},
 		build: function() {
