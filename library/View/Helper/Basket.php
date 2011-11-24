@@ -271,7 +271,7 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 			foreach ($list as $el) {
 				$d = new Zkernel_View_Data($el);
 				$item = $this->_model_item->fetchBasketCard($el->{$this->_field_order_item_id});
-				$ret[] = new Zkernel_View_Data(array_merge($d->toArray(), $item->toArray()));
+				$ret[] = $item ? new Zkernel_View_Data(array_merge($d->toArray(), $item->toArray())) : new Zkernel_View_Data(array_merge($d->toArray()));
 			}
 		}
 		return $ret;
