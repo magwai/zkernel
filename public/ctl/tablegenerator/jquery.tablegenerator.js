@@ -35,8 +35,8 @@
 				var tr = $(this).parents('.tg-row');
 				var tr_ind = tr.parents('.tg-table').find('.tg-row').index(tr);
 				var td_ind = tr.find('.tg-cell').index($(this));
-				var td_top = _t.find('.tg-row:first').find('.tg-cell').eq(td_ind);
-				var td_right = tr.find('.tg-cell:last');
+				var td_top = _t.find('.tg-row:first').find('.tg-cell').eq(td_ind).find('.tg-wrap');
+				var td_right = tr.find('.tg-cell:last').find('.tg-wrap');
 
 				var cur_col = opt.col[td_ind];
 				var next_col = opt.col[td_ind + 1];
