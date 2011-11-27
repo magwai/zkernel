@@ -75,13 +75,60 @@
 
 				for (var i1 = 0; i1 < opt.col.length; i1++) {
 					var val = opt.row[i].data[i1];
-					tds.append(_t.cell_html(typeof val == 'undefined' ? '' : val));
+					tds.append(_t.cell_html(typeof val == 'undefined' ? '' : val, opt.col[i1].type));
+					if (opt.col[i1].type == 'file') {
+						var name = 'tg-uploadify-' + i + '-' + i1;
+						tds.find('.tg-input[type=file]:last').attr({
+							'name': name,
+							'id': name
+						});
+						tds.find('.tg-input[type=hidden]:last').attr({
+							'name': name
+						});
+					}
 				}
 
 				body.append(tds);
 			}
 
+			body.find('.tg-input[type=file]').each(function() {
+				var t = $(this);
+				zuf.init({
+					'buttonImg': '/zkernel/ctl/tablegenerator/browse.png',
+					'fileDataName': t.attr('name'),
+					'folder': opt.file.folder,
+					'scriptData': {
+						'old': t.val(),
+						'sid': opt.file.sid
+					},
+					'width': '33',
+					'height': '20'
+				});
+				var h = t.nextAll('.tg-input[type=hidden]');
+				var v = h.val();
+				if (v) {
+					zuf.add(t.attr('name'), v, opt.file.url);
+					_t.zuf_del_reinit(t);
+				}
+				t.bind('select', function() {
+					t.uploadifyUpload();
+				}).bind('complete', function() {
+					var v = h.val().replace('u|', '');
+					h.val(v);
+					if (v) {
+						_t.save();
+						window.setTimeout(function() {
+							zuf.add(t.attr('name'), v, opt.file.url);
+							_t.zuf_del_reinit(t);
+						}, 500);
+					}
+				});
+			});
+
 			_t.find('.tg-cell').width((100 / opt.col.length) + '%');
+		},
+		zuf_del_reinit: function(o) {
+			o.nextAll('.uploadifyQueue').find('.cancel a').attr('href', 'javascript:zuf.remove("' + o.attr('name') + '", "' + o.nextAll('.tg-input[type=hidden]').val() + '", true);_t.save();');
 		},
 		add_row: function() {
 			var next_row_id = _t.get_row_next_id();
@@ -148,8 +195,8 @@
 			var o = $('<th class="tg-cell"><div class="tg-wrap"><div class="tg-label">' + title + '</div></th>');
 			return o;
 		},
-		cell_html: function(value) {
-			var o = $('<td class="tg-cell"><div class="tg-wrap"><input class="tg-input" /></div></td>');
+		cell_html: function(value, type) {
+			var o = $('<td class="tg-cell"><div class="tg-wrap"><input class="tg-input"' + (type == 'file' ? ' type="file"' : '') + ' />' + (type == 'file' ? '<input class="tg-input" type="hidden" />' : '') + '</div></div></td>');
 			o.find('.tg-input').val(value);
 			return o;
 		},
@@ -185,7 +232,7 @@
 
 			for (var i = 0; i < opt.row.length; i++) {
 				for (var i1 = 0; i1 < opt.col.length; i1++) {
-					opt.row[i].data[i1] = trs.eq(i + 1).find('.tg-cell').eq(i1).find('.tg-input').val();
+					opt.row[i].data[i1] = trs.eq(i + 1).find('.tg-cell').eq(i1).find('.tg-input:last').val();
 				}
 			}
 

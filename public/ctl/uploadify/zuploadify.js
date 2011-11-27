@@ -26,12 +26,12 @@ zuf.init = function(o) {
 		'onComplete': function(e, queueID, fileObj, response, data) {
 			if (response && response.slice(0, 2) == "u|") {
 				var v = response.slice(2);
-				zuf.results[n] += (zuf.results[n].length ? '*' : '') + response;
+				zuf.results[n] += (oo.multi && zuf.results[n].length ? '*' : '') + response;
 				var sd = o.scriptData;
 				if (sd.old != 'multi') sd.old = v;
 				hh.uploadifySettings('scriptData', sd);
 				zuf.uploads[n]--;
-				if (zuf.uploads[n] == 0) h.val((h.val().length ? (h.val() + '*') : '') + zuf.results[n]);
+				if (zuf.uploads[n] == 0) h.val((oo.multi && h.val().length ? (h.val() + '*') : '') + zuf.results[n]);
 				var done = true;
 				for (k in zuf.uploads) {
 					if (zuf.uploads[k] > 0) {
@@ -117,13 +117,13 @@ zuf.add = function(n, title, url, required) {
 	if (h.hasClass('zuf_deleted')) e.find('>a').click();*/
 };
 
-zuf.remove = function(n, k) {
+zuf.remove = function(n, k, all) {
 	var i = $('input[name=' + n + '][type=hidden]');
 	var o = i.prev('div.uploadifyQueue').find('div[rel="' + k + '"]');
 	o.remove();
 	var v = zuf.explode('*', i.val());
 	var vv = o.find('.fileName').text();
-	for (kk in v) if (v[kk] == 'd|' + vv) v[kk] = '';
+	for (kk in v) if ((v[kk] == 'd|' + vv) || all) v[kk] = '';
 	i.val(zuf.implode('*', v));
 };
 
