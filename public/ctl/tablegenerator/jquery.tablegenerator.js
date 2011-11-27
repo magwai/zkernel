@@ -135,7 +135,6 @@
 
 			var tr = $(this).parents('.tg-row');
 			var tr_ind = tr.parents('.tg-table').find('.tg-row').index(tr) - 1;
-			if (tr_ind < 0) tr_ind = 0;
 
 			var row = [];
 			for (var i = 0; i < opt.col.length; i++) row.push('');
