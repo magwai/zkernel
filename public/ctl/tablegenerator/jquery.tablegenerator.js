@@ -197,7 +197,7 @@
 		},
 		cell_html: function(value, type) {
 			var o = $('<td class="tg-cell"><div class="tg-wrap"><input class="tg-input"' + (type == 'file' ? ' type="file"' : '') + ' />' + (type == 'file' ? '<input class="tg-input" type="hidden" />' : '') + '</div></div></td>');
-			o.find('.tg-input').val(value);
+			o.find('.tg-input:last').val(value);
 			return o;
 		},
 		get_col_next_id: function() {
