@@ -66,16 +66,14 @@ class Zkernel_Controller_Plugin_Menu extends Zend_Controller_Plugin_Abstract {
 						'uri' => $el->url,
 						'pages' => $this->getDeeper($el->id)
 					);
-					$menu[] = array_merge($el->toArray(), $this->funcElArray($el, $md));
 				}else{
 					$md = array(
 						'label' => $el->title,
 						'uri' => $el->url,
 						'pages' => $this->getDeeper($el->id),
-						'key' => $el->key
 					);
-					$menu[] = $this->funcElArray($el, $md);
 				}
+				$menu[] = array_merge($el->toArray(), $this->funcElArray($el, $md));
 			}
 		}
 		return $menu;
