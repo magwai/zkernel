@@ -50,8 +50,16 @@ class Zkernel_View_Helper_HeadSingle extends Zend_View_Helper_HeadScript  {
 				@mkdir(PUBLIC_PATH.'/'.$cp.'/js', 0777, true);
 				@chmod(PUBLIC_PATH.'/'.$cp.'/js', 0777);
 			}
-			file_put_contents(PUBLIC_PATH.$nm, "/* hash: ".md5($m)." */\n".$this->view->minify($c, 'js'));
+			$c = "/* hash: ".md5($m)." */\n".$this->view->minify($c, 'js');
+			file_put_contents(PUBLIC_PATH.$nm, $c);
 			@chmod(PUBLIC_PATH.$nm, 0777);
+
+			if (function_exists('gzopen')) {
+				$zp = gzopen(PUBLIC_PATH.$nm.'.gz', 'wb9');
+				gzwrite($zp, $c);
+				gzclose($zp);
+			}
+
 		}
 		$this->headScript('file', $nm, 'set');
 		if ($aitems) foreach ($aitems as $el) $this->headScript('file', $el);

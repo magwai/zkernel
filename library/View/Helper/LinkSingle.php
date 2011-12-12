@@ -74,7 +74,7 @@ class Zkernel_View_Helper_LinkSingle extends Zend_View_Helper_HeadLink  {
 
 						$matches = $files = array();
 						preg_match_all('/src\=(\'|\"|)(.*?)(\'|\"|\,\))/si', $str, $res);
-						
+
 						if (@$res[2]) foreach ($res[2] as $k_1 => $el_1) {
 							$matches[] = $res[0][$k_1];
 							$files[] = $el_1;
@@ -104,8 +104,15 @@ class Zkernel_View_Helper_LinkSingle extends Zend_View_Helper_HeadLink  {
 						@mkdir(PUBLIC_PATH.'/'.$cp.'/css', 0777, true);
 						@chmod(PUBLIC_PATH.'/'.$cp.'/css', 0777);
 					}
-					file_put_contents(PUBLIC_PATH.$nm, "/* hash: ".md5($m)." */\n".$this->view->minify($c, 'css'));
+					$c = "/* hash: ".md5($m)." */\n".$this->view->minify($c, 'css');
+					file_put_contents(PUBLIC_PATH.$nm, $c);
 					@chmod(PUBLIC_PATH.$nm, 0777);
+
+					if (function_exists('gzopen')) {
+						$zp = gzopen(PUBLIC_PATH.$nm.'.gz', 'wb9');
+						gzwrite($zp, $c);
+						gzclose($zp);
+					}
 				}
 				$media = explode('_', $media);
 				$this->appendStylesheet($nm, $media[0], $media[1]);
