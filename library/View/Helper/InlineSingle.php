@@ -28,8 +28,16 @@ class Zkernel_View_Helper_InlineSingle extends Zend_View_Helper_InlineScript  {
 						@mkdir(PUBLIC_PATH.'/'.$cp.'/js', 0777, true);
 						@chmod(PUBLIC_PATH.'/'.$cp.'/js', 0777);
 					}
-					file_put_contents(PUBLIC_PATH.$nm, $this->view->minify($c, 'js'));
+					$c = $this->view->minify($c, 'js');
+					file_put_contents(PUBLIC_PATH.$nm, $c);
 					@chmod(PUBLIC_PATH.$nm, 0777);
+
+					if (function_exists('gzopen')) {
+						$zp = gzopen(PUBLIC_PATH.$nm.'.gz', 'wb9');
+						gzwrite($zp, $c);
+						gzclose($zp);
+						@chmod(PUBLIC_PATH.$nm.'.gz', 0777);
+					}
 				}
 				$c = $type == 'file' ? '<script type="text/javascript" src="'.$nm.'"></script>' : $nm;
 			}

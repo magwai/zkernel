@@ -58,6 +58,7 @@ class Zkernel_View_Helper_HeadSingle extends Zend_View_Helper_HeadScript  {
 				$zp = gzopen(PUBLIC_PATH.$nm.'.gz', 'wb9');
 				gzwrite($zp, $c);
 				gzclose($zp);
+				@chmod(PUBLIC_PATH.$nm.'.gz', 0777);
 			}
 
 		}
