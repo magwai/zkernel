@@ -37,4 +37,17 @@ class Zkernel_View_Helper_Sms extends Zkernel_View_Helper_Override  {
 		$response = $client->request('POST');
 		return $response->getStatus() == 200 && stripos($response->getBody(), 'error') == false;
 	}
+	
+	function iqsms($message, $phones, $config) {
+		$ok = 0;
+		foreach ($phones as $phone) {
+			$client = new Zend_Http_Client('http://gate.iqsms.ru/send/?phone='.rawurlencode($phone).'&text='.rawurlencode($message).(@$config['sender'] ? '&sender='.rawurlencode($config['sender']) : ''));
+			$y = Zend_Controller_Front::getInstance()->getParam('bootstrap')->getOption('sms');
+			$y = $y['iqsms'];
+			$client->setAuth($y['login'], $y['password']);
+			$response = $client->request('GET');
+			if ($response->getStatus() == 200 && stripos($response->getBody(), 'accepted') !== false) $ok++;
+		}
+		return $ok;
+	}
 }

@@ -3,7 +3,7 @@
 class Zkernel_Controller_Plugin_Menu extends Zend_Controller_Plugin_Abstract {
 	const DEFAULT_REGISTRY_KEY = 'Zend_Navigation';
     const DEFAULT_MODEL = 'Default_Model_Menu';
-    private $_model;
+    protected $_model;
 	protected $_map_cache = array();
 	protected $_menu = null;
 	protected $_key = null;
@@ -21,7 +21,7 @@ class Zkernel_Controller_Plugin_Menu extends Zend_Controller_Plugin_Abstract {
 		$this->save();
 	}
 
-	private function getDeeper($id = 0) {
+	function getDeeper($id = 0) {
     	$m = $this->_model->fetchAll(array('`parentid` = ?' => $id), 'orderid');
 		$mu = new Default_Model_Url();
     	$menu = array();
