@@ -14,6 +14,7 @@ class Zkernel_Form_Element_Gmap extends Zend_Form_Element_Text {
     	$type = $this->getAttrib('type');
     	$value = $this->getValue();
     	$height = $this->getAttrib('height');
+		$search = $this->getAttrib('search');
 		$width = $this->getAttrib('width');
 		$scrollwheel = $this->getAttrib('scrollwheel');
 		$center = $this->getAttrib('center');
@@ -26,7 +27,8 @@ window.cb_gmap_'.$this->getName().' = function(a1, a2) {
 	window.cb_gmap_'.$this->getName().'_loaded = true;
 	gmap.init("'.$this->getName().'", '.($value ? '["'.str_replace(array('|', ' '), array('","', '","'), $value).'"]' : 'null').', {'.
 	'"type": "'.($type ? $type : 'point').'",'.
-		($width ? '"width": '.$width.',' : '').
+		($search ? '"search": '.$search.',' : '').
+	    ($width ? '"width": '.$width.',' : '').
 	    ($height ? '"height": '.$height.',' : '').
 	    ($scrollwheel ? '"scrollwheel": '.$scrollwheel.',' : '').
 		($maptypeid ? '"mapTypeId": "'.$maptypeid.'",' : '').
@@ -35,7 +37,7 @@ window.cb_gmap_'.$this->getName().' = function(a1, a2) {
 	'});
 };
 $.include([
-	"/zkernel/ctl/gmap/gmap.js",
+	"/zkernel/ctl/gmap/gmap.js?'.rand(0, 111111111).'",
 	"http://maps.google.com/maps/api/js?sensor=false&callback=cb_gmap_'.$this->getName().'",
 ], function() {
     if (window.cb_gmap_'.$this->getName().'_loaded) window.cb_gmap_'.$this->getName().'();

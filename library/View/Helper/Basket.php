@@ -357,4 +357,12 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 		$ok = $this->_model_order->update($data, array('`id` = ?' => $oid, '`finished` = ?' => 1));
 		return $ok ? $oid : false;
 	}
+
+	function payCard($oid) {
+		$ret = $this->finishedCard($oid);
+		if ($ret) {
+			$ret->total = $this->finishedPrice($ret->id);
+		}
+		return $ret;
+	}
 }

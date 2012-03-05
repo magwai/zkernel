@@ -61,6 +61,26 @@ gmap.init = function(id, value, opt) {
 			latlng.lng().toFixed(6)
 		);
 	});
+	if (opt.search && opt.type == 'point') {
+		o.after('<div class="gmap-search"><input placeholder="Поиск по адресу" type="text" value="" class="ui-state-default ui-corner-all c_input" /></div>');
+		gmap.geocoder = new google.maps.Geocoder();
+		o.next('.gmap-search').find('input').keyup(function() {
+			window.clearTimeout(gmap.search_timer);
+			var t = $(this);
+			gmap.search_timer = window.setTimeout(function() {
+				gmap.geocoder.geocode({'address': t.val()}, function(results, status) {
+					if (status == google.maps.GeocoderStatus.OK) {
+						var z = gmap[id].getZoom();
+						if (z < 14) gmap[id].setZoom(14);
+						gmap[id].setCenter(results[0].geometry.location);
+						google.maps.event.trigger(gmap[id], 'click', {
+							latLng: results[0].geometry.location
+						});
+					}
+				});
+			}, 400);
+		});
+	}
 	if (value) {
             if(opt.type == 'point'){
                 var ll = new google.maps.LatLng(value[0], value[1]);
@@ -77,7 +97,7 @@ gmap.init = function(id, value, opt) {
 				latLng: pp[pp.length - 1]
 			});
 		}
-		gmap[id].setCenter(pp[0]); 
+		gmap[id].setCenter(pp[0]);
             }
 	}
 };

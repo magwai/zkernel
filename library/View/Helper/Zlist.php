@@ -100,9 +100,8 @@ class Zkernel_View_Helper_Zlist extends Zend_View_Helper_Abstract  {
 				? $this->view->override($paginator, $data['override_type'])
 				: $paginator;
 			$this->view->pager_count = $paginator->getTotalItemCount();
-			$pager_param = array(
-				'url' => $data['pager_url']
-			);
+			$pager_param = $this->view->getVars();
+			$pager_param['url'] = $data['pager_url'];
 			if ($data['pager_param']) $pager_param = array_merge($pager_param, $data['pager_param']);
 			$this->view->pager = $this->view->paginationControl(
 				$paginator,

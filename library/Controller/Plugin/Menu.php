@@ -22,7 +22,7 @@ class Zkernel_Controller_Plugin_Menu extends Zend_Controller_Plugin_Abstract {
 	}
 
 	function getDeeper($id = 0) {
-    	$m = $this->_model->fetchAll(array('`parentid` = ?' => $id), 'orderid');
+    	$m = $this->funcGetList($id);
 		$mu = new Default_Model_Url();
     	$menu = array();
 		$front = Zend_Controller_Front::getInstance();
@@ -84,6 +84,10 @@ class Zkernel_Controller_Plugin_Menu extends Zend_Controller_Plugin_Abstract {
 
 	public function save() {
 		Zend_Registry::set($this->_key, $this->_menu);
+	}
+
+	function funcGetList($id) {
+		return $this->_model->fetchAll(array('`parentid` = ?' => $id), 'orderid');
 	}
 
 	function funcElCheck($el) {
