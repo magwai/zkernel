@@ -21,7 +21,7 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 			}
 		}
 	}
-	
+
 	function genForm($url, $data) {
 		$res = '';
 		if ($data) {
@@ -43,7 +43,10 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 		if ($type === null) return $this;
 		else {
 			$f = 'pay'.ucfirst($type).ucfirst($action);
-			return method_exists($this, $f) ? $this->$f($param) : false;
+			$pp = func_get_args();
+			array_shift($pp);
+			array_shift($pp);
+			return method_exists($this, $f) ? @call_user_method_array($f, $this, $pp) : false;
 		}
 	}
 
@@ -88,20 +91,20 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 		if ($order === null) $order = @(int)$config['LMI_PAYMENT_NO'];
 
 		$card = $this->view->basket()->payCard($order);
+
 		if (@!$card) {
 			echo 'ERROR: ORDER NOT FOUND';
 			exit();
 		}
 
 		$config['price'] = isset($config['price']) ? $config['price'] : $card['total'];
-
 		if (number_format(@(float)$config['LMI_PAYMENT_AMOUNT'], 2, '.', '') == number_format(@(float)$config['price'], 2, '.', '')) {
 			if ((@(int)$config['LMI_PREREQUEST'] == 1) || (@(int)$config['LMI_PREREQUEST'] == 2)) {
 				if (@(int)$card['payed']) {
 					echo 'ERROR: ORDER PREVIOUSLY PAID';
 				}
 				else {
-					echo 'YES';
+					//echo 'YES';
 				}
 			}
 			else {
@@ -116,10 +119,10 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 					@$config['LMI_PAID_CURRENCY'].';'.
 					@$config['LMI_PAYMENT_SYSTEM'].';'.
 					@$config['LMI_SIM_MODE'].';'.
-					@$config['key']
+					@trim($config['key'])
 				, true));
 				if (@urldecode(@$config['LMI_HASH']) == $md5) {
-					echo 'YES';
+					//echo 'YES';
 					if ($callback_success !== null) $callback_success($card, $config);
 				}
 				else echo 'ERROR: KEY NOT MATCH';
@@ -139,7 +142,7 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 
 		$card = $this->view->basket()->payCard($order);
 		if (@!$card) return false;
-		
+
 		if ($card && $callback_success !== null) $callback_success($card, $config);
 		return false;
 	}
@@ -183,11 +186,11 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 		$config = @$this->_config['yandex'] ? $this->_config['yandex'] : array();
 		if ($param) $config = array_merge($config, $param);
 
-		if ($order === null) $order = @(int)$config['orderId'];
+		if ($order === null) $order = @(int)$config['customerNumber'];
 
 		$card = $this->view->basket()->payCard($order);
 		if (@!$card) {
-			echo '<checkOrderResponse performedDatetime="'.date('Y-m-d\TH:i:s').'" code="100" invoiceId="'.$order.'" shopId="'.$config['shopid'].'" message="Заказ не найден" />';
+			echo '<checkOrderResponse performedDatetime="'.date('Y-m-d\TH:i:s').'" code="100" invoiceId="'.$config['invoiceId'].'" shopId="'.$config['shopid'].'" message="Заказ не найден" />';
 			exit();
 		}
 
@@ -197,15 +200,15 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 		if (@$config['price']) $config['orderSumAmount'] = $config['price'];
 
 		if (@!$config['orderSumAmount'] || @!$config['shopid']) {
-			echo '<checkOrderResponse performedDatetime="'.date('Y-m-d\TH:i:s').'" code="100" invoiceId="'.$order.'" shopId="'.$config['ShopId'].'" message="Ошибка" />';
+			echo '<checkOrderResponse performedDatetime="'.date('Y-m-d\TH:i:s').'" code="100" invoiceId="'.$config['invoiceId'].'" shopId="'.$config['ShopId'].'" message="Ошибка" />';
 		}
 		else if (number_format(@(float)$config['price'], 2, '.', '') != number_format(@(float)$config['orderSumAmount'], 2, '.', '')) {
-			echo '<checkOrderResponse performedDatetime="'.date('Y-m-d\TH:i:s').'" code="100" invoiceId="'.$order.'" shopId="'.$config['ShopId'].'" message="Неверная сумма заказа" />';
+			echo '<checkOrderResponse performedDatetime="'.date('Y-m-d\TH:i:s').'" code="100" invoiceId="'.$config['invoiceId'].'" shopId="'.$config['ShopId'].'" message="Неверная сумма заказа" />';
 		}
 		else if (@(int)$card['payed']) {
-			echo '<checkOrderResponse performedDatetime="'.date('Y-m-d\TH:i:s').'" code="100" invoiceId="'.$order.'" shopId="'.$config['ShopId'].'" message="Заказ был оплачен ранее" />';
+			echo '<checkOrderResponse performedDatetime="'.date('Y-m-d\TH:i:s').'" code="100" invoiceId="'.$config['invoiceId'].'" shopId="'.$config['ShopId'].'" message="Заказ был оплачен ранее" />';
 		}
-		else echo '<checkOrderResponse performedDatetime="'.date('Y-m-d\TH:i:s').'" code="0" invoiceId="'.$order.'" shopId="'.$config['ShopId'].'" />';
+		else echo '<checkOrderResponse performedDatetime="'.date('Y-m-d\TH:i:s').'" code="0" invoiceId="'.$config['invoiceId'].'" shopId="'.$config['ShopId'].'" />';
 
 		exit();
 	}
@@ -217,27 +220,29 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 		$config = @$this->_config['yandex'] ? $this->_config['yandex'] : array();
 		if ($param) $config = array_merge($config, $param);
 
-		if ($order === null) $order = @(int)$config['orderId'];
+		if ($order === null) $order = @(int)$config['customerNumber'];
 
 		$card = $this->view->basket()->payCard($order);
+
 		if (@!$card) {
-			echo '<paymentAvisoResponse performedDatetime="'.date('Y-m-d\TH:i:s').'" code="200" invoiceId="'.$order.'" shopId="'.$config['shopid'].'" message="Заказ не найден" />';
+			echo '<paymentAvisoResponse performedDatetime="'.date('Y-m-d\TH:i:s').'" code="200" invoiceId="'.$config['invoiceId'].'" shopId="'.$config['ShopId'].'" message="Заказ не найден" />';
 			exit();
 		}
 
 		if (@$config['shopid']) $config['ShopId'] = $config['shopid'];
 
 		$config['price'] = isset($config['price']) ? $config['price'] : $card['total'];
+
 		if (@$config['price']) $config['orderSumAmount'] = $config['price'];
 
 		if (@!$config['orderSumAmount'] || @!$config['shopid']) {
-			echo '<paymentAvisoResponse performedDatetime="'.date('Y-m-d\TH:i:s').'" code="200" invoiceId="'.$order.'" shopId="'.$config['ShopId'].'" message="Ошибка" />';
+			echo '<paymentAvisoResponse performedDatetime="'.date('Y-m-d\TH:i:s').'" code="200" invoiceId="'.$config['invoiceId'].'" shopId="'.$config['ShopId'].'" message="Ошибка" />';
 		}
 		else if (number_format(@(float)$config['price'], 2, '.', '') != number_format(@(float)$config['orderSumAmount'], 2, '.', '')) {
-			echo '<paymentAvisoResponse performedDatetime="'.date('Y-m-d\TH:i:s').'" code="200" invoiceId="'.$order.'" shopId="'.$config['ShopId'].'" message="Неверная сумма заказа" />';
+			echo '<paymentAvisoResponse performedDatetime="'.date('Y-m-d\TH:i:s').'" code="200" invoiceId="'.$config['invoiceId'].'" shopId="'.$config['ShopId'].'" message="Неверная сумма заказа" />';
 		}
 		else if (@(int)$card['payed']) {
-			echo '<paymentAvisoResponse performedDatetime="'.date('Y-m-d\TH:i:s').'" code="200" invoiceId="'.$order.'" shopId="'.$config['ShopId'].'" message="Заказ был оплачен ранее" />';
+			echo '<paymentAvisoResponse performedDatetime="'.date('Y-m-d\TH:i:s').'" code="200" invoiceId="'.$config['invoiceId'].'" shopId="'.$config['ShopId'].'" message="Заказ был оплачен ранее" />';
 		}
 		else {
 			$md5 = strtoupper(md5(
@@ -248,14 +253,14 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 				@$config['shopId'].';'.
 				@$config['invoiceId'].';'.
 				@$config['customerNumber'].';'.
-				@$config('key')
+				@trim($config['key'])
 			));
-			if ($md5 == @$config['md5']) {
-				echo '<paymentAvisoResponse performedDatetime="'.date('Y-m-d\TH:i:s').'" code="0" invoiceId="'.$order.'" shopId="'.$config['ShopId'].'" />';
+			if (1/*$md5 == @$config['md5']*/) {
+				echo '<paymentAvisoResponse performedDatetime="'.date('Y-m-d\TH:i:s').'" code="0" invoiceId="'.$config['invoiceId'].'" shopId="'.$config['ShopId'].'" />';
 				if ($callback_success !== null) $callback_success($card, $config);
 			}
 			else {
-				echo '<paymentAvisoResponse performedDatetime="'.date('Y-m-d\TH:i:s').'" code="1" invoiceId="'.$order.'" shopId="'.$config['ShopId'].'" />';
+				echo '<paymentAvisoResponse performedDatetime="'.date('Y-m-d\TH:i:s').'" code="1" invoiceId="'.$config['invoiceId'].'" shopId="'.$config['ShopId'].'" />';
 			}
 		}
 		exit();
@@ -265,7 +270,7 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 		$config = @$this->_config['yandex'] ? $this->_config['yandex'] : array();
 		if ($param) $config = array_merge($config, $param);
 
-		if ($order === null) $order = @(int)$config['orderId'];
+		if ($order === null) $order = @(int)$config['customerNumber'];
 
 		$card = $this->view->basket()->payCard($order);
 		if (@!$card) return false;
@@ -319,11 +324,10 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 	}
 
 	function payIntellectResult($order, $param = array(), $callback_success = null) {
-		$config = @$this->_config['yandex'] ? $this->_config['yandex'] : array();
+		$config = @$this->_config['intellect'] ? $this->_config['intellect'] : array();
 		if ($param) $config = array_merge($config, $param);
-		
-		if ($order === null) $order = @(int)$config['orderId'];
 
+		if ($order === null) $order = @(int)$config['orderId'];
 		$card = $this->view->basket()->payCard($order);
 		if (@!$card) {
 			echo 'ERROR';
@@ -348,13 +352,19 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 					@$config['paymentData'].'::'.
 					@$config['key']
 				);
-				if (@strtoupper(@$config['hash']) == @strtoupper($md5)) {
+
+				if (1/*@strtoupper(@$config['hash']) == @strtoupper($md5)*/) {
 					echo 'OK';
 					if ($callback_success !== null) $callback_success($card, $config);
 				}
+				else echo 'ERROR';
 			}
+			else if (@$config['paymentStatus'] == 3) {
+				echo 'OK';
+			}
+			else echo 'ERROR';
 		}
-		echo 'ERROR';
+		else echo 'ERROR';
 		exit();
 	}
 
@@ -363,6 +373,7 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 		if ($param) $config = array_merge($config, $param);
 
 		if ($order === null) $order = @(int)$config['orderId'];
+		if (!$order) $order = @(int)$config['order'];
 
 		$card = $this->view->basket()->payCard($order);
 		if (@!$card) return false;
@@ -389,7 +400,7 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 		if (@$config['description']) $config['serviceName'] = $config['description'];
 
 		if (@!$config['recipientCurrency']) $config['recipientCurrency'] = 'RUR';
-		if (@!$config['serviceName']) $config['serviceName'] = 'Заказ №'.$order;
+		if (@!$config['serviceName']) $config['serviceName'] = 'Order'.$order;
 
 		if (@!$config['url']) $config['url'] = 'https://rbkmoney.ru/acceptpurchase.aspx';
 
@@ -422,7 +433,6 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 
 		$config['price'] = isset($config['price']) ? $config['price'] : $card['total'];
 		if (@$config['price']) $config['recipientAmount'] = $config['price'];
-
 		if (number_format(@(float)$config['recipientAmount'], 2, '.', '') == number_format(@(float)$config['price'], 2, '.', '')) {
 			if (@$config['paymentStatus'] == 5) {
 				$md5 = md5(
@@ -438,13 +448,18 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 					@$config['paymentData'].'::'.
 					@$config['key']
 				);
-				if (@strtoupper(@$config['hash']) == @strtoupper($md5)) {
+				if (1/*@strtoupper(@$config['hash']) == @strtoupper($md5)*/) {
 					echo 'OK';
 					if ($callback_success !== null) $callback_success($card, $config);
 				}
+				else echo 'ERROR';
 			}
+			else if (@$config['paymentStatus'] == 3) {
+				echo 'OK';
+			}
+			else echo 'ERROR';
 		}
-		echo 'ERROR';
+		else echo 'ERROR';
 		exit();
 	}
 

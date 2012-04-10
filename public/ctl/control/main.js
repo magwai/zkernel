@@ -198,6 +198,7 @@ c.go = function(controller, action, param, post) {
 				if (d.content) {
 					if (typeof CKEDITOR != 'undefined') CKEDITOR.instances = {};
 					$('#c_content').html(d.content);
+					$('dt[id$=\_crop-label],dd[id$=\_crop-element]').hide();
 					c.button_init();
 					$('.zend_form input:first').focus();
 				}

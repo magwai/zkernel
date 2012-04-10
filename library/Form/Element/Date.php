@@ -20,6 +20,7 @@ class Zkernel_Form_Element_Date extends Zend_Form_Element_Text
 		$regional = @$a['regional'] ? $a['regional'] : 'ru';
 		unset($a['regional']);
 		unset($a['helper']);
+
 		if (@$a['type'] == 'birth') {
 			$lang = array(
 				'en' => array(),
@@ -28,7 +29,7 @@ class Zkernel_Form_Element_Date extends Zend_Form_Element_Text
 						'short' => array('Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'),
 						'long' => array('Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь')
 					),
-					'titles' => array('Год:', 'Месяц:', 'День:')
+					'titles' => array('Год', 'Месяц', 'День')
 				)
 			);
 			$o = array(

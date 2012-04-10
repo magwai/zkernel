@@ -16,6 +16,7 @@ zuf.init = function(o) {
 	var n = o.fileDataName;
 	var hh = $('input[name=' + n + '][type=file]');
 	var h = $('input[name=' + n + '][type=hidden]');
+	h.data('zuf_options', o);
 	h.data('old_val', h.val());
 	var e = h.prevAll('em');
 	var oo = {
@@ -97,15 +98,49 @@ zuf.add = function(n, title, url, required) {
 		var url_valid = title.search(/^http\:\/\//gi) == -1
 			? url + '/' + title
 			: title;
+		var opt = i.data('zuf_options');
 		o.append('<div rel="' + title + '" class="uploadifyQueueItem uploadifyQueueLoaded">\
 			' + (required ? '' : '<div class="cancel">\
 				<a href="javascript:zuf.del(\'' + n + '\', \'' + title + '\')"><img src="/zkernel/ctl/uploadify/cancel.png" border="0" /></a>\
 			</div>') + '\
-			<span class="fileName"><a target="_blank" href="' + url_valid + '" class="c_fancy">' + title + '</a></span><span class="percentage"></span>\
+			<span class="fileName"><a target="_blank" href="' + url_valid + '" class="c_fancy' + (opt && opt.jcrop ? '_crop' : '') + '">' + title + '</a></span><span class="percentage"></span>\
 			<div class="uploadifyProgress">\
 				<div class="uploadifyProgressBar" style="width:100%;"><!--Progress Bar--></div>\
 			</div>\
 		</div>');
+		if (opt && opt.jcrop) {
+			var jo = typeof opt.jcrop == 'object' ? opt.jcrop : {};
+			//if (cr.length && cr.val()) jo.setSelect = cr.val().split(',');
+			var l = $('.c_fancy_crop').length;
+			o.find('.c_fancy_crop').attr('id', 'c_fancy_crop_' + l);
+			$('#c_fancy_crop_' + l).fancybox({
+				afterShow: function() {
+					var img = $('.fancybox-image');
+					var i = new Image();
+					i.onload = function() {
+						var aspect = img.width() / this.width;
+						var cr = $('#' + n + '_crop');
+						if (cr.length && cr.val()) {
+							var cr_val = cr.val().split(',');
+							if (cr_val.length == 4) {
+								jo.setSelect = [];
+								for (var c = 0; c < cr_val.length; c++) jo.setSelect.push(Math.floor(cr_val[c] * aspect));
+							}
+							else jo.setSelect = null;
+						}
+						else jo.setSelect = null;
+						jo.onChange = function(c) {
+							cr.val(Math.floor(c.x / aspect) + ',' + Math.floor(c.y / aspect) + ',' + Math.floor(c.x2 / aspect) + ',' + Math.floor(c.y2 / aspect));
+						};
+						jo.onRelease = function() {
+							cr.val('');
+						};
+						img.Jcrop(jo);
+					};
+					i.src = img.attr('src');
+				}
+			});
+		}
 	}
 	i.val(zuf.implode('*', v));
 	/*var h = $('input[name=' + n + '][type=hidden]');

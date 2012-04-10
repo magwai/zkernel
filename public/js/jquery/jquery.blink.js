@@ -20,6 +20,7 @@
 
 			var css_old = {};
 			for (k in opt.css) css_old[k] = _t.css(k);
+			_t.data('css_old', css_old);
 
 			var count = opt.count;
 			if (count) _t.data('blink_count', count);
@@ -49,6 +50,8 @@
 		blink_stop: function() {
 			var _t = jQuery(this);
 			_t.data('blink_count', 0);
+			var css = _t.data('css_old');
+			if (css && typeof css == 'object') _t.css(css);
 		}
 	});
 })(jQuery);

@@ -72,7 +72,14 @@ class Zkernel_View_Helper_Mail extends Zkernel_View_Helper_Override  {
 		$ok = true;
 
 		try {
-			$mail->send();
+			$config = Zend_Controller_Front::getInstance()->getParam('bootstrap')->getOptions();
+			$tr = null;
+			if (@$config['mail'] && @$config['mail']['transport']) {
+				if ($config['mail']['transport'] == 'smtp' && @$config['mail']['smtp'] && @$config['mail']['smtp']['host']) {
+					$tr = new Zend_Mail_Transport_Smtp($config['mail']['smtp']['host'], $config['mail']['smtp']);
+				}
+			}
+			$mail->send($tr);
 		}
 		catch (Zend_Mail_Transport_Exception $e) {
 			$ok = false;

@@ -46,6 +46,17 @@ class Zkernel_Image_Preview {
 			'correctPermissions' => true
 		));
 
+		if (@$param['crop']) {
+			$crop_data = explode(',', $param['crop']);
+			$image = $thumb->getOldImage();
+			$crop_width = $crop_data[2] - $crop_data[0];
+			$crop_height = $crop_data[3] - $crop_data[1];
+			$new_image = imagecreatetruecolor($crop_width, $crop_height);
+			imagecopyresampled($new_image, $image, 0, 0, $crop_data[0], $crop_data[1], $crop_width, $crop_height, $crop_width, $crop_height);
+			$thumb->setOldImage($new_image);
+			$thumb->setCurrentDimensions(array('width' => $crop_width, 'height' => $crop_height));
+		}
+
 		if ($fit) $thumb->adaptiveResize($width, $height, $align);
 		else $thumb->resize($width, $height);
 

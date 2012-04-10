@@ -52,6 +52,8 @@ class Zkernel_View_Helper_Zlist extends Zend_View_Helper_Abstract  {
 
 		$data['pager_param'] = @$data['pager_param'];
 
+		$data['pager_range'] = @$data['pager_range'] ? $data['pager_range'] : 10;
+
 		if (!$data['fetch_data'] && $data['fetch_model']) {
 			$class = $data['fetch_model'];
 			$class = is_object($class) ? $class : new $class();
@@ -96,6 +98,7 @@ class Zkernel_View_Helper_Zlist extends Zend_View_Helper_Abstract  {
 			$paginator = Zend_Paginator::factory($lv);
 			$paginator->setItemCountPerPage($data['pager_perpage']);
 			$paginator->setCurrentPageNumber($data['pager_page']);
+			$paginator->setPageRange($data['pager_range']);
 			$this->view->data = $list instanceOf Zend_Db_Select
 				? $this->view->override($paginator, $data['override_type'])
 				: $paginator;

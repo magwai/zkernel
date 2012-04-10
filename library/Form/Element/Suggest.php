@@ -10,6 +10,7 @@
 class Zkernel_Form_Element_Suggest extends Zend_Form_Element_Text {
 	public function render(Zend_View_Interface $view = null) {
     	$model = $this->getAttrib('model');
+		if ($model) $this->setAttrib('model', '');
 
     	$min_length = (int)$this->getAttrib('min_length');
     	$min_length = $min_length ? $min_length : 1;
