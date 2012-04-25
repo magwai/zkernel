@@ -13,7 +13,7 @@ class Zkernel_View_Helper_FormUploadify extends Zend_View_Helper_FormFile {
     	$required = @(int)$attribs['required'];
     	$url = $attribs['url'];
     	$required = $attribs['required'];
-    	$jcrop = $attribs['jcrop'];
+    	$jcrop = @$attribs['jcrop'];
     	unset($attribs['url']);
     	unset($attribs['destination']);
     	unset($attribs['required']);

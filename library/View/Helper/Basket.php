@@ -7,6 +7,7 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 	protected $_model_order_item = null;
 	protected $_model_discount = null;
 	protected $_model_delivery = null;
+	protected $_model_cash = null;
 	protected $_model_pay = null;
 	protected $_field_order_item_id = 'itemid';
 
@@ -16,6 +17,7 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 		if ($this->_model_order_item === null) $this->_model_order_item = new Default_Model_Orderitem;
 		if ($this->_model_discount === null && class_exists('Default_Model_Discount')) $this->_model_discount = new Default_Model_Discount;
 		if ($this->_model_delivery === null && class_exists('Default_Model_Delivery')) $this->_model_delivery = new Default_Model_Delivery;
+		if ($this->_model_cash === null && class_exists('Default_Model_Cash')) $this->_model_cash = new Default_Model_Cash;
 		if ($this->_model_pay === null && class_exists('Default_Model_Pay')) $this->_model_pay = new Default_Model_Pay;
 	}
 
@@ -114,15 +116,40 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 		$ret = $this->basketPriceClean($id);
 		$ret += $this->fetchDelivery($oid, $ret);
 		$ret += $this->fetchPay($oid, $ret);
+		$ret -= $this->fetchCash($oid);
 		return $ret;
 	}
-	
+
 	function getPercent($v, $total = 1) {
 		// Обрабатываем параметры: с процентами и без
 		if (strpos($v, '%') !== false) $v = substr($v, 0, -1) * $total / 100;
 		return is_numeric($v)
 			? (is_float($v) ? (float)$v : (int)$v)
 			: (string)$v;
+	}
+
+	function fetchCash($oid, $check_amount = true) {
+		$ret = 0;
+		if ($this->_model_cash && $this->view->user('id')) {
+			$card = $this->_model_order->fetchRow(array(
+				'`id` = ?' => $oid
+			));
+			if ($card && $card->cash) {
+				if ($check_amount) {
+					$cash = $this->_model_cash->fetchAmountForBasket($this->view->user('id'));
+					if ($cash && $card->cash) {
+						$ret = min($card->cash, $cash);
+						if ($ret != $card->cash) {
+							$this->basketSave(array(
+								'cash' => $ret
+							));
+						}
+					}
+				}
+				else $ret = $card->cash;
+			}
+		}
+		return $ret;
 	}
 
 	function fetchDelivery($oid, $price, $original = false) {
@@ -282,7 +309,26 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 	function basketSave($data) {
 		$oid = $this->basketId();
 		if (!$oid) return false;
+
+		$cash_changed = false;
+		if ($this->_model_cash && $this->view->user('id') && isset($data['cash'])) {
+			if ($data['cash'] < 0) $data['cash'] = 0;
+
+			$card = $this->_model_order->fetchRow(array(
+				'`id` = ?' => $oid
+			));
+			if ($card && @$data['cash'] != $card->cash) {
+
+				$cash = $this->_model_cash->fetchAmountForBasket($this->view->user('id'), $oid);
+				if ($cash) {
+					if (@$data['cash'] > $cash) return false;
+					else $cash_changed = true;
+				}
+			}
+		}
+
 		$ok = $this->_model_order->update($data, array('`id` = ?' => $oid));
+		if ($ok && $cash_changed) $this->_model_cash->saveCashForBasket($this->view->user('id'), $oid, @$data['cash']);
 		return $ok ? $oid : false;
 	}
 
@@ -337,6 +383,7 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 		$ret = $this->finishedPriceClean($oid, $id, $uid, $payed);
 		if ($oid) $ret += $this->fetchDelivery($oid, $ret);
 		if ($oid) $ret += $this->fetchPay($oid, $ret);
+		if ($oid) $ret -= $this->fetchCash($oid, false);
 		return $ret;
 	}
 
@@ -354,7 +401,25 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 	}
 
 	function finishedSave($oid, $data) {
+		$cash_changed = false;
+		if ($this->_model_cash && $this->view->user('id')) {
+			if (isset($data['cash']) && $data['cash'] < 0) $data['cash'] = 0;
+
+			$card = $this->_model_order->fetchRow(array(
+				'`id` = ?' => $oid
+			));
+
+			if ($card && $data['cash'] != $card->cash) {
+				$cash = $this->_model_cash->fetchAmountForBasket($this->view->user('id'), $oid);
+				if ($cash) {
+					if ($data['cash'] > $cash) return false;
+					else $cash_changed = true;
+				}
+			}
+		}
+
 		$ok = $this->_model_order->update($data, array('`id` = ?' => $oid, '`finished` = ?' => 1));
+		if ($ok && $cash_changed) $this->_model_cash->saveCashForBasket($this->view->user('id'), $oid, $data['cash']);
 		return $ok ? $oid : false;
 	}
 
