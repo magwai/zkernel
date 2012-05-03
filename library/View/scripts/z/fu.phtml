@@ -1,14 +1,48 @@
 <?php
 
 $this->layout()->disableLayout(true);
+
+$s = new Zend_Session_Namespace();
+if ($this->source == 'redactor' && $this->type == 'json') {
+	if (!@$_SESSION['isLoggedIn']) throw new Zend_Controller_Action_Exception(403, 'Forbidden');
+	$data = array();
+	$dir = PUBLIC_PATH.'/upload/mce/image';
+	$handle = @opendir($dir);
+	define('CACHE_DIR', 'upload/mce/image');
+	while ($path = @readdir($handle)) {
+		if (is_file($dir.'/'.$path)) {
+			$data[] = array(
+				'thumb' => $this->preview('mce/image', $path, array(
+					'width' => 90,
+					'height' => 72,
+					'fit' => true,
+					'stretch' => true,
+					'prefix' => 'mcith',
+					'cache_dir_folder' => 'mcith'
+				)),
+				'image' => '/upload/mce/image/'.$path
+			);
+
+		}
+	}
+	@closedir($handle);
+	header('Content-Type: application/json');
+	echo $this->json($data);
+	exit();
+}
+
 $ret = array();
 $ok = '';
 $key = array_keys($this->files);
 $key = @$key[0];
 if ($key){
+	if ($this->source == 'redactor') {
+		if (!@$_SESSION['isLoggedIn']) throw new Zend_Controller_Action_Exception(403, 'Forbidden');
+		$this->post = is_array($this->post) ? $this->post : array();
+		$this->post['folder'] = PUBLIC_PATH.'/upload/mce/'.($this->type == 'image' ? 'image' : 'file');
+	}
     try { Zend_Session::setId(@$this->post['sid']); } catch (Exception $e) {  }
-    $s = new Zend_Session_Namespace();
-	$tmp_name = $this->files[$key]['tmp_name'];
+    $tmp_name = $this->files[$key]['tmp_name'];
     $validators = array('Zend_Validate_File_Upload' => new Zend_Validate_File_Upload());
     if (@$s->form[$key]['validators']) $validators = array_merge($validators, $s->form[$key]['validators']);
     $valid = true;
@@ -42,9 +76,14 @@ if ($key){
     		));
     		$name = $filter->filter($name);
     		$path = $new_dir.'/'.$name;
-    		$res = @move_uploaded_file($tmp_name, $path);
+			$res = @move_uploaded_file($tmp_name, $path);
 			if ($res) {
-				$ok = 'u|'.$name;
+				if ($this->source == 'redactor') {
+					$ok = $this->type == 'image'
+						? '<img src="/upload/mce/image/'.$name.'" alt="" />'
+						: ($this->type == 'url' ? '/upload/mce/file/'.$name : '<a href="/upload/mce/file/'.$name.'">'.$name.'</a>');
+				}
+				else $ok = 'u|'.$name;
 				@chmod($path, 0755);
 			}
 			else $ret[] = 'uploadifyNocopy';

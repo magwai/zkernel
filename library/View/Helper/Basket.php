@@ -136,7 +136,7 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 			));
 			if ($card && $card->cash) {
 				if ($check_amount) {
-					$cash = $this->_model_cash->fetchAmountForBasket($this->view->user('id'));
+					$cash = $this->_model_cash->fetchAmountForBasket($this->view->user('id'), $card->id);
 					if ($cash && $card->cash) {
 						$ret = min($card->cash, $cash);
 						if ($ret != $card->cash) {
@@ -313,12 +313,13 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 		$cash_changed = false;
 		if ($this->_model_cash && $this->view->user('id') && isset($data['cash'])) {
 			if ($data['cash'] < 0) $data['cash'] = 0;
+			$price_clean = $this->basketPriceClean();
+			if ($data['cash'] > $price_clean) $data['cash'] = $price_clean;
 
 			$card = $this->_model_order->fetchRow(array(
 				'`id` = ?' => $oid
 			));
 			if ($card && @$data['cash'] != $card->cash) {
-
 				$cash = $this->_model_cash->fetchAmountForBasket($this->view->user('id'), $oid);
 				if ($cash) {
 					if (@$data['cash'] > $cash) return false;
@@ -326,7 +327,6 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 				}
 			}
 		}
-
 		$ok = $this->_model_order->update($data, array('`id` = ?' => $oid));
 		if ($ok && $cash_changed) $this->_model_cash->saveCashForBasket($this->view->user('id'), $oid, @$data['cash']);
 		return $ok ? $oid : false;
@@ -402,8 +402,10 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 
 	function finishedSave($oid, $data) {
 		$cash_changed = false;
-		if ($this->_model_cash && $this->view->user('id')) {
-			if (isset($data['cash']) && $data['cash'] < 0) $data['cash'] = 0;
+		if ($this->_model_cash && $this->view->user('id') && isset($data['cash'])) {
+			if ($data['cash'] < 0) $data['cash'] = 0;
+			$price_clean = $this->finishedPriceClean($oid);
+			if ($data['cash'] > $price_clean) $data['cash'] = $price_clean;
 
 			$card = $this->_model_order->fetchRow(array(
 				'`id` = ?' => $oid

@@ -101,6 +101,34 @@ class Zkernel_Form_Element_Mce extends Zend_Form_Element_Textarea {
 });
 ';
 		}
+		else if ($this->getView()->control()->config->wysiwyg == 'redactor') {
+			$o = array(
+				'path' => '/zkernel/ctl/redactor',
+				'focus' => false,
+				'removeClasses' => false,
+				'removeStyles' => false,
+				'convertLinks' => false,
+				'autosave' => false,
+				//'autoresize' => true,
+				'imageGetJson' => '/z/fu/source/redactor/type/json',
+				'imageUpload' => '/z/fu/source/redactor/type/image',
+				'linkFileUpload' => '/z/fu/source/redactor/type/url',
+				'fileUpload' => '/z/fu/source/redactor/type/file'
+			);
+			if ($a) $o = array_merge($o, $a);
+			$js =
+'$.include([
+	"/zkernel/ctl/redactor/redactor.js"
+], function() {
+	var opt = '.Zend_Json::encode($o).';
+	var o = $("textarea[name='.$this->getName().']");
+	o.parent().width(o[0].offsetWidth);
+	o.val(o.val().replace("<!-- pagebreak -->", "<hr />"));
+    o.redactor(opt);
+});
+$.include(["/zkernel/ctl/redactor/css/redactor.css|link"]);
+';
+		}
     	$this->getView()->inlineScript('script', $js);
 		return parent::render($view);
 	}

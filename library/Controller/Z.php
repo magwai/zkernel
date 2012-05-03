@@ -36,6 +36,8 @@ class Zkernel_Controller_Z extends Zkernel_Controller_Action {
     }
 
 	function fuAction() {
+		$this->view->type = (string)$this->getRequest()->getParam('type');
+		$this->view->source = (string)$this->getRequest()->getParam('source');
 		$this->view->post = $_POST;
 		$this->view->files = $_FILES;
 	}

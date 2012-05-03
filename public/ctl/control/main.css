@@ -36,7 +36,7 @@ a#c_mlink .ui-icon{float:right;margin:11px 0 0 5px;}
 
 .c_overlay{height:100%;width:100%;position:fixed;left:0;top:0;z-index:4000;display:none;background:#cccccc;opacity:.7;filter:alpha(opacity=70);}
 
-#c_menu_frame{display:none;position:absolute;z-index:570;background-image:none;border-top:0;top:38px;left:20px;width:200px;}
+#c_menu_frame{display:none;position:absolute;z-index:1570;background-image:none;border-top:0;top:38px;left:20px;width:200px;}
 
 #c_menu{padding:20px 20px 10px 20px;color:#ffffff;font-weight:bold;font-size:16px;}
 #c_menu a,#c_menu a:link,#c_menu a:visited{color:#ffffff;display:block;margin:0 0 10px 0;text-decoration:none;}
