@@ -32,12 +32,12 @@ class Zkernel_Application_Resource_User extends Zend_Application_Resource_Resour
 			$class_user = $options['user'];
 
 			$this->_user = new Zkernel_User(array(
-				'role' => new $class_role(),
-				'role_refer' => new $class_role_refer(),
-				'resource' => new $class_resource(),
-				'rule' => new $class_rule(),
-				'rule_role' => new $class_rule_role(),
-				'rule_resource' => new $class_rule_resource(),
+				'role' => class_exists($class_role) ? new $class_role() : null,
+				'role_refer' => class_exists($class_role_refer) ? new $class_role_refer() : null,
+				'resource' => class_exists($class_resource) ? new $class_resource() : null,
+				'rule' => class_exists($class_rule) ? new $class_rule() : null,
+				'rule_role' => class_exists($class_rule_role) ? new $class_rule_role() : null,
+				'rule_resource' => class_exists($class_rule_resource) ? new $class_rule_resource() : null,
 				'user' => new $class_user()
 			));
 			$this->_user->initAcl();

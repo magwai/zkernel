@@ -174,7 +174,7 @@ $.include([
 			$(".c_fancy").fancybox();
 		},
 		'.($c->pager_scroll ? 'scroll: true,' : ($c->pager_perpage ? 'pager: "#list_pager",' : '')).'
-		prmNames: {page: "_page", rows: "rows", sort: "_orderby", order: "_orderdir", search:"_search", nd: "nd"}
+		prmNames: {page: "_page", rows: "_rows", sort: "_orderby", order: "_orderdir", search:"_search", nd: "nd"}
 	});
 	'.($is_search ? '$("#list").jqGrid("filterToolbar", {beforeSearch: function() { $(this).jqGrid("setGridParam",{search:true}).trigger("reloadGrid",[{page:1}]); return true;}});$("#list").setGridHeight(c.table_height());' : '').'
 	'.($c->drag ? '$("#list").jqGrid("sortableRows", {

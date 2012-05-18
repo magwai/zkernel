@@ -11,6 +11,6 @@ class Zkernel_Db_Model_Lang extends Zkernel_Db_Table {
 	protected $_name = 'lang';
 
 	function fetchIds() {
-		return $this->fetchCol('id');
+		return $this->fetchCol('id', null, 'default desc');
 	}
 }

@@ -52,7 +52,10 @@ class Zkernel_View_Helper_User extends Zend_View_Helper_Abstract  {
 
 	public function user($p = null) {
 		if ($this->_user === null) $this->init();
-		if ($p === true) return $this->_user->get();
+		if ($p === true) {
+			$ret = $this->_user->get();
+			return $ret ? $this->view->override()->overrideSingle($ret, 'user') : array();
+		}
 		else if ($p !== null) return @$this->_user->$p;
     	return $this;
     }

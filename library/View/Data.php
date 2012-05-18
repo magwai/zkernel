@@ -17,7 +17,7 @@ class Zkernel_View_Data implements Countable, Iterator, ArrayAccess {
 	public function __construct($d = null) {
 		if ($d !== null) {
 			if ($d instanceof Zend_Db_Table_Row) $d = $d->toArray();
-			foreach ($d as $k => $v) $this->set($k, $v);
+			if ($d && (is_array($d) || is_object($d))) foreach ($d as $k => $v) $this->set($k, $v);
 		}
     }
 

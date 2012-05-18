@@ -47,6 +47,7 @@ class Zkernel_User {
 	}
 
 	function initAcl() {
+		if (!$this->_models['role'] || !$this->_models['role_refer'] || !$this->_models['resource'] || !$this->_models['rule'] || !$this->_models['rule_role'] || !$this->_models['rule_resource']) return $this;
 		$this->_acl = new Zend_Acl();
 		$roles = $this->_models['role']->fetchCol('id');
 		if ($roles) {

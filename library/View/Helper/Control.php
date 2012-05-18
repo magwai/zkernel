@@ -595,7 +595,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
     	$this->config->orderby = str_replace('list_', '', $this->config->orderby);
 
     	$this->config->control_lang_current = $this->config->control_lang_data[$this->config->control_lang];
-    	return $this;
+		return $this;
 	}
 
 	public function routeShow() {

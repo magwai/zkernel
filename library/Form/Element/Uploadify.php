@@ -52,17 +52,22 @@ $.include(["/zkernel/js/swfobject.js", "/zkernel/ctl/uploadify/jquery.uploadify.
     	if (!$this->getAttrib('multi')) $values = array($values[0]);
     	foreach ($values as $num => $v) {
 	    	$ss = substr($v, 0, 2);
-	    	if ($ss == 'u|') {
+	    	/*if ($ss == 'u|') {
 	    		$values[$num] = $v = str_replace('u|', '', $v);
-	    		$this->getView()->inlineScript('script', 'zuf.add("'.$this->getName().'", "'.$v.'", "'.$this->url.'", '.(int)$this->isRequired().');');
+	    		$this->getView()->inlineScript()->offsetSetScript(500 + $num, 'zuf.add("'.$this->getName().'", "'.$v.'", "'.$this->url.'", '.(int)$this->isRequired().');');
 	    	}
-	    	else if ($ss == 'd|') {
+	    	else */
+			if ($ss == 'd|') {
 	    		$v = str_replace('d|', '', $v);
 	    		@unlink($this->destination.'/'.$v);
 	    		unset($values[$num]);
 	    		$this->setValue(implode('*', $values));
-	    		$this->getView()->inlineScript('script', 'zuf.remove("'.$this->getName().'", "'.$v.'");');
+	    		$this->getView()->inlineScript()->offsetSetScript(501 + $num, 'zuf.remove("'.$this->getName().'", "'.$v.'");');
 	    	}
+			else if ($v) {
+				$values[$num] = $v = str_replace('u|', '', $v);
+	    		$this->getView()->inlineScript()->offsetSetScript(500 + $num, 'zuf.add("'.$this->getName().'", "'.$v.'", "'.$this->url.'", '.(int)$this->isRequired().');');
+			}
     	}
     	return implode('*', $values);
     }
