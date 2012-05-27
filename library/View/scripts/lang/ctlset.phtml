@@ -1,0 +1,11 @@
+<?php
+
+$s = new Zend_Session_Namespace;
+$s->lang = $this->control()->config->param->id;
+$this->inlineScript('script', '$(function() { window.location += ""; });');
+
+$this->control(array(
+	'stop_frame' => true,
+	'use_db' => false,
+	'type' => 'none'
+));

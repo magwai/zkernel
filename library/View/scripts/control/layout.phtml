@@ -65,7 +65,10 @@ else {
 		//'title' => 'Панель управления'
 	);
 	$reg = Zend_Registry::isRegistered('Zkernel_Multilang') ? Zend_Registry::get('Zkernel_Multilang') : '';
-	if ($reg && !@$reg->domain) $p['lang'] = $reg->stitle;
+	if ($reg && !@$reg->domain) $p['lang'] = $reg->session
+		? $reg->id
+		: $reg->stitle;
+	if ($reg->session) $p['lang_session'] = true;
 	if ($reg && @$reg->domain) $d = explode(' ', $reg->domain);
 
 	$this	->inlineScript('script', '$(function() { c.init('.Zend_Json::encode($p).', '.Zend_Json::encode($l).'); });');

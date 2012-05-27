@@ -5,16 +5,19 @@ $list = $model->fetchAll(null, 'orderid');
 $reg = Zend_Registry::get('Zkernel_Multilang') ? Zend_Registry::get('Zkernel_Multilang') : '';
 
 ?>
-<div id="c_lang"><select onchange="window.location = this.value">
+<div id="c_lang"><select onchange="<?php echo $reg->session ? 'c.go(\'lang\', \'ctlset\', {\'id\': this.value})' : 'window.location = this.value' ?>">
 <?php
 
-if (count($list)) foreach ($list as $el) {
-	$d = explode(' ', @$el->domain);
+if (count($list)) {
+	$list = $this->override($list);
+	foreach ($list as $el) {
+		$d = explode(' ', @$el->domain);
 
 ?>
-	<option<?php echo $reg->id == $el->id ? ' selected="selected"' : '' ?> value="<?php echo $reg->domain ? 'http://'.$d[0] : '/'.$el->stitle ?>/control"><?php echo $el->title ?></option>
+	<option<?php echo $reg->id == $el->id ? ' selected="selected"' : '' ?> value="<?php echo $reg->session ? $el->id : ($reg->domain ? 'http://'.$d[0] : '/'.$el->stitle).'/control' ?>"><?php echo $el->title ?></option>
 <?php
 
+	}
 }
 
 ?>

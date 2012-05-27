@@ -19,7 +19,7 @@ class Zkernel_Controller_Action extends Zend_Controller_Action {
 	function init() {
 		$p = explode('/', trim(@$_SERVER['REQUEST_URI'], '/'));
 		$reg = Zend_Registry::isRegistered('Zkernel_Multilang') ? Zend_Registry::get('Zkernel_Multilang') : '';
-		if ($reg && !$reg->domain && $p) array_shift($p);
+		if ($reg && !$reg->domain && !$reg->session && $p) array_shift($p);
 		$model = 'Default_Model_'.ucfirst($this->getRequest()->getControllerName());
 		if (@class_exists($model)) $this->model = new $model();
 		if (substr(@$p[1], 0, 3) == 'ctl') {

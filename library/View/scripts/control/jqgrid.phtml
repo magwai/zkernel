@@ -114,7 +114,7 @@ $.include([
 		ExpandColumn: "'.$field_model[0]['name'].'",'
 :		''
 ).'
-	   	url: "'.($reg && !@$reg->domain ? '/'.$reg->stitle : '').'/'.$c->controller.'/'.$c->action.'",
+	   	url: "'.($reg && !@$reg->domain && !$reg->session ? '/'.$reg->stitle : '').'/'.$c->controller.'/'.$c->action.'",
 	   	mtype: "post",
 		datatype: "json",
 	   	colNames: '.Zend_Json::encode($field_title).',

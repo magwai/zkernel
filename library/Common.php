@@ -166,19 +166,26 @@ class Zkernel_Common {
 		return $res;
     }
 
-	static function getDateBack($period, $parezh = 'imen', $parts = array('day', 'hour', 'minute'), $round = array()) {
+	static function getDateBack($period, $parezh = 'imen', $parts = array('day', 'hour', 'minute'), $round = array(), $param = array()) {
 		global $m;
 		if ($period < 0) return '';
 		$res = '';
-		$year = array('год', 'года', 'лет');
-		$month = array('месяц', 'месяца', 'месяцев');
-		$day = array('день', 'дня', 'дней');
-		$hour = array('час', 'часа', 'часов');
-		$minute = array('минута', 'минуты', 'минут');
-		$second = array('секунда', 'секунды', 'секунд');
+		$year = @$param['year'] ? $param['year'] : array('год', 'года', 'лет');
+		$month = @$param['month'] ? $param['month'] : array('месяц', 'месяца', 'месяцев');
+		$day = @$param['day'] ? $param['day'] : array('день', 'дня', 'дней');
+		$hour = @$param['hour'] ? $param['hour'] : array('час', 'часа', 'часов');
+		$minute = @$param['minute'] ? $param['minute'] : array('минута', 'минуты', 'минут', 'минуту');
+		$second = @$param['second'] ? $param['second'] : array('секунда', 'секунды', 'секунд', 'секунду');
+		$show = array(
+			'month' => isset($param['show']['month']) ? $param['show']['month'] : true,
+			'day' => isset($param['show']['day']) ? $param['show']['day'] : true,
+			'hour' => isset($param['show']['hour']) ? $param['show']['hour'] : true,
+			'minute' => isset($param['show']['minute']) ? $param['show']['minute'] : true,
+			'second' => isset($param['show']['second']) ? $param['show']['second'] : false
+		);
 		if ($parezh == 'vinit') {
-			$minute[0] = 'минуту';
-			$second[0] = 'секунду';
+			$minute[0] = $minute[3];
+			$second[0] = $second[3];
 		}
 		$n_y = in_array('year', $parts)
 			? floor($period / 31536000)
@@ -192,11 +199,11 @@ class Zkernel_Common {
 		$n_s = floor($period - ($n_y * 31536000 + $n_t * 2592000 + $n_d * 86400 + $n_h * 3600 + $n_m * 60));
 
 		if ($n_y && in_array('year', $parts)) $res .= $n_y.' '.$m->f_get_pluralform($n_y, $year).' ';
-		if ($n_t && in_array('month', $parts) && (!in_array('month', $round) || $n_t > 3 && $res)) $res .= $n_t.' '.self::getPluralform($n_t, $month).' ';
-		if ($n_d && in_array('day', $parts) && (!in_array('day', $round) || $n_d > 3)) $res .= $n_d.' '.self::getPluralform($n_d, $day).' ';
-		if ($n_h && in_array('hour', $parts) && (!in_array('hour', $round) || $n_h > 3 && $res)) $res .= $n_h.' '.self::getPluralform($n_h, $hour).' ';
-		if ($n_m && in_array('minute', $parts) && (!in_array('minute', $round) || $n_m > 3 && $res)) $res .= $n_m.' '.self::getPluralform($n_m, $minute).' ';
-		if ($n_s && in_array('second', $parts) && (!in_array('second', $round) || $n_s > 3 && $res)) $res .= $n_s.' '.self::getPluralform($n_s, $second).' ';
+		if ((@$show['month'] ? !$n_y : true) && $n_t && in_array('month', $parts) && (!in_array('month', $round) || $n_t > 3 && $res)) $res .= $n_t.' '.self::getPluralform($n_t, $month).' ';
+		if ((@$show['day'] ? !$n_t : true) && $n_d && in_array('day', $parts) && (!in_array('day', $round) || $n_d > 3)) $res .= $n_d.' '.self::getPluralform($n_d, $day).' ';
+		if ((@$show['hour'] ? !$n_d : true) && $n_h && in_array('hour', $parts) && (!in_array('hour', $round) || $n_h > 3 && $res)) $res .= $n_h.' '.self::getPluralform($n_h, $hour).' ';
+		if ((@$show['minute'] ? !$n_h : true) && $n_m && in_array('minute', $parts) && (!in_array('minute', $round) || $n_m > 3 && $res)) $res .= $n_m.' '.self::getPluralform($n_m, $minute).' ';
+		if ((@$show['second'] ? !$n_m : true) && $n_s && in_array('second', $parts) && (!in_array('second', $round) || $n_s > 3 && $res)) $res .= $n_s.' '.self::getPluralform($n_s, $second).' ';
 
 		return trim($res);
 	}

@@ -112,9 +112,11 @@ class Zkernel_User {
 		if ($this->_auth === null) $this->initAuth();
 		$key = 'user_'.$this->_models['user']->info('name');
 		if ($password === null) {
-			$data = $this->_models['user']->fetchRow(array(
-				'`login` = ?' => $login
-			));
+			$data = method_exists($this->_models['user'], 'fetchUserDataByLogin')
+				? $this->_models['user']->fetchUserDataByLogin($login)
+				: $this->_models['user']->fetchRow(array(
+					'`login` = ?' => $login
+				));
 			if ($data) {
 				$result = $this->_auth->getStorage()->write($login);
 				$this->_data = $data;

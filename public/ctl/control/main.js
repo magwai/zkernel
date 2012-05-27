@@ -122,7 +122,7 @@ c.button_init = function() {
 
 c.load_menu = function(success) {
 	$.ajax({
-		url: (c.cfg.lang ? '/' + c.cfg.lang : '') + '/control/menu/?' + c.rnd(),
+		url: (c.cfg.lang && !c.cfg.lang_session ? '/' + c.cfg.lang : '') + '/control/menu/?' + c.rnd(),
 		dataType: 'json',
 		success: function(data) {
 			$('#c_menu').empty().hide();
@@ -180,7 +180,7 @@ c.go = function(controller, action, param, post) {
 		return false;
 	}
 	c.xhr = $.ajax({
-		url: (c.cfg.lang ? '/' + c.cfg.lang : '') + c.url_assemble(controller, action, param),
+		url: (c.cfg.lang && !c.cfg.lang_session ? '/' + c.cfg.lang : '') + c.url_assemble(controller, action, param),
 		type: post ? 'post' : 'get',
 		data: post,
 		dataType: 'json',
@@ -214,7 +214,7 @@ c.go = function(controller, action, param, post) {
 		complete: function() {
 		}
 	});
-	//$.php((c.cfg.lang ? '/' + c.cfg.lang : '') + c.url_assemble(controller, action, param), post);
+	//$.php((c.cfg.lang && !c.cfg.lang_session ? '/' + c.cfg.lang : '') + c.url_assemble(controller, action, param), post);
 	return false;
 };
 
@@ -235,7 +235,7 @@ c.array2url = function(a) {
 
 c.load_auth = function(success) {
 	$.ajax({
-		url: (c.cfg.lang ? '/' + c.cfg.lang : '') + '/control/auth?' + c.rnd(),
+		url: (c.cfg.lang && !c.cfg.lang_session ? '/' + c.cfg.lang : '') + '/control/auth?' + c.rnd(),
 		dataType: 'json',
 		success: function(data) {
 			c.cfg.login = data.login;
@@ -263,7 +263,7 @@ c.build_auth = function(lo) {
 c.login = function(data, controller, action) {
 	c.loading_start(false/*, 400*/);
 	$.ajax({
-		url: (c.cfg.lang ? '/' + c.cfg.lang : '') + '/control/auth/?' + c.rnd(),
+		url: (c.cfg.lang && !c.cfg.lang_session ? '/' + c.cfg.lang : '') + '/control/auth/?' + c.rnd(),
 		type: 'post',
 		dataType: 'json',
 		data: data,
@@ -290,7 +290,7 @@ c.login = function(data, controller, action) {
 c.logout = function() {
 	c.loading_start(false/*, 400*/);
 	$.ajax({
-		url: (c.cfg.lang ? '/' + c.cfg.lang : '') + '/control/auth/?' + c.rnd(),
+		url: (c.cfg.lang && !c.cfg.lang_session ? '/' + c.cfg.lang : '') + '/control/auth/?' + c.rnd(),
 		type: 'post',
 		dataType: 'json',
 		data: {
