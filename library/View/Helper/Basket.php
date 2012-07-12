@@ -7,6 +7,7 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 	protected $_model_order_item = null;
 	protected $_model_discount = null;
 	protected $_model_delivery = null;
+	protected $_model_deliveryregion = null;
 	protected $_model_cash = null;
 	protected $_model_pay = null;
 	protected $_field_order_item_id = 'itemid';
@@ -17,6 +18,7 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 		if ($this->_model_order_item === null) $this->_model_order_item = new Default_Model_Orderitem;
 		if ($this->_model_discount === null && class_exists('Default_Model_Discount')) $this->_model_discount = new Default_Model_Discount;
 		if ($this->_model_delivery === null && class_exists('Default_Model_Delivery')) $this->_model_delivery = new Default_Model_Delivery;
+		if ($this->_model_deliveryregion === null && class_exists('Default_Model_Deliveryregion')) $this->_model_deliveryregion = new Default_Model_Deliveryregion;
 		if ($this->_model_cash === null && class_exists('Default_Model_Cash')) $this->_model_cash = new Default_Model_Cash;
 		if ($this->_model_pay === null && class_exists('Default_Model_Pay')) $this->_model_pay = new Default_Model_Pay;
 	}
@@ -113,15 +115,16 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 
 	function basketPrice($id = null) {
 		$oid = $this->basketId();
-		$ret = $this->basketPriceClean($id);
-		$ret += $this->fetchDelivery($oid, $ret);
-		$ret += $this->fetchPay($oid, $ret);
+		$ret_original = $this->basketPriceClean($id);
+		$ret = $ret_original;
+		$ret += $this->fetchDelivery($oid, $ret_original);
+		$ret += $this->fetchDeliveryregion($oid, $ret_original);
+		$ret += $this->fetchPay($oid, $ret_original);
 		$ret -= $this->fetchCash($oid);
 		return $ret;
 	}
 
 	function getPercent($v, $total = 1) {
-		// Обрабатываем параметры: с процентами и без
 		if (strpos($v, '%') !== false) $v = substr($v, 0, -1) * $total / 100;
 		return is_numeric($v)
 			? (is_float($v) ? (float)$v : (int)$v)
@@ -167,6 +170,51 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 					else {
 						$delivery_price_from = isset($delivery->price_from) ? $this->getPercent($delivery->price_from, $price) : '';
 						if (!$delivery_price_from || $delivery_price_from > $price) $ret = $this->getPercent($delivery->price, $price);
+						$ret += $this->discountPayDelivery($card->pay, $price, $ret);
+					}
+				}
+			}
+		}
+		return $ret;
+	}
+
+	function fetchDeliveryregion($oid, $price, $original = false) {
+		$ret = 0;
+		if ($this->_model_deliveryregion) {
+			$card = $this->_model_order->fetchRow(array(
+				'`id` = ?' => $oid
+			));
+			if ($card) {
+				$delivery = $this->_model_deliveryregion->fetchRow(array(
+					'`id` = ?' => (int)$card->region
+				));
+				if ($delivery && $delivery->price) {
+					if ($original) $ret = $delivery->price;
+					else {
+						$delivery_price_from = isset($delivery->price_from) ? $this->getPercent($delivery->price_from, $price) : '';
+						if (!$delivery_price_from || $delivery_price_from > $price) $ret = $this->getPercent($delivery->price, $price);
+						$ret += $this->discountPayDelivery($card->pay, $price, $ret);
+					}
+				}
+			}
+		}
+		return $ret;
+	}
+
+	function discountPayDelivery($pay_id, $price, $delivery) {
+		$ret = 0;
+		if ($delivery) {
+			if ($this->_model_pay) {
+				$pay = $this->_model_pay->fetchRow(array(
+					'`id` = ?' => (int)$pay_id
+				));
+				if ($pay) {
+					$pay = new Zkernel_View_Data($pay);
+					if ($pay->price_delivery) {
+						$ret += $this->getPercent($pay->price_delivery, $delivery);
+					}
+					if ($pay->price_delivery_item) {
+						$ret += $this->getPercent($pay->price_delivery_item, $price);
 					}
 				}
 			}
@@ -184,11 +232,14 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 				$pay = $this->_model_pay->fetchRow(array(
 					'`id` = ?' => (int)$card->pay
 				));
-				if ($pay && $pay->price) {
-					if ($original) $ret = $pay->price;
-					else {
-						$pay_price_from = isset($pay->price_from) ? $this->getPercent($pay->price_from, $price) : 0;
-						if (!$pay_price_from || $pay_price_from > $price) $ret = $this->getPercent($pay->price, $price);
+				if ($pay) {
+					$pay = new Zkernel_View_Data($pay);
+					if ($pay->price) {
+						if ($original) $ret = $pay->price;
+						else {
+							$pay_price_from = isset($pay->price_from) ? $this->getPercent($pay->price_from, $price) : 0;
+							if (!$pay_price_from || $pay_price_from > $price) $ret = $this->getPercent($pay->price, $price);
+						}
 					}
 				}
 			}
@@ -199,7 +250,6 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 	function basketAdd($id, $quant = 1) {
 		$oid = $this->basketId(true);
 		$item = $this->_model_item->fetchBasketCard($id);
-		if (!$item || !$item->price || !$quant) return false;
 		$ex = $this->_model_order_item->fetchRow(array(
 			'`parentid` = ?' => $oid,
 			'`'.$this->_field_order_item_id.'` = ?' => $id
@@ -281,6 +331,15 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 		return $ok;
 	}
 
+	function basketClear() {
+		$oid = $this->basketId();
+		if (!$oid) return false;
+		$ok = $this->_model_order_item->delete(array(
+			'`parentid` = ?' => $oid
+		));
+		return $ok;
+	}
+
 	function basketList() {
 		$oid = $this->basketId();
 		$list = $this->_model_order_item->fetchAll(array('`parentid` = ?' => $oid), 'orderid');
@@ -293,6 +352,11 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 			}
 		}
 		return $ret;
+	}
+
+	function basketIds() {
+		$oid = $this->basketId();
+		return $this->_model_order_item->fetchCol($this->_field_order_item_id, array('`parentid` = ?' => $oid), 'orderid');
 	}
 
 	function basketCard() {

@@ -16,19 +16,19 @@ class Zkernel_Db_Table extends Zend_Db_Table_Abstract
 	protected function _where(Zend_Db_Table_Select $select, $where) {
 		$select = parent::_where($select, $where);
 
-		if(($this->_multilang_type == 1) && $this->_current_lang) 
+		if(($this->_multilang_type == 1) && $this->_current_lang)
 			$select->where('`lang` = '.$this->_current_lang->id);
-		
+
 		return $select;
 	}
 	*/
 
  	public function select($withFromPart = self::SELECT_WITHOUT_FROM_PART) {
  		$select = parent::select($withFromPart);
- 		
- 		if(($this->_multilang_type == 1) && $this->_current_lang) 
+
+ 		if(($this->_multilang_type == 1) && $this->_current_lang)
  			$select->where('`lang` = '.$this->_current_lang->id);
- 			
+
  		return $select;
  	}
 
@@ -137,7 +137,7 @@ class Zkernel_Db_Table extends Zend_Db_Table_Abstract
 						}
 					}
 					break;
-				}	
+				}
 			}
 		}
     }
@@ -149,7 +149,7 @@ class Zkernel_Db_Table extends Zend_Db_Table_Abstract
 			if ($reg) {
 				$changed = false;
 				$cols = $this->info('metadata');
-				
+
 				switch($this->_multilang_type){
 				case 1:
 						if (!array_key_exists('lang', $cols)) {
@@ -158,7 +158,7 @@ class Zkernel_Db_Table extends Zend_Db_Table_Abstract
 							$this->getAdapter()->query('ALTER TABLE `'.$this->_name.'` ADD INDEX `i_lang` (`lang`)');
 						}
 					break;
-				default:	
+				default:
 					$m = new Default_Model_Lang();
 					$ids = implode('|', $reg->_ids);
 					$ml = implode('|', $this->_multilang_field);
@@ -168,15 +168,15 @@ class Zkernel_Db_Table extends Zend_Db_Table_Abstract
 							$this->getAdapter()->query('ALTER TABLE `'.$this->_name.'` ADD `ml_'.$el.'_'.$reg->id.'` '.$cols[$el]['DATA_TYPE'].($cols[$el]['LENGTH'] ? '('.$cols[$el]['LENGTH'].')' : '').($cols[$el]['DEFAULT'] ? ' DEFAULT '.$cols[$el]['DEFAULT'] : ''));
 						}
 					}
-					foreach ($cols as $k => $el) {
+					/*foreach ($cols as $k => $el) {
 						if (preg_match('/^ml\_'.$el.'\_(\d+)$/i', $k) && !preg_match('/^ml\_('.implode('|', $this->_multilang_field).')\_('.implode('|', $ids).')+$/i')) {
 							$changed = true;
 							$this->getAdapter()->query('ALTER TABLE `'.$this->_name.'` DROP `'.$k.'`');
 						}
-					}
+					}*/
 					break;
 				}
-				
+
 				if ($changed) {
 					$cache = $this->getMetadataCache();
 					if ($cache) $cache->clean();

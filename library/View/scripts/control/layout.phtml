@@ -68,7 +68,7 @@ else {
 	if ($reg && !@$reg->domain) $p['lang'] = $reg->session
 		? $reg->id
 		: $reg->stitle;
-	if ($reg->session) $p['lang_session'] = true;
+	if ($reg && $reg->session) $p['lang_session'] = true;
 	if ($reg && @$reg->domain) $d = explode(' ', $reg->domain);
 
 	$this	->inlineScript('script', '$(function() { c.init('.Zend_Json::encode($p).', '.Zend_Json::encode($l).'); });');

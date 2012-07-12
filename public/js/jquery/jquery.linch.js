@@ -95,7 +95,8 @@
 				'cy': 37,
 				'padding_inner': 10,
 				'padding': 5,
-				'spike_radius': 10
+				'spike_radius': 10,
+				'cb_change': function() {}
 			}, options ? options : {});
 			var t_height = t.height();
 			var t_width = t.width();
@@ -202,6 +203,7 @@
 			if (x > (w - opt.cx - opt.padding)) x = w - opt.cx - opt.padding;
 			if (!y) y = 0;
 			if (y > (h - opt.cy - opt.padding)) y = h - opt.cy - opt.padding;
+			data = typeof data != 'array' ? [] : data;
 			data.push({
 				'text': '',
 				'x': x,
@@ -212,11 +214,13 @@
 				'color': color_current,
 				'spikes': []
 			});
+			opt.cb_change();
 			t.linch_render(data);
 			return false;
 		},
 		linch_delete: function(ind) {
 			data[ind] = null;
+			opt.cb_change();
 			t.linch_render(data);
 		},
 		linch_clear: function() {
@@ -349,6 +353,7 @@
 					tt.change(function() {
 						var o = jQuery(this).parents('.linch_object:first');
 						data[o.data('index')].text = jQuery(this).val();
+						opt.cb_change();
 					});
 				}
 				else {
@@ -499,6 +504,7 @@
 		},
 		linch_spike_delete: function(o, i) {
 			data[o].spikes[i] = null;
+			opt.cb_change();
 			t.linch_render_spikes(o);
 		},
 		linch_spike_add: function(o, align, offset, ox, oy) {
@@ -508,6 +514,7 @@
 			    x: ox,
 			    y: oy
 			});
+			opt.cb_change();
 			t.linch_render_spikes(o);
 		},
 		linch_get: function() {

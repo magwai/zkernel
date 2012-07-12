@@ -42,7 +42,7 @@ class Zkernel_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstrac
 						}
 					}
 				}
-				$this->_lang = $this->_model->fetchRow(null, '(`id` = '.(int)$this->_session->lang.') DESC, (`default` = 1) DESC', 1);
+				$this->_lang = $this->_model->fetchRow(null, '(`id` = '.(int)$this->_session->lang.') DESC, (`default` = 1) DESC');
 				if ($this->_lang) $this->_lang = new Zkernel_View_Data($this->_lang);
 				$this->_lang->_default = $this->getDefault();
 				$this->_lang->_ids = $this->_model->fetchIds();
@@ -78,7 +78,7 @@ class Zkernel_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstrac
 				$this->_session->lang = $this->_model->fetchOne('id', array('`stitle` = ?' => $request->getParam('lang')));
 				if (!$this->_session->lang) $error = true;
 			}
-			$this->_lang = $this->_model->fetchRow(null, '(`id` = '.(int)$this->_session->lang.') DESC, (`default` = 1) DESC', 1);
+			$this->_lang = $this->_model->fetchRow(null, '(`id` = '.(int)$this->_session->lang.') DESC, (`default` = 1) DESC');
 			if ($this->_lang) {
 				$this->_lang = new Zkernel_View_Data($this->_lang);
 				$this->_lang->session = $this->_issession;
@@ -118,13 +118,14 @@ class Zkernel_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstrac
 	}
 
 	public function set($id) {
-		$this->_lang = $this->_model->fetchRow(null, '(`id` = '.(int)$id.') DESC, (`default` = 1) DESC', 1);
+		$this->_lang = $this->_model->fetchRow(null, '(`id` = '.(int)$id.') DESC, (`default` = 1) DESC');
 		if ($this->_lang) {
 			$this->_lang = new Zkernel_View_Data($this->_lang);
 			$this->_lang->session = $this->_issession;
 			if (!$this->_domain) unset($this->_lang->domain);
 		}
 		$this->_lang->_default = $this->getDefault();
+		$this->_lang->_ids = $this->_model->fetchIds();
 	}
 
 	public function save() {

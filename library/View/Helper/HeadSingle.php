@@ -12,7 +12,7 @@ class Zkernel_View_Helper_HeadSingle extends Zend_View_Helper_HeadScript  {
 		$m = 0;
 		$aitems = $items = array();
         $this->getContainer()->ksort();
-        foreach ($this as $item) {
+		foreach ($this as $item) {
             if (!$this->_isValid($item)) continue;
         	if (stripos($item->attributes['src'], 'maps.google.com') !== false || stripos($item->attributes['src'], 'api-maps.yandex.ru') !== false || preg_match('/^http\:\/\//i', $item->attributes['src'])) {
             	$aitems[] = $item->attributes['src'];

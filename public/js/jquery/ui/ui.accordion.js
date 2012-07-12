@@ -1,7 +1,7 @@
-/*
- * jQuery UI Accordion 1.8.8
+/*!
+ * jQuery UI Accordion 1.8.21
  *
- * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
+ * Copyright 2012, AUTHORS.txt (http://jqueryui.com/about)
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
  *
@@ -114,6 +114,7 @@ $.widget( "ui.accordion", {
 			.not( self.active || "" )
 			.attr({
 				"aria-expanded": "false",
+				"aria-selected": "false",
 				tabIndex: -1
 			})
 			.next()
@@ -126,6 +127,7 @@ $.widget( "ui.accordion", {
 			self.active
 				.attr({
 					"aria-expanded": "true",
+					"aria-selected": "true",
 					tabIndex: 0
 				});
 		}
@@ -173,6 +175,7 @@ $.widget( "ui.accordion", {
 			.removeClass( "ui-accordion-header ui-accordion-disabled ui-helper-reset ui-state-default ui-corner-all ui-state-active ui-state-disabled ui-corner-top" )
 			.removeAttr( "role" )
 			.removeAttr( "aria-expanded" )
+			.removeAttr( "aria-selected" )
 			.removeAttr( "tabIndex" );
 
 		this.headers.find( "a" ).removeAttr( "tabIndex" );
@@ -477,12 +480,14 @@ $.widget( "ui.accordion", {
 		toHide.prev()
 			.attr({
 				"aria-expanded": "false",
+				"aria-selected": "false",
 				tabIndex: -1
 			})
 			.blur();
 		toShow.prev()
 			.attr({
 				"aria-expanded": "true",
+				"aria-selected": "true",
 				tabIndex: 0
 			})
 			.focus();
@@ -504,14 +509,16 @@ $.widget( "ui.accordion", {
 		// other classes are removed before the animation; this one needs to stay until completed
 		this.toHide.removeClass( "ui-accordion-content-active" );
 		// Work around for rendering bug in IE (#5421)
-		if (this.toHide.length) this.toHide.parent()[0].className = this.toHide.parent()[0].className;
+		if ( this.toHide.length ) {
+			this.toHide.parent()[0].className = this.toHide.parent()[0].className;
+		}
 
 		this._trigger( "change", null, this.data );
 	}
 });
 
 $.extend( $.ui.accordion, {
-	version: "1.8.8",
+	version: "1.8.21",
 	animations: {
 		slide: function( options, additions ) {
 			options = $.extend({
@@ -543,11 +550,11 @@ $.extend( $.ui.accordion, {
 			// fix width before calculating height of hidden element
 			var s = options.toShow;
 			originalWidth = s[0].style.width;
-			s.width( parseInt( s.parent().width(), 10 )
-				- parseInt( s.css( "paddingLeft" ), 10 )
-				- parseInt( s.css( "paddingRight" ), 10 )
-				- ( parseInt( s.css( "borderLeftWidth" ), 10 ) || 0 )
-				- ( parseInt( s.css( "borderRightWidth" ), 10) || 0 ) );
+			s.width( s.parent().width()
+				- parseFloat( s.css( "paddingLeft" ) )
+				- parseFloat( s.css( "paddingRight" ) )
+				- ( parseFloat( s.css( "borderLeftWidth" ) ) || 0 )
+				- ( parseFloat( s.css( "borderRightWidth" ) ) || 0 ) );
 
 			$.each( fxAttrs, function( i, prop ) {
 				hideProps[ prop ] = "hide";

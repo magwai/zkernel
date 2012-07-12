@@ -13,8 +13,11 @@ if ($this->control()->config->action == 'ctlshow') {
 			$oid = (string)$model[0];
 			$model = 'Default_Model_'.ucfirst($oid);
 			$m = new $model();
-			$titles[$el->oid] = $m->fetchOne('title', array('`id` = ?' => $id));
-			$titles[$el->oid] = (@$db[$oid]['zk_title'] ? trim($db[$oid]['zk_title']) : $oid).': '.(@$titles[$el->oid] ? $titles[$el->oid] : $el->id);
+			try {
+				$titles[$el->oid] = $m->fetchOne('title', array('`id` = ?' => (int)$id));
+				$titles[$el->oid] = (@$db[$oid]['zk_title'] ? trim($db[$oid]['zk_title']) : $oid).': '.(@$titles[$el->oid] ? $titles[$el->oid] : $el->id);
+			}
+			catch (Exception $e) { }
 		}
 	}
 }

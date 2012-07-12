@@ -163,7 +163,7 @@ class Zkernel_Image_Preview {
 			$thumb->setOldImage($image);
 		}
 
-		$thumb->save($this->path.'/'.$prefix.$name, $format);
+		$thumb->save($this->path.'/'.$prefix.@$param['crop'].$name, $format);
 
 		return true;
 	}

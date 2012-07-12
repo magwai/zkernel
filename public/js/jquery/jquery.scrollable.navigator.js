@@ -60,9 +60,9 @@
 			
 			
 			if (hashed) {
-				history.pushState({i: 0});
+				history.pushState({i: 0}, '');
 				
-				$(window).bind("popstate", function(evt) {
+				$(window).on("popstate", function(evt) {
 					var s = evt.originalEvent.state;
 					if (s) { api.seekTo(s.i); }
 				});					
@@ -71,7 +71,7 @@
 			function doClick(el, i, e) {
 				api.seekTo(i);
 				e.preventDefault(); 
-				if (hashed) { history.pushState({i: i}); }
+				if (hashed) { history.pushState({i: i}, ''); }
 			}
 			
 			function els() {

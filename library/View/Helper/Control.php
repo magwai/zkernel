@@ -606,7 +606,11 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 			$where = $this->config->where ? $this->config->where->toArray() : array();
 			if (count($this->config->param->search)) {
 				foreach ($this->config->param->search as $k => $v) {
-					if (isset($this->config->field[$k])) $where['`'.$k.'` LIKE ?'] = '%'.$v.'%';
+					if (isset($this->config->field[$k])) {
+						if ($this->config->field[$k]->stype == 'select') $where['`'.$k.'` = ?'] = $v;
+						else if (strlen($v) == 10 && strtotime($v)) $where['DATE(`'.$k.'`) = DATE(?)'] = date('Y-m-d', strtotime($v));
+						else $where['`'.$k.'` LIKE ?'] = '%'.$v.'%';
+					}
 				}
 			}
 			if ($this->config->tree) {

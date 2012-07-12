@@ -20,7 +20,7 @@ class Zkernel_View_Helper_LinkSingle extends Zend_View_Helper_HeadLink  {
 		}
 		if ($css) {
 			$zp = defined('ZKERNEL_DIR') ? ZKERNEL_DIR : 'zkernel';
-			$zpath = realpath(PUBLIC_PATH.'/'.$zp);
+			$zpath = defined('ZKERNEL_PATH') ? ZKERNEL_PATH : realpath(PUBLIC_PATH.'/'.$zp);
 			$cp = defined('CACHE_DIR') ? CACHE_DIR : 'pc';
 			$m = '';
 			foreach ($css as $media => $els) {
@@ -69,7 +69,6 @@ class Zkernel_View_Helper_LinkSingle extends Zend_View_Helper_HeadLink  {
 								), $su);
 								$str = str_ireplace($matches[$k_1], 'url('.$su.($mtime ? '?'.filemtime($dir_full.'/'.$el_1) : '').')', $str);
 							}
-
 						}
 
 						$matches = $files = array();

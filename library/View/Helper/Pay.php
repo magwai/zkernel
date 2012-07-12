@@ -404,6 +404,8 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 
 		if (@!$config['url']) $config['url'] = 'https://rbkmoney.ru/acceptpurchase.aspx';
 
+		if (@!$config['preference']) $config['preference'] = 'inner';
+
 		if (@!$config['recipientAmount'] || @!$config['eshopId']) return false;
 
 		$res = $this->genForm($config['url'], array(
@@ -411,7 +413,8 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 			'recipientCurrency' => $config['recipientCurrency'],
 			'recipientAmount' => $config['recipientAmount'],
 			'orderId' => $order,
-			'serviceName' => $config['serviceName']
+			'serviceName' => $config['serviceName'],
+			'preference' => $config['preference']
 		));
 		if ($res) echo $res;
 		else return false;
