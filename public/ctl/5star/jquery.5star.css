@@ -1,0 +1,38 @@
+
+.rate-current-score {
+    background:url(ratings.gif) 0 -16px no-repeat;
+    display:block;
+    text-indent: -9999px;
+    position:absolute;
+    height: 100%;
+    overflow: hidden;
+}
+.rate-wrapper {
+    height: 16px;
+    background:url(ratings.gif) 0 0 no-repeat;
+    width:85px;
+    float:left;
+    position: relative;
+    overflow: hidden;
+    text-align: left;
+}
+.rate-wrapper * {
+
+    margin:0; border:0; padding:0;
+}
+.rate-wrapper a {
+    height:100%;
+    float:left;
+    text-indent:-9999px;
+    position:absolute;
+    overflow:hidden;
+    line-height:1em;
+}
+
+.rate-wrapper a:hover{ background:url(ratings.gif) bottom right no-repeat;}
+.score-1 {width:20%; z-index:55;}
+.score-2 {width:40%; z-index:54;}
+.score-3 {width:60%; z-index:53;}
+.score-4 {width:80%; z-index:52;}
+.score-5 {width:100%; z-index:51;}
+.score a:hover{ background:url(ratings.gif) bottom right no-repeat;}

@@ -70,7 +70,9 @@ else {
 	    }
 	    else $dt['search'] = false;
 	    if ($el->hidden) $dt['hidden'] = true;
+	    if ($el->editable) $dt['editable'] = true;
 	    if ($el->stype) $dt['stype'] = $el->stype;
+	    if ($el->editrules) $dt['editrules'] = $el->editrules->toArray();
 	    if ($el->editoptions) $dt['editoptions'] = $el->editoptions->toArray();
 	    if ($el->searchoptions) $dt['searchoptions'] = $el->searchoptions->toArray();
 	    if ($el->formatter) {
@@ -99,7 +101,8 @@ else {
 $.include([
 	"/zkernel/ctl/jqgrid/i18n/grid.locale-ru.js",
 	"/zkernel/ctl/jqgrid/grid.base.js",
-	'.($is_search ? '"/zkernel/ctl/jqgrid/grid.custom.js?18",' : '').'
+	'.($c->cell_edit ? '"/zkernel/ctl/jqgrid/grid.common.js","/zkernel/ctl/jqgrid/grid.celledit.js?8",' : '').'
+	'.($is_search ? '"/zkernel/ctl/jqgrid/grid.custom.js",' : '').'
 	'.($c->tree ? '"/zkernel/ctl/jqgrid/grid.treegrid.js",' : '').'
 	'.($is_fmatter ? '"/zkernel/js/jquery/jquery.fmatter.js",' : '').'
 	"/zkernel/js/jquery/ui/ui.core.js",
@@ -121,7 +124,9 @@ $.include([
 	   	colModel: '.Zend_Json::encode($field_model).',
 	   	rowNum: '.$c->pager_perpage.',
 	   	rowList: '.Zend_Json::encode($c->pager_list->toArray()).',
-	   	'.($c->drag ? '' : 'sortname: "'.$c->orderby.'",').'
+	   	'.($c->cell_edit ? 'cellEdit: true, cellsubmit: "clientArray",' : '').'
+	   	'.($c->after_save_cell ? 'afterSaveCell: function(rowid, name, val, iRow, iCol) {'.$c->after_save_cell.'},' : '').'
+		'.($c->drag ? '' : 'sortname: "'.$c->orderby.'",').'
 	   	'.($c->drag ? '' : 'sortorder: "'.$c->orderdir.'",').'
 	    viewrecords: true,
 	    width: c.table_width(),

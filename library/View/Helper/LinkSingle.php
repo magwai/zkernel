@@ -24,6 +24,7 @@ class Zkernel_View_Helper_LinkSingle extends Zend_View_Helper_HeadLink  {
 			$cp = defined('CACHE_DIR') ? CACHE_DIR : 'pc';
 			$m = '';
 			foreach ($css as $media => $els) {
+				ksort($els);
 				$c = '';
 				$items = array();
 				foreach ($els as $item) {

@@ -212,7 +212,8 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 	    	'oac_apply' 			=> true,
 			'oac_cancel'			=> true,
 			'oac_ok_title'			=> 'OK',
-	    	'post_field_extend'		=> array(),
+	    	'oac_add_apply'			=> false,
+			'post_field_extend'		=> array(),
 	    	'post_field_unset'		=> array(),
 	    	'orderby' 				=> '',
 	    	'orderdir' 				=> 'asc',
@@ -236,7 +237,8 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 	    	'static_field' => false,
 	    	'zk_meta' => 0,
 			'search' => array(),
-			'delete_mode' => 'db'
+			'delete_mode' => 'db',
+			'cell_edit' => false
 		);
 		if ($data !== null) $d = array_merge($d, $data);
 		$this->config = new Zkernel_Config_Control($d);
@@ -441,7 +443,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 		if (!$this->config->view) {
 			switch ($this->config->type) {
 				case 'add':
-					$this->config->oac_apply = false;
+					if (!$this->config->oac_add_apply) $this->config->oac_apply = false;
 					$this->config->place = $this->config->control_lang_current['add_place'];
 					$view = 'form';
 					break;
@@ -609,7 +611,30 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 					if (isset($this->config->field[$k])) {
 						if ($this->config->field[$k]->stype == 'select') $where['`'.$k.'` = ?'] = $v;
 						else if (strlen($v) == 10 && strtotime($v)) $where['DATE(`'.$k.'`) = DATE(?)'] = date('Y-m-d', strtotime($v));
-						else $where['`'.$k.'` LIKE ?'] = '%'.$v.'%';
+						else if (strlen($v) == 23) {
+							$p = explode(' - ', $v);
+							if (strtotime($p[0]) && strtotime($p[1])) {
+								$where['DATE(`'.$k.'`) >= DATE("'.date('Y-m-d', strtotime($p[0])).'") AND DATE(`'.$k.'`) <= DATE("'.date('Y-m-d', strtotime($p[1])).'")'] = '';
+							}
+						}
+						else {
+							$w = '';
+							$v = explode(',', $v);
+							foreach ($v as $el) {
+								$el = trim(str_replace(array(
+									'"',
+									'*',
+									'?'
+								), array(
+									'',
+									'%',
+									'_'
+								), $el));
+								$w .= ($w ? ' OR ' : '').'(`'.$k.'` LIKE "%'.$el.'%")';
+
+							}
+							$where[] = $w;
+						}
 					}
 				}
 			}
@@ -968,6 +993,7 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 					if ($ok || $m2m_changed) {
 						$this->config->info[] = $this->config->control_lang_current['data_saved'];
 						$this->config->func_success;
+						if ($this->config->oac_add_apply && @$this->config->post['is_apply'] && $this->config->type == 'add') $this->view->inlineScript('script', 'c.go("'.$this->config->controller.'", "ctledit", '.Zend_Json::encode(array('id' => $ok)).');');
 					}
 					else {
 						//$this->config->info[] = 'Изменений данных не было';

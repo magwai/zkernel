@@ -1,6 +1,6 @@
 /*
-SWFObject v2.2 <http://code.google.com/p/swfobject/> 
-is released under the MIT License <http://www.opensource.org/licenses/mit-license.php> 
+SWFObject v2.2 <http://code.google.com/p/swfobject/>
+is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
 */
 ;var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="ShockwaveFlash.ShockwaveFlash",q="application/x-shockwave-flash",R="SWFObjectExprInst",x="onreadystatechange",O=window,j=document,t=navigator,T=false,U=[h],o=[],N=[],I=[],l,Q,E,B,J=false,a=false,n,G,m=true,M=function(){var aa=typeof j.getElementById!=D&&typeof j.getElementsByTagName!=D&&typeof j.createElement!=D,ah=t.userAgent.toLowerCase(),Y=t.platform.toLowerCase(),ae=Y?/win/.test(Y):/win/.test(ah),ac=Y?/mac/.test(Y):/mac/.test(ah),af=/webkit/.test(ah)?parseFloat(ah.replace(/^.*webkit\/(\d+(\.\d+)?).*$/,"$1")):false,X=!+"\v1",ag=[0,0,0],ab=null;
 if(typeof t.plugins!=D&&typeof t.plugins[S]==r){ab=t.plugins[S].description;if(ab&&!(typeof t.mimeTypes!=D&&t.mimeTypes[q]&&!t.mimeTypes[q].enabledPlugin)){T=true;
@@ -64,7 +64,7 @@ mmSWFUpload 1.0: Flash upload dialog - http://profandesign.se/swfupload/,  http:
 
 SWFUpload is (c) 2006-2007 Lars Huring, Olov Nilzén and Mammon Media and is released under the MIT License:
 http://www.opensource.org/licenses/mit-license.php
- 
+
 SWFUpload 2 is (c) 2007-2008 Jake Roberts and is released under the MIT License:
 http://www.opensource.org/licenses/mit-license.php
 */
@@ -74,7 +74,7 @@ var SWFUpload;if(SWFUpload==undefined){SWFUpload=function(a){this.initSWFUpload(
 /*
 Uploadify v3.1.0
 Copyright (c) 2012 Reactive Apps, Ronnie Garcia
-Released under the MIT License <http://www.opensource.org/licenses/mit-license.php> 
+Released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
 */
 
 /*
@@ -95,7 +95,7 @@ Things that we updated
 	var methods = {
 
 		init : function(options, swfUploadOptions) {
-			
+
 			return this.each(function() {
 
 				// Create a reference to the jQuery DOM object
@@ -110,7 +110,7 @@ Things that we updated
 					id       : $this.attr('id'), // The ID of the DOM object
 					swf      : 'uploadify.swf',  // The path to the uploadify SWF file
 					uploader : 'uploadify.php',  // The path to the server-side upload script
-					
+
 					// Options
 					auto            : true,               // Automatically upload files when added to the queue
 					buttonClass     : '',                 // A class name to add to the browse button DOM object
@@ -137,7 +137,7 @@ Things that we updated
 					successTimeout  : 30,                 // The number of seconds to wait for Flash to detect the server's response after the file has finished uploading
 					uploadLimit     : 0,                  // The maximum number of files you can upload
 					width           : 120,                // The width of the browse button
-					
+
 					// Events
 					overrideEvents   : []             // (Array) A list of default event handlers to skip
 					/*
@@ -148,7 +148,7 @@ Things that we updated
 					onDialogOpen     // Triggered when the browse dialog is opened
 					onDisable        // Triggered when the browse button gets disabled
 					onEnable         // Triggered when the browse button gets enabled
-					onFallback       // Triggered is Flash is not detected    
+					onFallback       // Triggered is Flash is not detected
 					onInit           // Triggered when Uploadify is initialized
 					onQueueComplete  // Triggered when all files in the queue have been uploaded
 					onSelectError    // Triggered when an error occurs while selecting a file (file size, queue size limit, etc.)
@@ -176,7 +176,7 @@ Things that we updated
 					button_disabled          : false,
 					button_cursor            : (settings.buttonCursor == 'arrow' ? SWFUpload.CURSOR.ARROW : SWFUpload.CURSOR.HAND),
 					button_window_mode       : SWFUpload.WINDOW_MODE.TRANSPARENT,
-					debug                    : settings.debug,						
+					debug                    : settings.debug,
 					requeue_on_error         : settings.requeueErrors,
 					file_post_name           : settings.fileObjName,
 					file_size_limit          : settings.fileSizeLimit,
@@ -184,13 +184,13 @@ Things that we updated
 					file_types_description   : settings.fileTypeDesc,
 					file_queue_limit         : settings.queueSizeLimit,
 					file_upload_limit        : settings.uploadLimit,
-					flash_url                : settings.swf,					
+					flash_url                : settings.swf,
 					prevent_swf_caching      : settings.preventCaching,
 					post_params              : settings.formData,
 					upload_url               : settings.uploader,
 					use_query_string         : (settings.method == 'get'),
-					
-					// Event Handlers 
+
+					// Event Handlers
 					file_dialog_complete_handler : handlers.onDialogClose,
 					file_dialog_start_handler    : handlers.onDialogOpen,
 					file_queued_handler          : handlers.onSelect,
@@ -209,7 +209,7 @@ Things that we updated
 				}
 				// Add the user-defined settings to the swfupload object
 				swfUploadSettings = $.extend(swfUploadSettings, settings);
-				
+
 				// Detect if Flash is available
 				var playerVersion  = swfobject.getFlashPlayerVersion();
 				var flashInstalled = (playerVersion.major >= 9);
@@ -221,7 +221,7 @@ Things that we updated
 
 					// Add the SWFUpload object to the elements data object
 					$this.data('uploadify', swfuploadify);
-					
+
 					// Wrap the instance
 					var $wrapper = $('<div />', {
 						'id'    : settings.id,
@@ -234,7 +234,7 @@ Things that we updated
 					$('#' + swfuploadify.movieName).wrap($wrapper);
 					// Recreate the reference to wrapper
 					$wrapper = $('#' + settings.id);
-					// Add the data object to the wrapper 
+					// Add the data object to the wrapper
 					$wrapper.data('uploadify', swfuploadify);
 
 					// Create the button
@@ -262,7 +262,7 @@ Things that we updated
 						'position' : 'absolute',
 						'z-index'  : 1
 					});
-					
+
 					// Create the file queue
 					if (!settings.queueID) {
 						var $queue = $('<div />', {
@@ -273,7 +273,7 @@ Things that we updated
 						swfuploadify.settings.queueID      = settings.id + '-queue';
 						swfuploadify.settings.defaultQueue = true;
 					}
-					
+
 					// Create some queue related objects and variables
 					swfuploadify.queueData = {
 						files              : {}, // The files in the queue
@@ -312,7 +312,7 @@ Things that we updated
 
 		},
 
-		// Stop a file upload and remove it from the queue 
+		// Stop a file upload and remove it from the queue
 		cancel : function(fileID, supressEvent) {
 
 			var args = arguments;
@@ -377,14 +377,14 @@ Things that we updated
 					swfuploadify = $this.data('uploadify'),
 					settings     = swfuploadify.settings;
 
-				// Destroy the SWF object and 
+				// Destroy the SWF object and
 				swfuploadify.destroy();
-				
+
 				// Destroy the queue
 				if (settings.defaultQueue) {
 					$('#' + settings.queueID).remove();
 				}
-				
+
 				// Reload the original DOM element
 				$('#' + settings.id).replaceWith(swfuploadify.original);
 
@@ -398,7 +398,7 @@ Things that we updated
 
 		// Disable the select button
 		disable : function(isDisabled) {
-			
+
 			this.each(function() {
 				// Create a reference to the jQuery DOM object
 				var $this        = $(this),
@@ -476,7 +476,7 @@ Things that we updated
 							swfuploadify.setFileQueueLimit(value);
 							break;
 						case 'buttonImage':
-							swfuploadify.button.css('background-image', settingValue);
+							swfuploadify.button.css('background-image', 'url(' + value + ')');
 							break;
 						case 'buttonCursor':
 							if (value == 'arrow') {
@@ -505,7 +505,7 @@ Things that we updated
 					settings[name] = value;
 				}
 			});
-			
+
 			if (args.length === 1) {
 				return returnValue;
 			}
@@ -546,7 +546,7 @@ Things that we updated
 				swfuploadify.queueData.uploadSize    = 0;
 				swfuploadify.queueData.bytesUploaded = 0;
 				swfuploadify.queueData.uploadQueue   = [];
-				
+
 				// Upload the files
 				if (args[0]) {
 					if (args[0] == '*') {
@@ -648,7 +648,7 @@ Things that we updated
 				fileSize += '.' + fileSizeParts[1].substr(0,2);
 			}
 			fileSize += suffix;
-			
+
 			// Truncate the filename if it's too long
 			var fileName = file.name;
 			if (fileName.length > 25) {
@@ -657,7 +657,7 @@ Things that we updated
 
 			// Run the default event handler
 			if ($.inArray('onSelect', settings.overrideEvents) < 0) {
-				
+
 				// Add the file item to the queue
 				$('#' + settings.queueID).append('<div id="' + file.id + '" class="uploadify-queue-item">\
 					<div class="cancel">\
@@ -668,7 +668,7 @@ Things that we updated
 						<div class="uploadify-progress-bar"><!--Progress Bar--></div>\
 					</div>\
 				</div>');
-				
+
 			}
 
 			this.queueData.queueSize += file.size;
@@ -751,7 +751,7 @@ Things that we updated
 				if (settings.removeCompleted) {
 					switch (file.filestatus) {
 						case SWFUpload.FILE_STATUS.COMPLETE:
-							setTimeout(function() { 
+							setTimeout(function() {
 								if ($('#' + file.id)) {
 									swfuploadify.queueData.queueSize -= file.size;
 									delete swfuploadify.queueData.files[file.id]
@@ -870,7 +870,7 @@ Things that we updated
 			this.bytesLoaded     = fileBytesLoaded;
 			var queueBytesLoaded = this.queueData.queueBytesUploaded + fileBytesLoaded;
 			var percentage       = Math.round(fileBytesLoaded / fileTotalBytes * 100);
-			
+
 			// Calculate the average speed
 			var suffix = 'KB/s';
 			var mbs = 0;
@@ -886,7 +886,7 @@ Things that we updated
 				this.queueData.averageSpeed = Math.floor(mbs);
 				suffix = 'MB/s';
 			}
-			
+
 			// Call the default event handler
 			if ($.inArray('onUploadProgress', settings.overrideEvents) < 0) {
 				if (settings.progressData == 'percentage') {
@@ -938,7 +938,7 @@ Things that we updated
 			}
 
 			// Call the user-defined event handler
-			if (settings.onUploadStart) settings.onUploadStart.call(this, file); 
+			if (settings.onUploadStart) settings.onUploadStart.call(this, file);
 		},
 
 		// Triggered when a file upload returns a successful code
@@ -955,7 +955,7 @@ Things that we updated
 			}
 
 			// Call the user-defined event handler
-			if (settings.onUploadSuccess) settings.onUploadSuccess.call(this, file, data, response); 
+			if (settings.onUploadSuccess) settings.onUploadSuccess.call(this, file, data, response);
 		}
 
 	}

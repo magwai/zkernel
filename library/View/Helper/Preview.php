@@ -7,7 +7,7 @@
  * http://www.opensource.org/licenses/mit-license.php
  */
 
-class Zkernel_View_Helper_Preview extends Zend_View_Helper_Abstract  {
+class Zkernel_View_Helper_Preview extends Zend_View_Helper_Abstract  { 
 	public function preview($dir, $name, $param = array()) {
     	if (!$dir || !$name) return @$param['default'];
 		$prefix = $param['prefix'] = @$param['prefix'] ? $param['prefix'].'_' : '';

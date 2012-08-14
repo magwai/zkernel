@@ -3,11 +3,11 @@
 **
  * jqGrid extension for cellediting Grid Data
  * Tony Tomov tony@trirand.com
- * http://trirand.com/blog/ 
+ * http://trirand.com/blog/
  * Dual licensed under the MIT and GPL licenses:
  * http://www.opensource.org/licenses/mit-license.php
  * http://www.gnu.org/licenses/gpl-2.0.html
-**/ 
+**/
 /**
  * all events and options here are aded anonynous and not in the base grid
  * since the array is to big. Here is the order of execution.
@@ -130,7 +130,7 @@ $.jgrid.extend({
 		return this.each(function(){
 			var $t= this, fr;
 			if (!$t.grid || $t.p.cellEdit !== true) {return;}
-			if ( $t.p.savedRow.length >= 1) {fr = 0;} else {fr=null;} 
+			if ( $t.p.savedRow.length >= 1) {fr = 0;} else {fr=null;}
 			if(fr !== null) {
 				var cc = $("td:eq("+iCol+")",$t.rows[iRow]),v,v2,
 				cm = $t.p.colModel[iCol], nm = cm.name, nmjq = $.jgrid.jqID(nm) ;
@@ -271,7 +271,7 @@ $.jgrid.extend({
 						}
 					} else {
 						try {
-							window.setTimeout(function(){$.jgrid.info_dialog($.jgrid.errors.errcap,v+" "+cv[1],$.jgrid.edit.bClose);},100);
+							//window.setTimeout(function(){$.jgrid.info_dialog($.jgrid.errors.errcap,v+" "+cv[1],$.jgrid.edit.bClose);},100);
 							$($t).jqGrid("restoreCell",iRow,iCol);
 						} catch (e) {}
 					}
@@ -304,7 +304,7 @@ $.jgrid.extend({
 				$($t).triggerHandler("jqGridAfterRestoreCell", [$t.rows[iRow].id, $t.p.savedRow[fr].v, iRow, iCol]);
 				if ($.isFunction($t.p.afterRestoreCell)) {
 					$t.p.afterRestoreCell.call($t, $t.rows[iRow].id, $t.p.savedRow[fr].v, iRow, iCol);
-				}				
+				}
 				$t.p.savedRow.splice(0,1);
 			}
 			window.setTimeout(function () { $("#"+$t.p.knv).attr("tabindex","-1").focus();},0);
@@ -402,7 +402,7 @@ $.jgrid.extend({
 						if ($t.p.colModel[i].hidden !== true) {
 							ind = i;
 							break;
-						}						
+						}
 					}
 				}
 				return ind;

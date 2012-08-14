@@ -117,10 +117,12 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 		$oid = $this->basketId();
 		$ret_original = $this->basketPriceClean($id);
 		$ret = $ret_original;
-		$ret += $this->fetchDelivery($oid, $ret_original);
-		$ret += $this->fetchDeliveryregion($oid, $ret_original);
-		$ret += $this->fetchPay($oid, $ret_original);
-		$ret -= $this->fetchCash($oid);
+		if (!$id) {
+			$ret += $this->fetchDelivery($oid, $ret_original);
+			$ret += $this->fetchDeliveryregion($oid, $ret_original);
+			$ret += $this->fetchPay($oid, $ret_original);
+			$ret -= $this->fetchCash($oid);
+		}
 		return $ret;
 	}
 

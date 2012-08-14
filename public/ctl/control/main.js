@@ -197,6 +197,7 @@ c.go = function(controller, action, param, post) {
 				if (d.navpane) c.build_navpane(d.navpane);
 				if (d.content) {
 					if (typeof CKEDITOR != 'undefined') CKEDITOR.instances = {};
+					$('.mceListBoxMenu').remove();
 					$('#c_content').html(d.content);
 					$('dt[id$=\_crop-label],dd[id$=\_crop-element]').hide();
 					c.button_init();
@@ -351,6 +352,15 @@ c.do_action = function(obj, parent, post) {
 	var action = obj.action;
 	var param = obj.param;
 	if (!param) param = {};
+	if (typeof param == 'string') {
+		var arr = {};
+		var p = param.split('&');
+		for (var i = 0; i < p.length; p++) {
+			var pp = p[i].split('=');
+			if (pp.length == 2) arr[pp[0]] = pp[1];
+		}
+		param = arr;
+	}
 	var field = obj.field ? obj.field : 'id';
 	var conf = Number(obj.confirm);
 	if (conf && !confirm(parent.value + '?')) return;
@@ -380,7 +390,7 @@ c.implode = function(glue, pieces) {
 	return ((pieces instanceof Array) ? pieces.join (glue) : pieces);
 };
 
-c.submit = function(apply) {
+c.submit = function(apply) {;
 	if (c.loading) {
 		//c.info('Дождитесь окончания предыдущей операции или отмените загрузку');
 		return false;
@@ -436,7 +446,7 @@ c.submit = function(apply) {
 c.sumbit_full = function(apply) {
 	var form = $('#c_form');
 	apply = typeof apply == 'undefined' ? 0 : apply;
-	$('#c_form input[type=file]').remove();
+	//$('#c_form input[type=file]').remove();
 	var post = form.serialize();
 	post += (post.length ? '&' : '') + 'cposted=1&is_apply=' + escape(apply);
 	c.loading_finish();
