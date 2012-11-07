@@ -8,6 +8,7 @@
  */
 
 class Zkernel_View_Helper_Preview extends Zend_View_Helper_Abstract  { 
+//titov hello
 	public function preview($dir, $name, $param = array()) {
     	if (!$dir || !$name) return @$param['default'];
 		$prefix = $param['prefix'] = @$param['prefix'] ? $param['prefix'].'_' : '';
