@@ -53,8 +53,8 @@ class Zkernel_Form extends Zend_Form {
 		return $e;
     }
 
-	function getErrors() {
-		$e = parent::getErrors();
+	function getErrors($name = null, $suppressArrayNotation = false) {
+		$e = parent::getErrors($name, $suppressArrayNotation);
 		if ($e) {
 			foreach ($e as &$el) {
 				if ($el) {
