@@ -57,7 +57,6 @@
 			if( !(oTarget && oSelect.oLabel && oSelect.oLabel.get(0) == oTarget.get(0)) ){$(this).hide();}
 		});
 	};
-	window.jqTransformHideSelect = jqTransformHideSelect;
 	/* Check for an external click */
 	var jqTransformCheckExternalClick = function(event) {
 		if ($(event.target).parents('.jqTransformSelectWrapper').length === 0) { jqTransformHideSelect($(event.target)); }
@@ -316,7 +315,7 @@
 			var iSelectHeight = ($('li',$ul).length)*($('li:first',$ul).height());//+1 else bug ff
 			(iSelectHeight < $ul.height()) && $ul.css({height:iSelectHeight,'overflow':'hidden'});//hidden else bug with ff
 			$ul.css({display:'none',visibility:'visible'});
-			jqTransformAddDocumentListener();
+
 		});
 	};
 	$.fn.jqTransform = function(options){
@@ -334,7 +333,7 @@
 			$('input:radio', this).jqTransRadio();
 			$('textarea', this).jqTransTextarea();
 
-			//if( $('select', this).jqTransSelect().length > 0 ){jqTransformAddDocumentListener();}
+			if( $('select', this).jqTransSelect().length > 0 ){jqTransformAddDocumentListener();}
 			selfForm.bind('reset',function(){var action = function(){jqTransformReset(this);}; window.setTimeout(action, 10);});
 
 			//preloading dont needed anymore since normal, focus and hover image are the same one
@@ -365,3 +364,4 @@
 	};/* End the Plugin */
 
 })(jQuery);
+				   

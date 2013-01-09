@@ -46,6 +46,26 @@ class Zkernel_Db_Model_Twitter {
 		}
 		if ($statuses && count($statuses) > 0) {
 			foreach ($statuses as $el) {
+				if (count((array)$el) < 2) continue;
+				$d = $this->_parseStatus($el);
+				$res[] = $d;
+				$this->_twitter[$this->_name]['status_card'][$d['id']] = $d;
+			}
+		}
+		return $res ? new Zkernel_View_Data($res) : array();
+	}
+
+	function _fetchHomeStatuses() {
+		$res = array();
+		if (isset($this->_twitter[$this->_name]['status_list'])) $statuses = $this->_twitter[$this->_name]['status_list'];
+		else {
+			$statuses = $this->_service->status->friendsTimeline();
+			$this->_twitter[$this->_name]['status_list'] = $statuses;
+			Zend_Registry::set('Zkernel_Twitter', $this->_twitter);
+		}
+		if ($statuses && count($statuses) > 0) {
+			foreach ($statuses as $el) {
+				if (count((array)$el) < 2) continue;
 				$d = $this->_parseStatus($el);
 				$res[] = $d;
 				$this->_twitter[$this->_name]['status_card'][$d['id']] = $d;
@@ -65,6 +85,7 @@ class Zkernel_Db_Model_Twitter {
 		}
 		if ($statuses && $statuses->results && count($statuses) > 0) {
 			foreach ($statuses->results as $el) {
+				if (count((array)$el) < 2) continue;
 				$d = $this->_parseStatus($el);
 				$res[] = $d;
 				$this->_twitter[$this->_name]['status_card'][$d['id']] = $d;
@@ -79,7 +100,13 @@ class Zkernel_Db_Model_Twitter {
 			'id' => (string)$el->id,
 			'date' => date('Y-m-d H:i:s', strtotime((string)$el->created_at)),
 			'message' => (string)$el->text,
-			'from_user' => (string)$el->from_user
+			'from_user' => (string)$el->from_user,
+			'original' => new Zkernel_View_Data(array(
+				'user' => new Zkernel_View_Data(array(
+					'screen_name' => @(string)$el->user->screen_name,
+					'profile_image_url' => @(string)$el->user->profile_image_url
+				))
+			))
 		);
 	}
 

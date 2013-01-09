@@ -17,8 +17,8 @@
 .linch_toolbar .linch_toolbar_color{margin:0 5px 0 0;float:right;-moz-user-select:none;-o-user-select:none;-khtml-user-select:none;user-select:none;outline:none;position:relative;}
 .linch_toolbar .linch_toolbar_width{margin:0 5px 0 0;float:right;-moz-user-select:none;-o-user-select:none;-khtml-user-select:none;user-select:none;outline:none;width:20px;height:20px;display:block;background:#fff no-repeat;border:1px solid #000;}
 .linch_toolbar .linch_toolbar_width input{border:0;width:20px!important;height:20px!important;display:block;margin:0!important;padding:0!important;vertical-align:middle;text-align:center;}
-.linch_toolbar .linch_toolbar_arrow{border:1px solid #000;height: 20px;padding: 0px 0px 0px 20px;width: 20px; background: url(images/arrow.png) left center no-repeat;margin:0 5px 0 0;float:right;-moz-user-select:none;-o-user-select:none;-khtml-user-select:none;user-select:none;outline:none;}
-.linch_toolbar .linch_toolbar_arrow input{width:20px!important;height:20px!important;display:block;margin:0!important;padding:0!important;vertical-align:middle;text-align:center;}
+.linch_toolbar .linch_toolbar_arrow{margin:0 5px 0 0;float:right;-moz-user-select:none;-o-user-select:none;-khtml-user-select:none;user-select:none;outline:none;}
+.linch_toolbar .linch_toolbar_arrow input{width:22px!important;height:22px!important;display:block;margin:0!important;padding:0!important;vertical-align:middle;text-align:center;}
 .linch_toolbar .linch_hidden{display:none;float:right;}
 .linch_toolbar .linch_toolbar_color_button{-moz-user-select:none;-o-user-select:none;-khtml-user-select:none;user-select:none;outline:none;width:20px;height:20px;display:block;border:1px solid #000;}
 .linch_toolbar .linch_toolbar_color_popup{position:absolute;}

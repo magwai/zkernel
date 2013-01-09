@@ -6,17 +6,18 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 	function init() {
 		$config = Zend_Controller_Front::getInstance()->getParam('bootstrap')->getOptions();
 		$this->_config = @$config['pay'] ? $config['pay'] : array();
+		$view = Zend_Controller_Action_HelperBroker::getStaticHelper('viewRenderer')->view;
 		$mt = new Default_Model_Txt;
-		$config_db = $mt->fetchPairs('key', 'value', 'SUBSTRING(`key`, 1, 4) = "pay_"');
+		$config_db = $mt->fetchCol('key', 'SUBSTRING(`key`, 1, 4) = "pay_"');
 		if ($config_db) {
-			foreach ($config_db as $k => $v) {
-				$p = explode('_', $k);
+			foreach ($config_db as $v) {
+				$p = explode('_', $v);
 				array_shift($p);
 				$p0 = array_shift($p);
 				if ($p0 && $p) {
 					$p = implode('_', $p);
 					$this->_config[$p0] = isset($this->_config[$p0]) ? $this->_config[$p0] : array();
-					$this->_config[$p0][$p] = $v;
+					$this->_config[$p0][$p] = $view->txt($v);
 				}
 			}
 		}
@@ -38,7 +39,7 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 </html>' : '';
 	}
 
-	function pay($type = null, $action = 'form', $param = array()) {
+	function pay($type = null, $action = 'form') {
 		$this->init();
 		if ($type === null) return $this;
 		else {
@@ -48,6 +49,40 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 			array_shift($pp);
 			return method_exists($this, $f) ? @call_user_method_array($f, $this, $pp) : false;
 		}
+	}
+
+	function payPaypalForm($order, $param = array()) {
+		$config = @$this->_config['paypal'] ? $this->_config['paypal'] : array();
+		if ($param) $config = array_merge($config, $param);
+
+		$card = $this->view->basket()->payCard($order);
+		if (@!$card) return false;
+
+		$config['item_number'] = $order;
+		if (@!$config['url']) $config['url'] = 'https://www.paypal.com/cgi-bin/webscr';
+
+		$config['business'] = @$config['business'];
+		$config['item_name'] = isset($config['item_name']) ? $config['item_name'] : 'Order #'.$config['item_number'];
+		$config['amount'] = isset($config['price']) ? $config['price'] : $card['total'];
+
+		$config['return'] = isset($config['return']) ? $config['return'] : $param['return'];
+		$config['cancel_return'] = isset($config['cancel_return']) ? $config['cancel_return'] : $param['cancel_return'];
+
+		$res = $this->genForm($config['url'], array(
+			'no_shipping' => 1,
+			'cmd' => '_xclick',
+			'amount' => $config['amount'],
+			'item_name' => $config['item_name'],
+			'item_number' => $config['item_number'],
+			'quantity' => 1,
+			'business' => $config['business'],
+			'return' => $config['return'],
+			'cancel_return' => $config['cancel_return']
+		));
+		if ($res) echo $res;
+		else return false;
+
+		exit();
 	}
 
 	function payWebmoneyForm($order, $param = array()) {
@@ -81,6 +116,38 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 		if ($res) echo $res;
 		else return false;
 
+		exit();
+	}
+
+	function payPaypalResult($order, $param = array(), $callback_success = null) {
+		$config = @$this->_config['paypal'] ? $this->_config['paypal'] : array();
+		if ($param) $config = array_merge($config, $param);
+
+		if ($order === null) $order = @(int)$config['item_number'];
+
+		$card = $this->view->basket()->payCard($order);
+
+		if (@!$card) {
+			echo 'ERROR: ORDER NOT FOUND';
+			exit();
+		}
+
+		$config['price'] = isset($config['price']) ? $config['price'] : $card['total'];
+		if (number_format(@(float)$config['mc_gross'], 2, '.', '') == number_format(@(float)$config['price'], 2, '.', '')) {
+			$client = new Zend_Http_Client('https://www.paypal.com/cgi-bin/webscr');
+			$post = $_POST;
+			$post['cmd'] = '_notify-validate';
+			$client->setParameterPost($post);
+			$response = $client->request('POST');
+			$res = $response->getBody();
+			if ($res == 'VERIFIED') {
+				if ($callback_success !== null) $callback_success($card, $config);
+			}
+			else echo 'ERROR: KEY NOT MATCH';
+		}
+		else {
+			echo 'ERROR: INVALID PRICE';
+		}
 		exit();
 	}
 
@@ -134,6 +201,19 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 		exit();
 	}
 
+	function payPaypalSuccess($order, $param = array(), $callback_success = null) {
+		$config = @$this->_config['paypal'] ? $this->_config['paypal'] : array();
+		if ($param) $config = array_merge($config, $param);
+
+		if ($order === null) $order = @(int)$config['item_number'];
+
+		$card = $this->view->basket()->payCard($order);
+		if (@!$card) return false;
+
+		if ($card && $callback_success !== null) $callback_success($card, $config);
+		return false;
+	}
+
 	function payWebmoneySuccess($order, $param = array(), $callback_success = null) {
 		$config = @$this->_config['webmoney'] ? $this->_config['webmoney'] : array();
 		if ($param) $config = array_merge($config, $param);
@@ -145,6 +225,10 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 
 		if ($card && $callback_success !== null) $callback_success($card, $config);
 		return false;
+	}
+
+	function payPaypalFail($order, $param = array(), $callback_success = null) {
+		return $this->payPaypalSuccess($order, $param, $callback_success);
 	}
 
 	function payWebmoneyFail($order, $param = array(), $callback_success = null) {

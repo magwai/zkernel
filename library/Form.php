@@ -17,6 +17,8 @@ class Zkernel_Form extends Zend_Form {
 
 	function translateError($e, $v = null) {
 		$d = array(
+			'notLessThan' => 'слишком большое значение',
+			'notGreaterThan' => 'слишком маленькое значение',
 			'isEmpty' => 'обязательно для заполнения',
 			'regexNotMatch' => 'недопустимые символы',
 			'fileImageSizeWidthTooBig' => 'картинка слишком широкая',
@@ -53,8 +55,8 @@ class Zkernel_Form extends Zend_Form {
 		return $e;
     }
 
-	function getErrors($name = null, $suppressArrayNotation = false) {
-		$e = parent::getErrors($name, $suppressArrayNotation);
+	function getErrors() {
+		$e = parent::getErrors();
 		if ($e) {
 			foreach ($e as &$el) {
 				if ($el) {

@@ -382,7 +382,7 @@
 			var d = data[ind];
 			var ds = d.spikes;
 			if (typeof d.group != 'undefined' && d.group) {
-				d.group.remove();
+				try { d.group.remove(); } catch (e) {}
 				d.group = null;
 			}
 			d.group = paper.set();

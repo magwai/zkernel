@@ -8,7 +8,6 @@
  */
 
 class Zkernel_View_Helper_Preview extends Zend_View_Helper_Abstract  { 
-//titov hello
 	public function preview($dir, $name, $param = array()) {
     	if (!$dir || !$name) return @$param['default'];
 		$prefix = $param['prefix'] = @$param['prefix'] ? $param['prefix'].'_' : '';
@@ -16,6 +15,8 @@ class Zkernel_View_Helper_Preview extends Zend_View_Helper_Abstract  {
 		$ext = $ext === false ? '' : @substr($name, $ext + 1);
 		$ctype = 'image';
 		if ($ext == 'flv' || $ext == 'avi' || $ext == '3gp' || $ext == 'wmv') $ctype = 'video';
+		$modified_o = @filemtime(PUBLIC_PATH.'/upload/'.$dir.'/'.$name);
+		if (!$modified_o) return @$param['default'];
 
 		$png_name = (@$param['corner'] && $ctype == 'image')? preg_replace('/\.(.+)$/','.png',$name):'';
 		$param['new_name'] = $png_name;
@@ -24,8 +25,6 @@ class Zkernel_View_Helper_Preview extends Zend_View_Helper_Abstract  {
 		$dir_dest = @$param['cache_dir_folder'] ? $param['cache_dir_folder'] : $dir;
 
 		$modified = @filemtime(PUBLIC_PATH.'/'.$cp.'/'.$dir_dest.'/'.$prefix.@$param['crop'].(($png_name)?$png_name:$name));
-    	$modified_o = @filemtime(PUBLIC_PATH.'/upload/'.$dir.'/'.$name);
-		if (!$modified_o && !$modified) return @$param['default'];
 
 		if ($modified < $modified_o) {
 			if (!@file_exists(PUBLIC_PATH.'/'.$cp.'/'.$dir_dest)) mkdir(PUBLIC_PATH.'/'.$cp.'/'.$dir_dest, 0777, true);

@@ -137,14 +137,14 @@ $.include(["/zkernel/ctl/redactor/css/redactor.css|link"]);
 		$value = parent::getValue();
 		$value = str_ireplace(array(
 			'<p style="margin-top: 0px; margin-right: 0px; margin-bottom: 1em; margin-left: 0px;">',
-			"<p>&nbsp;</p>\n<hr />\n<p>&nbsp;</p>",
-			'<hr />',
+			//"<p>&nbsp;</p>\n<hr />\n<p>&nbsp;</p>",
+			//'<hr />',
 			'<div style="page-break-after: always;">
 	<span style="display: none;">&nbsp;</span></div>'
 		), array(
 			'<p>',
-			'<hr />',
-			'<!-- pagebreak -->',
+			//'<hr />',
+			//'<!-- pagebreak -->',
 			'<!-- pagebreak -->'
 		), $value);
 		return $value;

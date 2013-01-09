@@ -16,12 +16,12 @@ class Zkernel_View_Helper_Zlist extends Zend_View_Helper_Abstract  {
 
 		$data['fetch_data'] = isset($data['fetch_data']) ? $data['fetch_data'] : array();
 
-		$data['fetch_model'] = is_object(@$data['fetch_model']) ? $data['fetch_model'] : (@$data['fetch_model'] ? (class_exists($data['fetch_model']) ? $data['fetch_model'] : 'Default_Model_'.ucfirst($data['fetch_model'])) : '');
+		$data['fetch_model'] = is_object(@$data['fetch_model']) ? $data['fetch_model'] : (@$data['fetch_model'] ? (class_exists($data['fetch_model']) ? $data['fetch_model'] : 'Default_Model_'.ucfirst(@$data['fetch_model'])) : '');
 
 		$data['fetch_param'] = @$data['fetch_param'] ? (is_array($data['fetch_param']) ? $data['fetch_param'] : array($data['fetch_param'])) : array();
 
 		$data['fetch_method'] = @$data['fetch_method'] ? $data['fetch_method'] : 'list';
-		if (!method_exists($data['fetch_model'], $data['fetch_method'])) $data['fetch_method'] = 'fetch'.ucfirst($data['fetch_method']);
+		if ($data['fetch_model'] && !method_exists($data['fetch_model'], $data['fetch_method'])) $data['fetch_method'] = 'fetch'.ucfirst($data['fetch_method']);
 
 		$data['override_type'] = @$data['override_type'];
 		if (!$data['override_type']) $data['override_type'] = strtolower(str_ireplace('Default_Model_', '', $data['fetch_model']));

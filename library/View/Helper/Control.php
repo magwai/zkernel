@@ -896,7 +896,6 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 
 					if (count($this->config->post_field_extend)) $this->config->data->set($this->config->post_field_extend);
 					$m2m_changed = false;
-
 					foreach ($this->config->data as $k => $v) {
 						if (@$this->config->field->$k->m2m) {
 							$m2m_new = isset($this->config->data->$k) ? $this->config->data->$k->toArray() : array();

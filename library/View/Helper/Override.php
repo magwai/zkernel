@@ -33,11 +33,11 @@ class Zkernel_View_Helper_Override extends Zend_View_Helper_Abstract  {
 		));
 		$m = $r->message_valid ? $r->message_valid : $r->message;
 		$sp = preg_split('/\<\!\-\-\ pagebreak\ \-\-\>/si', $m);
-		if (count($sp) < 2) $sp = preg_split('/\<hr(\ )\/\>/si', $m);
+		//if (count($sp) < 2) $sp = preg_split('/\<hr(\ )\/\>/si', $m);
 		if (count($sp) > 1) {
 			$r->description_valid = preg_replace(array('/\<p\>$/i', '/\<p\>(\&nbsp\;|)\<\/p\>$/i'), array('', ''), $sp[0]);
 			array_shift($sp);
-			$r->message_valid = preg_replace(array('/^\<\/p\>/i', '/^\<p\>(\&nbsp\;|)\<\/p\>/i'), array('', ''), trim(implode('<hr />', $sp)));
+			$r->message_valid = preg_replace(array('/^\<\/p\>/i', '/^\<p\>(\&nbsp\;|)\<\/p\>/i'), array('', ''), trim(implode(/*'<hr />'*/'', $sp)));
 		}
 		else if (!$r->message_valid) $r->message_valid = $r->message;
 	}
@@ -59,7 +59,8 @@ class Zkernel_View_Helper_Override extends Zend_View_Helper_Abstract  {
 		}
 		if (isset($r->title)) $r->title_valid = htmlspecialchars($r->title);
 		if (isset($r->date)) $r->date_valid = Zkernel_Common::getDate($r->date);
-		if ($type !== null && method_exists($this, 'override'.ucfirst($type))) $this->{'override'.ucfirst($type)}($r, $options);
+		//if (isset($options['num'])) $r->_num = $options['num'];
+		if ($type !== null && method_exists($this, 'override'.ucfirst($type))) $this->{'override'.ucfirst((string)$type)}($r, $options);
 		return $r;
 	}
 
@@ -68,7 +69,8 @@ class Zkernel_View_Helper_Override extends Zend_View_Helper_Abstract  {
 		if ($data === null) return $this;
 		$nd = array();
 		if (!$data) return $nd;
-		foreach ($data as $el) {
+		foreach ($data as $n => $el) {
+			//$options['num'] = $n;
 			$nd[] = $this->overrideSingle($el, $type, $options);
 		}
 		return $nd;

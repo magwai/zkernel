@@ -20,7 +20,7 @@ class Zkernel_View_Helper_Meta extends Zend_View_Helper_Abstract  {
 		$this->_set_meta('description', $data['description']);
 	}
 
-	private function _set_meta($key, $str) {
+	public function _set_meta($key, $str) {
 		$f = substr($str, 0, 1);
 		$data = trim($str, ' +-');
 		if ($key == 'title') $this->view->headTitle($data, ($f == '+' ? 'APPEND' : ($f == '-' ? 'PREPEND' : 'SET')));
@@ -31,6 +31,9 @@ class Zkernel_View_Helper_Meta extends Zend_View_Helper_Abstract  {
 	}
 
 	public function meta($oid = null, $param = array()) {
+		if ($oid == 'inst') {
+			return $this;
+		}
 		if ($oid == 'auto') {
 			$this->auto($param);
 			return;

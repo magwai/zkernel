@@ -522,11 +522,16 @@ c.build_navpane = function(d) {
 c.live_init = function(field, opt) {
 	opt = typeof opt == 'undefined' ? {} : opt;
 	$('#list td[aria-describedby=list_' + field + '] input,#list td[aria-describedby=list_' + field + '] select').bind(typeof opt.event == 'undefined' ? 'change' : opt.event, function() {
+		if (c.loading) return false;
 		var o = {sposted: 1};
 		o[field] = $(this).attr('type') == 'checkbox'
 			? ($(this)[0].checked ? 1 : 0)
 			: $(this).val();
 		if (typeof opt.single != 'undefined' && opt.single) {
+			if (!$(this)[0].checked) {
+				$(this)[0].checked = true;
+				return false;
+			}
 			$('#list td[aria-describedby=list_' + field + '] input,#list td[aria-describedby=list_' + field + '] select').not($(this)).each(function() {
 				$(this).val('')[0].checked = false;
 			});

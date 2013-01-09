@@ -244,11 +244,11 @@ class Zkernel_Common {
 	static function stitle($str, $length = 56000) {
 		$str = self::translit($str);
 		$str = strtolower($str);
-		$str = @preg_replace('/[^\w]/', '_', $str);
-		while (strpos($str, '__') !== false) $str = str_replace('__', '_', $str);
-		$str = trim($str, '_');
+		$str = @preg_replace('/[^\w]/', '-', $str);
+		while (strpos($str, '--') !== false) $str = str_replace('--', '-', $str);
+		$str = trim($str, '-');
 		if (strlen($str) > $length) {
-			$p = explode('_', $str);
+			$p = explode('-', $str);
 			$c = array();
 			foreach ($p as $el) $c[] = strlen($el);
 			while (strlen($str) > $length) {
@@ -256,7 +256,7 @@ class Zkernel_Common {
 				if ($i === false) break;
 				unset($c[$i]);
 				unset($p[$i]);
-				$str = implode('_', $p);
+				$str = implode('-', $p);
 			}
 		}
 		return $str;

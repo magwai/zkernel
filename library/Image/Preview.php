@@ -26,10 +26,6 @@ class Zkernel_Image_Preview {
 		if (!is_array($bg_color)) $bg_color = $m->f_hex2rgb($bg_color);
 		$fit = isset($param['fit']) ? $param['fit'] : false;
 		$mark = @$param['mark'];
-		
-		//наложение маски, заданной png файлом с прозрачностью. 
-		$mask = @$param['mask']; 
-
 		$corner = @$param['corner'];
 		$align = isset($param['align']) ? $param['align'] : 'cc';
 		$align = array(strtolower(substr($align, 0, 1)), strtolower(substr($align, 1, 1)));
@@ -166,14 +162,6 @@ class Zkernel_Image_Preview {
 			$this->corner($image, $param['corner']);
 			$thumb->setOldImage($image);
 		}
-		
-		if($mask) {
-			$format = 'PNG';
-			$name = (@$param['new_name'])?$param['new_name']:$name;
-			$image = $thumb->getOldImage();
-			$this->alpha_mask($image, $param['mask']);
-			$thumb->setOldImage($image);
-		}		
 
 		$thumb->save($this->path.'/'.$prefix.@$param['crop'].$name, $format);
 
@@ -283,62 +271,4 @@ class Zkernel_Image_Preview {
 
 		@imagedestroy($corner);
 	}
-	/**
-	 * Накладывает маску на изображение 
-	 * @param resource $image - ресурс изображения.
-	 * @param mixed[] $param - параметры маски
-	 * @throws Zkernel_Exception
-	 */
-	private function alpha_mask(&$image, $param){
-		if (!isset($param['file'])) throw new Zkernel_Exception("Параметр 'file' не установлен");
-		$mask = @imagecreatefrompng($param['file']);
-		if (!$mask) throw new Zkernel_Exception("Ресурс маски изображения из файла '{$param['file']}' не создан");
-		
-		$this->_add_alpha_mask($image, $mask);
-		imagedestroy($mask);
-	}
-	/**
-	 * Накладывает маску $mask на изображение $image. Поддерживается полупрозрачность.
-	 * Маска должна быть двухцветная. На месте белого цвета будет картинка, 
-	 * на месте черного - прозрачный цвет, а на месте серого - полупрозрачный. Чем более серый цвет чернее, тем более прозрачным будет на
-	 * этом месте изображение. 
-	 * 
-	 * 
-	 * As I needed a function that enables me to put a separate mask into the alpha channel of a picture, I found there is no function to allow this directly via PHP/GD, hence I wrote a quick'n'dirty function that does the trick. 
-	 *	For the mask any format is fine (jpg, png, gif, ...). Black will be transparent, white will be opaque - greyscale makes it half transparent, like with any alpha channel. The alpha channel is only 7 bit, hence there are just 128 variations of transparency possible. 
-	 *	I use the red channel, for the transparency, so you can make it either greyscale or redscale, doesn't matter.
-	 *
-	 * @param resource &$image - ресурс изображения.
-	 * @param resource $mask - ресурс маски
-	 */
-	private function _add_alpha_mask(&$image, $mask) {
-		// Get sizes and set up new picture
-		$xSize = imagesx( $image );
-		$ySize = imagesy( $image );
-		$newPicture = imagecreatetruecolor( $xSize, $ySize );
-		imagesavealpha( $newPicture, true );
-		imagefill( $newPicture, 0, 0, imagecolorallocatealpha( $newPicture, 0, 0, 0, 127 ) );
-		 
-		// Resize mask if necessary
-		if( $xSize != imagesx( $mask ) || $ySize != imagesy( $mask ) ) {
-			$tempPic = imagecreatetruecolor( $xSize, $ySize );
-			imagecopyresampled( $tempPic, $mask, 0, 0, 0, 0, $xSize, $ySize, imagesx( $mask ), imagesy( $mask ) );
-			imagedestroy( $mask );
-			$mask = $tempPic;
-		}
-		
-		// Perform pixel-based alpha map application
-		for( $x = 0; $x < $xSize; $x++ ) {
-			for( $y = 0; $y < $ySize; $y++ ) {
-				$alpha = imagecolorsforindex( $mask, imagecolorat( $mask, $x, $y ) );
-				$alpha = 127 - floor( $alpha[ 'red' ] / 2 );
-				$color = imagecolorsforindex( $image, imagecolorat( $image, $x, $y ) );
-				imagesetpixel( $newPicture, $x, $y, imagecolorallocatealpha( $newPicture, $color[ 'red' ], $color[ 'green' ], $color[ 'blue' ], $alpha ) );
-			}
-		}
-		 
-		// Copy back to original picture
-		imagedestroy( $image );
-		$image = $newPicture;
-	}	
 }

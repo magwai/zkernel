@@ -11,6 +11,7 @@ class Zkernel_View_Helper_Mail extends Zkernel_View_Helper_Override  {
 	function mail($data) {
 		$mail = new Zend_Mail('utf-8');
 		$mail->setType(Zend_Mime::MULTIPART_RELATED);
+		$mail->setHeaderEncoding(Zend_Mime::ENCODING_BASE64);
 		$body = $this->view->partial('mail/frame.phtml', array(
 			'message' => @$data['body'] ? $data['body'] : $this->view->partial('mail/'.$data['view'].'.phtml', $data)
 		));
@@ -72,11 +73,14 @@ class Zkernel_View_Helper_Mail extends Zkernel_View_Helper_Override  {
 		$ok = true;
 
 		try {
-			$config = Zend_Controller_Front::getInstance()->getParam('bootstrap')->getOptions();
 			$tr = null;
-			if (@$config['mail'] && @$config['mail']['transport']) {
-				if ($config['mail']['transport'] == 'smtp' && @$config['mail']['smtp'] && @$config['mail']['smtp']['host']) {
-					$tr = new Zend_Mail_Transport_Smtp($config['mail']['smtp']['host'], $config['mail']['smtp']);
+			$bt = Zend_Controller_Front::getInstance()->getParam('bootstrap');
+			if ($bt) {
+				$config = $bt->getOptions();
+				if (@$config['mail'] && @$config['mail']['transport']) {
+					if ($config['mail']['transport'] == 'smtp' && @$config['mail']['smtp'] && @$config['mail']['smtp']['host']) {
+						$tr = new Zend_Mail_Transport_Smtp($config['mail']['smtp']['host'], $config['mail']['smtp']);
+					}
 				}
 			}
 			$mail->send($tr);

@@ -81,6 +81,11 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 				if ($dd) $d = array_merge($d, $dd);
 			}
 			$id = $this->_model_order->insert($d);
+			if ($id) {
+				if (method_exists($this, 'onCreate')) {
+					$this->onCreate($id);
+				}
+			}
 		}
 		return $id;
 	}
@@ -109,7 +114,7 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 			->where('i.id = ?', $oid)
 			->group('i.id');
 		if ($id != null) $s->where('m.'.$this->_field_order_item_id.' = ?', $id);
-		$ret = (int)$this->_model_order->getAdapter()->fetchOne($s, 'SUM(`price`)');
+		$ret = (float)$this->_model_order->getAdapter()->fetchOne($s, 'SUM(`price`)');
 		return $ret;
 	}
 
@@ -249,7 +254,7 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 		return $ret;
 	}
 
-	function basketAdd($id, $quant = 1) {
+	function basketAdd($id, $quant = 1, $ext = array()) {
 		$oid = $this->basketId(true);
 		$item = $this->_model_item->fetchBasketCard($id);
 		$ex = $this->_model_order_item->fetchRow(array(
@@ -257,25 +262,32 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 			'`'.$this->_field_order_item_id.'` = ?' => $id
 		));
 		if ($ex) {
-			$ok = $this->_model_order_item->update(array(
+			$d = array_merge(array(
 				'quant' => $ex->quant + $quant
-			), array(
+			), $ext);
+			$ok = $this->_model_order_item->update($d, array(
 				'`id` = ?' => $ex->id
 			));
 		}
 		else {
-			$ok = $this->_model_order_item->insert(array(
+			$d = array(
 				'parentid' => $oid,
 				'quant' => $quant,
 				$this->_field_order_item_id => $id,
 				'price' => $item->price,
 				'orderid' => (int)$this->_model_order_item->fetchMax('orderid') + 1
-			));
+			);
+			if (method_exists($this, 'basketItemDefault')) {
+				$dd = $this->basketItemDefault();
+				if ($dd) $d = array_merge($d, $dd);
+			}
+			$d = array_merge($d, $ext);
+			$ok = $this->_model_order_item->insert($d);
 		}
 		return $ok;
 	}
 
-	function basketSet($id, $quant) {
+	function basketSet($id, $quant, $ext = array()) {
 		$oid = $this->basketId(true);
 		$item = $this->_model_item->fetchBasketCard($id);
 		if (!$item || !$item->price || !$quant) return false;
@@ -284,20 +296,27 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 			'`'.$this->_field_order_item_id.'` = ?' => $id
 		));
 		if ($ex) {
-			$ok = $this->_model_order_item->update(array(
+			$d = array_merge(array(
 				'quant' => $quant
-			), array(
+			), $ext);
+			$ok = $this->_model_order_item->update($d, array(
 				'`id` = ?' => $ex->id
 			));
 		}
 		else {
-			$ok = $this->_model_order_item->insert(array(
+			$d = array(
 				'parentid' => $oid,
 				'quant' => $quant,
 				$this->_field_order_item_id => $id,
 				'price' => $item->price,
 				'orderid' => (int)$this->_model_order_item->fetchMax('orderid') + 1
-			));
+			);
+			if (method_exists($this, 'basketItemDefault')) {
+				$dd = $this->basketItemDefault();
+				if ($dd) $d = array_merge($d, $dd);
+			}
+			$d = array_merge($d, $ext);
+			$ok = $this->_model_order_item->insert($d);
 		}
 		return $ok;
 	}
@@ -428,6 +447,7 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 	}
 
 	function finishedPriceClean($oid = null, $id = null, $uid = null, $payed = null) {
+		$meta = $this->_model_order_item->info('metadata');
 		$s = $this->_model_order->getAdapter()->select()
 			->from(array('i' => $this->_model_order->info('name')), '')
 			->joinLeft(array('m' => $this->_model_order_item->info('name')), 'i.id = m.parentid', array(
@@ -436,12 +456,12 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 			->where('i.active = ?', 1)
 			->where('i.finished = ?', 1)
 			->group('i.id');
+		if (isset($meta['calc_it'])) $s->where('m.calc_it = ?', 1);
 		if ($payed != null) $s->where('i.payed = ?', (int)$payed);
 		if ($uid != null) $s->where('i.author = ?', $uid);
 		if ($oid != null) $s->where('i.id = ?', $oid);
 		if ($id != null) $s->where('m.id = ?', $id);
-
-		$ret = (int)$this->_model_order->getAdapter()->fetchOne($s, 'SUM(`price`)');
+		$ret = (float)$this->_model_order->getAdapter()->fetchOne($s, 'SUM(`price`)');
 		return $ret;
 	}
 
@@ -460,7 +480,11 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 			foreach ($list as $el) {
 				$d = new Zkernel_View_Data($el);
 				$item = $this->_model_item->fetchBasketCard($el->{$this->_field_order_item_id});
-				$ret[] = $item ? new Zkernel_View_Data(array_merge($d->toArray(), $item->toArray())) : new Zkernel_View_Data(array_merge($d->toArray()));
+				if ($item) {
+					$item = $item->toArray();
+					unset($item['id']);
+				}
+				$ret[] = $item ? new Zkernel_View_Data(array_merge($item, $d->toArray())) : new Zkernel_View_Data(array_merge($d->toArray()));
 			}
 		}
 		return $ret;

@@ -12,7 +12,7 @@ class Zkernel_Application_Resource_User extends Zend_Application_Resource_Resour
 	protected $_user = null;
 
 	public function init () {
-		if (null === $this->_user && strpos($_SERVER['REQUEST_URI'], '/fu') === false) {
+		if (null === $this->_user && !preg_match('/\/fu$/i', $_SERVER['REQUEST_URI'])) {
 			$options = $this->getOptions();
 
 			if (!isset($options['role'])) $options['role'] = 'Default_Model_Role';
