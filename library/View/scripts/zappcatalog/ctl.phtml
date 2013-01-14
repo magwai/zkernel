@@ -1,0 +1,51 @@
+<?php
+$this->control = array(
+			'tree' => 0,
+			'static_field' => true,
+			'field' => array(
+				'title' => array(
+					'title' => 'Название',
+					'unique' => true,
+					'required' => true,
+					'order' => 1
+			),
+				'stitle' => array(
+					'active' => false,
+					'title' => 'Псевдоним',
+					'description' => 'Латиница, цифры, -, _',
+					'unique' => true,
+					'required' => true,
+					'validators' => array(array(
+						'validator' => 'Regex',
+						'options' => array('/^[a-z0-9\_\-]*$/i')
+						)),
+					'order' => 2
+			),
+		 		'pic' => array(
+					'active' => false,
+		 			'title' => 'Картинка',
+		 			'type' => 'uploadify',
+		 			'validators' => array('File_IsImage'),
+		 			'order' => 3
+				),			
+				'message' => array(
+					'active' => false,
+					'title' => 'Текст',
+					'type' => 'mce',
+					'order' => 4
+			)
+		),
+			'action_config' => array(
+				'ctlshow' => array(
+					'field' => array(
+						'pic' => array('active' => false),
+						'message' => array('active' => false)
+					)
+				),		
+				'ctledit' => array(
+					'field' => array(
+						'stitle' => array('active' => true)
+						)
+				)
+		)
+);

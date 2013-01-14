@@ -1,0 +1,34 @@
+<?php
+
+$this->control(array(
+	'use_db' => false,
+	'type' => 'add',
+	'func_override' => 'php_function:$cnt = $control->view->partial("zappimages/import.phtml", array(
+		"name" => $control->config->data["ext"],
+		"replace" => $control->config->data["replace"] == "replace",
+		"cid" => $control->config->param->cid
+	));$control->config->info[] = $cnt ? "Загружено картинок: ".$cnt : "Не загружено ни одной картинки";',
+	'field' => array(
+		'pic' => array(
+			'active' => 0
+		),
+		'ext' => array(
+			'title' => 'ZIP архив',
+			'description' => '',
+			'type' => 'uploadify',
+			'order' => 1,
+			'required' => 1
+		),
+		'replace' => array(
+			'title' => 'Как загружать?',
+			'type' => 'select',
+			'param' => array(
+				'multioptions' => array(
+					'add' => 'Добавить к существующим',
+					'replace' => 'Заменить на новые'
+				)
+			),
+			'order' => 2
+		)
+	),
+));

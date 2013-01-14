@@ -1,0 +1,50 @@
+<?php
+
+$this->control = array(
+			'drag' => 1,
+			'post_field_extend' => array(
+				'type' => $this->type
+			),
+			'where' => array(
+				'`type` = ?' => $this->type
+			),
+			'field' => array(
+				'title' => array(
+					'title' => 'Название',
+					'order' => 1,
+					'required' => true
+				),
+				'pic' => array(
+					'title' => 'Изображение',
+					'type' => 'uploadify',
+					'validators' => array(
+						'File_IsImage'
+					),
+					'order' => 2,
+					'required' => true
+				),
+				'message' => array(
+					'active' => false,
+					'title' => 'Текст',
+					'type' => 'mce',
+					'order' => 3
+				),
+				'type' => array(
+					'active' => false
+				)
+			),
+			'action_config' => array(
+				'ctlshow' => array(
+					'button_top' => array(
+						'add', 'edit', 'delete', array(
+						'title' => 'Загрузить архив',
+						'action' => 'ctlzip'
+						)
+					),
+					'field' => array(
+						'pic' => array('active' => false),
+						'message' => array('active' => false)
+					)
+				)
+			)
+		);

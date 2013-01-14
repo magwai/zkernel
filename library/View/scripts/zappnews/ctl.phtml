@@ -1,0 +1,62 @@
+<?php
+$this->control = array(
+			'orderby' => 'date',
+			'orderdir' => 'desc',
+			'static_field' => true,
+			'field' => array(
+				'date' => array(
+					'title' => 'Дата',
+					'type' => 'date',
+					'required' => true,
+					'sortable' => true,
+					'formatter' => 'date',
+					'param' => array(
+						'value' => date('d.m.Y')
+					),
+					'width' => '20%',
+					'order' => 1
+				),
+				'title' => array(
+					'title' => 'Заголовок',
+					'required' => true,
+					'unique' => true,
+					'order' => 2
+				),
+				'stitle' => array(
+					'active' => false,
+					'title' => 'Псевдоним',
+					'description' => 'Латиница, цифры, -, _',
+					'unique' => true,
+					'required' => true,
+					'validators' => array(array(
+						'validator' => 'Regex',
+						'options' => array('/^[a-z0-9\_\-]*$/i'))),
+					'order' => 3
+				),
+		 		'pic' => array(
+		 			'title' => 'Картинка',
+		 			'type' => 'uploadify',
+		 			'validators' => array('File_IsImage'),
+		 			'order' => 4
+				),
+				'message' => array(
+					'title' => 'Текст',
+					'type' => 'mce',
+					'required' => true,
+					'order' => 5
+				)
+			),
+			'action_config' => array(
+				'ctlshow' => array(
+					'field' => array(
+						'pic' => array('active' => false),
+						'message' => array('active' => false)
+					)
+				),
+				'ctledit' => array(
+					'field' => array(
+						'stitle' => array('active' => true)
+					)
+				)
+		)
+);

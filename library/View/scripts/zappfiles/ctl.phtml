@@ -1,0 +1,36 @@
+<?php
+
+$this->control = array(
+			'drag' => 1,
+			'post_field_extend' => array(
+				'type' => $this->type
+			),
+			'where' => array(
+				'`type` = ?' => $this->type
+			),
+			'field' => array(
+				'title' => array(
+					'title' => 'Название',
+					'order' => 1,
+					'required' => true
+				),
+				'ext' => array(
+					'title' => 'Файл',
+					'type' => 'uploadify',
+					'order' => 2,
+					'required' => true
+				),
+				'type' => array(
+					'active' => false
+				)
+			),
+			'action_config' => array(
+				'ctlshow' => array(
+					'field' => array(
+						'ext' => array(
+							'active' => false
+						)
+					)
+				)
+			)
+		);

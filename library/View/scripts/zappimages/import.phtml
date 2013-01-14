@@ -1,0 +1,62 @@
+<?php
+
+set_time_limit(200);
+
+$dir = PUBLIC_PATH.'/upload/'.$this->control()->config->controller.'_ext';
+$dir1 = PUBLIC_PATH.'/upload/'.$this->control()->config->controller.'_pic';
+$name = $this->name;
+$cid = (int)$this->cid;
+$replace = (int)$this->replace;
+$fn = $dir.'/'.$name;
+$cnt = 0;
+
+@exec('unzip -j '.$fn.' -d '.$dir);
+@unlink($fn);
+
+$data = array();
+$handle = @opendir($dir);
+while ($path = @readdir($handle)) {
+	if (preg_match('/\.(jpg|jpeg|gif|png)$/i', $path)) $data[] = $path;
+}
+closedir($handle);
+
+if ($data) {
+	$model = $this->control()->config->model;
+	if ($replace) {
+		$ex = $model->fetchList($cid);
+		if (count($ex)) foreach($ex as $el) @unlink($dir1.'/'.$el->pic);
+		$model->deleteList($cid);
+	}
+	foreach ($data as $el) {
+		$p = explode('.', $el);
+		$ext = strtolower($p[count($p) - 1]);
+		array_pop($p);
+		$name = implode('.', $p);
+
+		$stitle = Zkernel_Common::stitle($name, 50);
+    	$stitle = $stitle ? $stitle : '_';
+    	$stitle_n = $stitle;
+		$stitle_p = -1;
+		do {
+			$stitle_p++;
+			$stitle_n = $stitle.($stitle_p == 0 ? '' : $stitle_p);
+			$stitle_c = (int)$model->fetchCountImg(array('`pic` = ?' => $stitle_n.'.'.$ext));
+		}
+		while ($stitle_c > 0);
+		$stitle = $stitle_n;
+
+		$ok = @copy($dir.'/'.$el, $dir1.'/'.$stitle.'.'.$ext);
+		if ($ok) {
+			chmod($dir1.'/'.$stitle.'.'.$ext, 0777);
+			$ok = $model->insertImg(array(
+				'parentid' => $cid,
+				'pic' => $stitle.'.'.$ext
+			));
+			if ($ok) $cnt++;
+		}
+	}
+}
+
+@exec('rm -R '.$dir.'/*');
+
+echo $cnt;
