@@ -32,7 +32,8 @@ class Zkernel_Application_Resource_Routedb extends Zend_Application_Resource_Res
 							$el['map'] = explode(',', $el['map']);
 							foreach ($el['map'] as $n => $m) $map[$n + 1] = $m;
 						}
-						$reverse = preg_replace('/\((.+?)\)/i', '%s', $el['url']);
+						if(isset($el['reverse']) && !empty($el['reverse'])) $reverse = $el['reverse'];
+						else $reverse = preg_replace('/\((.+?)\)/i', '%s', $el['url']);
 						$route = new Zend_Controller_Router_Route_Regex(
 							$el['url'],
 							array(
