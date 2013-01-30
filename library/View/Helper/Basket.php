@@ -162,13 +162,15 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 		return $ret;
 	}
 
-	function fetchDelivery($oid, $price, $original = false) {
+	function fetchDelivery($oid, $price, $original = false, $edit_mode = false) {
 		$ret = 0;
 		if ($this->_model_delivery) {
 			$card = $this->_model_order->fetchRow(array(
 				'`id` = ?' => $oid
 			));
 			if ($card) {
+				$card = new Zkernel_View_Data($card);
+				if ($card->price_delivery && !$edit_mode) return $card->price_delivery;
 				$delivery = $this->_model_delivery->fetchRow(array(
 					'`id` = ?' => (int)$card->delivery
 				));
@@ -185,13 +187,15 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 		return $ret;
 	}
 
-	function fetchDeliveryregion($oid, $price, $original = false) {
+	function fetchDeliveryregion($oid, $price, $original = false, $edit_mode = false) {
 		$ret = 0;
 		if ($this->_model_deliveryregion) {
 			$card = $this->_model_order->fetchRow(array(
 				'`id` = ?' => $oid
 			));
 			if ($card) {
+				$card = new Zkernel_View_Data($card);
+				if ($card->price_deliveryregion && !$edit_mode) return $card->price_deliveryregion;
 				$delivery = $this->_model_deliveryregion->fetchRow(array(
 					'`id` = ?' => (int)$card->region
 				));
@@ -229,13 +233,15 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 		return $ret;
 	}
 
-	function fetchPay($oid, $price, $original = false) {
+	function fetchPay($oid, $price, $original = false, $edit_mode = false) {
 		$ret = 0;
 		if ($this->_model_pay) {
 			$card = $this->_model_order->fetchRow(array(
 				'`id` = ?' => $oid
 			));
 			if ($card) {
+				$card = new Zkernel_View_Data($card);
+				if ($card->price_pay && !$edit_mode) return $card->price_pay;
 				$pay = $this->_model_pay->fetchRow(array(
 					'`id` = ?' => (int)$card->pay
 				));
@@ -388,7 +394,14 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 
 	function basketFinish($data = array()) {
 		$data['finished'] = 1;
-		return $this->basketSave($data);
+		$oid = $this->basketSave($data);
+		$clean = $this->finishedPriceClean($oid);
+		$data = array();
+		$meta = $this->_model_order->info('metadata');
+		if (isset($meta->price_pay)) $data['price_delivery'] = $this->fetchDelivery($oid, $clean);
+		if (isset($meta->price_pay)) $data['price_pay'] = $this->fetchPay($oid, $clean);
+		$this->finishedSave($oid, $data);
+		return $oid;
 	}
 
 	function basketSave($data) {
