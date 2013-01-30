@@ -57,6 +57,7 @@
 			if( !(oTarget && oSelect.oLabel && oSelect.oLabel.get(0) == oTarget.get(0)) ){$(this).hide();}
 		});
 	};
+	window.jqTransformHideSelect = jqTransformHideSelect;
 	/* Check for an external click */
 	var jqTransformCheckExternalClick = function(event) {
 		if ($(event.target).parents('.jqTransformSelectWrapper').length === 0) { jqTransformHideSelect($(event.target)); }
