@@ -398,9 +398,9 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 		$clean = $this->finishedPriceClean($oid);
 		$data = array();
 		$meta = $this->_model_order->info('metadata');
-		if (isset($meta->price_pay)) $data['price_delivery'] = $this->fetchDelivery($oid, $clean);
+		if (isset($meta->price_delivery)) $data['price_delivery'] = $this->fetchDelivery($oid, $clean);
 		if (isset($meta->price_pay)) $data['price_pay'] = $this->fetchPay($oid, $clean);
-		$this->finishedSave($oid, $data);
+		if ($data) $this->finishedSave($oid, $data);
 		return $oid;
 	}
 
