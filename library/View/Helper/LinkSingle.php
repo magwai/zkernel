@@ -42,6 +42,12 @@ class Zkernel_View_Helper_LinkSingle extends Zend_View_Helper_HeadLink  {
 		        }
 		        else $mod = true;
 				if ($mod) {
+					$static_hosts = array();
+					$bt = Zend_Controller_Front::getInstance()->getParam('bootstrap');
+					if ($bt) {
+						$config = $bt->getOptions();
+						$static_hosts = @$config['statichost'];
+					}
 					foreach ($items as $k => $el) {
 						$dir_full = dirname($el);
 						$dir = str_ireplace(PUBLIC_PATH, '', $dir_full);
@@ -67,12 +73,12 @@ class Zkernel_View_Helper_LinkSingle extends Zend_View_Helper_HeadLink  {
 									'/'.$zp,
 									'/'
 								), $su);
-								$str = str_ireplace($matches[$k_1], 'url('.$su.($mtime ? '?'.filemtime($dir_full.'/'.$el_1) : '').')', $str);
+								$str = str_ireplace($matches[$k_1], 'url('.($static_hosts ? 'http://'.$static_hosts[substr((string)hexdec(substr(sha1($su), 0, 15)), 0, 1)] : '').$su.($mtime ? '?'.filemtime($dir_full.'/'.$el_1) : '').')', $str);
 							}
 						}
 
 						$matches = $files = array();
-						preg_match_all('/src\=(\'|\"|)(.*?)(\'|\"|\,\))/si', $str, $res);
+						preg_match_all('/src\=(\'|\"|)(.*?)(\'|\"|\,|\))/si', $str, $res);
 
 						if (@$res[2]) foreach ($res[2] as $k_1 => $el_1) {
 							$matches[] = $res[0][$k_1];
@@ -92,7 +98,7 @@ class Zkernel_View_Helper_LinkSingle extends Zend_View_Helper_HeadLink  {
 									'/zkernel',
 									'/'
 								), $su);
-								$str = str_ireplace($matches[$k_1], 'src="'.$su.($mtime ? '?'.filemtime($dir_full.'/'.$el_1) : '').'"', $str);
+								$str = str_ireplace($matches[$k_1], 'src="'.($static_hosts ? 'http://'.$static_hosts[substr((string)hexdec(substr(sha1($su), 0, 15)), 0, 1)] : '').$su.($mtime ? '?'.filemtime($dir_full.'/'.$el_1) : '').'"', $str);
 							}
 						}
 

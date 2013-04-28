@@ -10,6 +10,7 @@ jQuery.fn.textPlaceholder = function () {
 		if (that.placeholder && 'placeholder' in document.createElement(that.tagName)) return;
 
 		var placeholder = that.getAttribute('placeholder');
+		if (placeholder == null) placeholder = '';
 		var input = jQuery(that);
 
 		if (that.value === '' || that.value == placeholder) {

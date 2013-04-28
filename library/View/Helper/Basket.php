@@ -345,6 +345,11 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 		), array(
 			'`id` = ?' => $ex->id
 		));
+		if (!$this->basketQuant() && $this->_model_cash) {
+			$this->basketSave(array(
+				'cash' => 0
+			));
+		}
 		return $ok;
 	}
 
@@ -355,6 +360,11 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 			'`parentid` = ?' => $oid,
 			'`'.$this->_field_order_item_id.'` = ?' => $id
 		));
+		if (!$this->basketQuant() && $this->_model_cash) {
+			$this->basketSave(array(
+				'cash' => 0
+			));
+		}
 		return $ok;
 	}
 

@@ -33,7 +33,7 @@ class Zkernel_User {
 			: (isset($this->_data->$k) ? $this->_data->$k : null);
 	}
 
-	private function initAuth() {
+	function initAuth() {
 		$this->_auth = Zend_Auth::getInstance();
 		$this->_auth->setStorage(new Zend_Auth_Storage_Session('Default', 'user_'.$this->_models['user']->info('name')));
 		$this->_auth_adapter = new Zend_Auth_Adapter_DbTable(

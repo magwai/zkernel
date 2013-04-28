@@ -12,7 +12,7 @@ if ($path && $file) {
 		? 'application/javascript'
 		: 'text/css';
 
-	$modified = gmdate('D, d M Y H:i:s', filemtime($path)).' GMT';
+	$modified = gmdate('D, d M Y H:i:s', @filemtime($path)).' GMT';
 
 	$expires = gmdate('D, d M Y H:i:s', time() + 2592000).' GMT';
 

@@ -71,19 +71,51 @@ class Zkernel_View_Helper_Mail extends Zkernel_View_Helper_Override  {
 			$this->view->txt('site_title').($data['subject'] ? ' — '.$data['subject'] : '')
 		);
 		$ok = true;
-
 		try {
 			$tr = null;
 			$bt = Zend_Controller_Front::getInstance()->getParam('bootstrap');
 			if ($bt) {
 				$config = $bt->getOptions();
-				if (@$config['mail'] && @$config['mail']['transport']) {
-					if ($config['mail']['transport'] == 'smtp' && @$config['mail']['smtp'] && @$config['mail']['smtp']['host']) {
-						$tr = new Zend_Mail_Transport_Smtp($config['mail']['smtp']['host'], $config['mail']['smtp']);
+				if (@$config['mail']) {
+					if (@$config['mail']['transports'] && @$config['mail']['transports']['transport']) {
+						foreach ($config['mail']['transports']['transport'] as $k => $v) {
+							$class = 'Zend_Mail_Transport_'.ucfirst($v);
+							$tr = new $class($config['mail']['transports'][$v]['host'][$k], array(
+								'host' => $config['mail']['transports'][$v]['host'][$k],
+								'port' => $config['mail']['transports'][$v]['port'][$k],
+								'auth' => $config['mail']['transports'][$v]['auth'][$k],
+								'username' => $config['mail']['transports'][$v]['username'][$k],
+								'password' => $config['mail']['transports'][$v]['password'][$k],
+								'ssl' => $config['mail']['transports'][$v]['ssl'][$k]
+							));
+							try {
+								$ok = true;
+								$mail->send($tr);
+								break;
+							}
+							catch (Exception $e) {
+								$ok = false;
+								//@file_put_contents(DATA_PATH.'/mail-'.time().microtime(true).'.txt', var_export($e, 1));
+							}
+						}
+						$tr = null;
+					}
+					else if (@$config['mail']['transport']) {
+						$k = $config['mail']['transport'];
+						if (@$config['mail'][$k] && @$config['mail'][$k]['host']) {
+							try {
+								$class = 'Zend_Mail_Transport_'.ucfirst($k);
+								$tr = new $class($config['mail']['smtp']['host'], $config['mail'][$k]);
+							}
+							catch (Exception $e) {
+								$tr = null;
+								$ok = false;
+							}
+						}
 					}
 				}
 			}
-			$mail->send($tr);
+			if ($tr) $mail->send($tr);
 		}
 		catch (Zend_Mail_Transport_Exception $e) {
 			$ok = false;

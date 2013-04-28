@@ -72,7 +72,8 @@ if ($key){
     	if (file_exists($new_dir)) {
     		if (@$this->post['old'] && $this->post['old'] != 'multi') @unlink($new_dir.'/'.$this->post['old']);
     		$filter = new Zkernel_Filter_File_Uploadify(array(
-    			'directory' => $new_dir
+    			'directory' => $new_dir,
+				'length' => isset($this->post['length']) ? $this->post['length'] : 20
     		));
     		$name = $filter->filter($name);
     		$path = $new_dir.'/'.$name;

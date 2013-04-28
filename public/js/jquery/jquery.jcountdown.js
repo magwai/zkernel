@@ -241,6 +241,14 @@ $.fn.countdown = function( method /*, options*/ ) {
 					if( settings.onResume ) {
 						$this.bind("resume.jcdevt", settings.onResume );
 					}
+					
+					if( typeof options['servertime'] != 'undefined' && options.servertime !== null ) {
+						var local = new Date(),
+							difference = local.getTime() - settings.servertime;
+							difference = Number(difference);
+
+						settings.difference = difference;
+					}
 
 					settings.timer = setInterval( func, settings.updateTime );
 					$this.data("jcdData", settings);

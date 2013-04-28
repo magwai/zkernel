@@ -247,7 +247,7 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 
 		if (@$config['shopid']) $config['ShopId'] = $config['shopid'];
 
-		if (@!$config['url']) $config['url'] = 'https://money.yandex.ru/eshop.xml';
+		if (@!$config['url']) $config['url'] = @$config['demo'] ? 'https://demomoney.yandex.ru/eshop.xml' : 'https://money.yandex.ru/eshop.xml';
 
 		if (@!$config['Sum'] || @!$config['scid'] || @!$config['shopid']) return false;
 
@@ -279,7 +279,7 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 		}
 
 		if (@$config['shopid']) $config['ShopId'] = $config['shopid'];
-
+		
 		$config['price'] = isset($config['price']) ? $config['price'] : $card['total'];
 		if (@$config['price']) $config['orderSumAmount'] = $config['price'];
 
@@ -293,7 +293,7 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 			echo '<checkOrderResponse performedDatetime="'.date('Y-m-d\TH:i:s').'" code="100" invoiceId="'.$config['invoiceId'].'" shopId="'.$config['ShopId'].'" message="Заказ был оплачен ранее" />';
 		}
 		else echo '<checkOrderResponse performedDatetime="'.date('Y-m-d\TH:i:s').'" code="0" invoiceId="'.$config['invoiceId'].'" shopId="'.$config['ShopId'].'" />';
-
+		
 		exit();
 	}
 
@@ -399,7 +399,7 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 			'recipientAmount' => $config['recipientAmount'],
 			'orderId' => $order,
 			'serviceName' => $config['serviceName'],
-			'user_email' => @$config['user_email']
+			'user_email' => ''//@$config['user_email']
 		));
 		if ($res) echo $res;
 		else return false;

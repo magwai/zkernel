@@ -70,7 +70,6 @@ c.init = function(p, l) {
 		return false;
 	});
 
-
 	if (c.cfg.menu && c.cfg.menu.length) {
 		c.build_menu(c.cfg.menu, $('#c_menu'));
 		$('.c_tline .mf').show();
@@ -363,7 +362,17 @@ c.do_action = function(obj, parent, post) {
 	}
 	var field = obj.field ? obj.field : 'id';
 	var conf = Number(obj.confirm);
-	if (conf && !confirm(parent.value + '?')) return;
+	if (conf) {
+		var txt = ($(parent).data('confirm') ? $(parent).data('confirm') : parent.value);
+		if ($(parent).data('confirm-key')) {
+			var res = prompt(txt);
+			if (res != $(parent).data('confirm-key')) return;
+		}
+		else {
+			txt += '?';
+			if (!confirm(txt)) return;
+		}
+	}
 	var l = $('#list');
 	if (l.length) {
 		var id = obj.id ? obj.id : l.getGridParam('selrow');

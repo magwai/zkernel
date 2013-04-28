@@ -16,7 +16,8 @@ class Zkernel_Form_Element_Uploadify extends Zend_Form_Element_Hidden {
     		'fileDataName' => $this->getName(),
 	    	'folder' => '/'.$this->destination,
 	    	'scriptData' => array(
-    			'old' => $this->getAttrib('multi') ? 'multi' : $this->getValue(),
+    			'length' => $this->getAttrib('length') ? $this->getAttrib('length') : 20,
+				'old' => $this->getAttrib('multi') ? 'multi' : $this->getValue(),
     			'sid' => session_id()
     		)
     	);
