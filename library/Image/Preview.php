@@ -26,6 +26,7 @@ class Zkernel_Image_Preview {
 		if (!is_array($bg_color)) $bg_color = $m->f_hex2rgb($bg_color);
 		$fit = isset($param['fit']) ? $param['fit'] : false;
 		$mark = @$param['mark'];
+		$mask = @$param['mask']; 
 		$corner = @$param['corner'];
 		$align = isset($param['align']) ? $param['align'] : 'cc';
 		$align = array(strtolower(substr($align, 0, 1)), strtolower(substr($align, 1, 1)));
@@ -154,7 +155,7 @@ class Zkernel_Image_Preview {
 			$this->mark($image, $mark);
 			$thumb->setOldImage($image);
 		}
-
+		
 		if($corner) {
 			$format = 'PNG';
 			$name = (@$param['new_name'])?$param['new_name']:$name;
@@ -163,6 +164,14 @@ class Zkernel_Image_Preview {
 			$thumb->setOldImage($image);
 		}
 
+		if($mask) {
+			$format = 'PNG';
+			$name = (@$param['new_name'])?$param['new_name']:$name;
+			$image = $thumb->getOldImage();
+			$this->alpha_mask($image, $param['mask']);
+			$thumb->setOldImage($image);
+		}		
+		
 		$thumb->save($this->path.'/'.$prefix.@$param['crop'].$name, $format);
 
 		return true;
@@ -271,4 +280,44 @@ class Zkernel_Image_Preview {
 
 		@imagedestroy($corner);
 	}
+	
+	private function alpha_mask(&$image, $param){
+		if (!isset($param['file'])) throw new Zkernel_Exception("mask file does not exists");
+		$mask = @imagecreatefrompng($param['file']);
+		if (!$mask) throw new Zkernel_Exception("Cannot create mask png");
+
+		$this->_add_alpha_mask($image, $mask);
+		imagedestroy($mask);
+	}
+	
+	private function _add_alpha_mask(&$image, $mask) {
+		// Get sizes and set up new picture
+		$xSize = imagesx( $image );
+		$ySize = imagesy( $image );
+		$newPicture = imagecreatetruecolor( $xSize, $ySize );
+		imagesavealpha( $newPicture, true );
+		imagefill( $newPicture, 0, 0, imagecolorallocatealpha( $newPicture, 0, 0, 0, 127 ) );
+
+		// Resize mask if necessary
+		if( $xSize != imagesx( $mask ) || $ySize != imagesy( $mask ) ) {
+			$tempPic = imagecreatetruecolor( $xSize, $ySize );
+			imagecopyresampled( $tempPic, $mask, 0, 0, 0, 0, $xSize, $ySize, imagesx( $mask ), imagesy( $mask ) );
+			imagedestroy( $mask );
+			$mask = $tempPic;
+		}
+
+		// Perform pixel-based alpha map application
+		for( $x = 0; $x < $xSize; $x++ ) {
+			for( $y = 0; $y < $ySize; $y++ ) {
+				$alpha = imagecolorsforindex( $mask, imagecolorat( $mask, $x, $y ) );
+				$alpha = 127 - floor( $alpha[ 'red' ] / 2 );
+				$color = imagecolorsforindex( $image, imagecolorat( $image, $x, $y ) );
+				imagesetpixel( $newPicture, $x, $y, imagecolorallocatealpha( $newPicture, $color[ 'red' ], $color[ 'green' ], $color[ 'blue' ], $alpha ) );
+			}
+		}
+
+		// Copy back to original picture
+		imagedestroy( $image );
+		$image = $newPicture;
+	}	
 }
