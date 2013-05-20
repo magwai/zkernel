@@ -142,5 +142,3 @@ if ($format == "tinymce") {
 
 	echo $content . "};";
 }
-
-?>

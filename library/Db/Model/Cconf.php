@@ -23,7 +23,7 @@ class Zkernel_Db_Model_Cconf extends Zkernel_Db_Table {
     	);
     }
 
-	public function fetchPairs($where = null, $action = null, $controller = null) {
+	public function fetchAllPairs($where = null, $action = null, $controller = null, $trash = null) {
 		if ($controller === null) $controller = Zend_Controller_Front::getInstance()->getRequest()->getControllerName();
 		if ($action === null) $action = Zend_Controller_Front::getInstance()->getRequest()->getActionName();
 		$select = $this->select()

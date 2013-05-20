@@ -487,13 +487,13 @@ class Zkernel_View_Helper_Control extends Zend_View_Helper_Abstract  {
 		// Получаем настройки из БД
     	$mc = new Default_Model_Cconf();
 
-    	$conf = $mc->fetchPairs(null, '', '');
+    	$conf = $mc->fetchAllPairs(null, '', '');
     	if (!$conf) $conf = array();
 
-    	$conf_c = $mc->fetchPairs(null, '', $this->config->controller);
+    	$conf_c = $mc->fetchAllPairs(null, '', $this->config->controller);
     	if ($conf_c) $conf = array_merge($conf, $conf_c);
 
-    	$conf_s = $mc->fetchPairs(null, $this->config->action, $this->config->controller);
+    	$conf_s = $mc->fetchAllPairs(null, $this->config->action, $this->config->controller);
     	if ($conf_s) $conf = array_merge($conf, $conf_s);
 
     	//$this->config->set($conf_s);

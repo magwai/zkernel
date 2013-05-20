@@ -4,7 +4,7 @@
  *
  * @package MCFileManager.filesystems
  * @author Moxiecode
- * @copyright Copyright © 2005, Moxiecode Systems AB, All rights reserved.
+ * @copyright Copyright ï¿½ 2005, Moxiecode Systems AB, All rights reserved.
  */
 
 // File type contstants
@@ -151,7 +151,7 @@ class Moxiecode_BaseFile {
 	 * @param MCE_File $dest File to copy to.
 	 * @return boolean true - success, false - failure
 	 */
-	function copyTo($dest) {
+	function copyTo(&$dest) {
 	}
 
 	/**
@@ -212,7 +212,7 @@ class Moxiecode_BaseFile {
 	 * @param MCE_File $dest File to rename/move to.
 	 * @return boolean true- success, false - failure
 	 */
-	function renameTo($dest) {
+	function renameTo(&$dest) {
 	}
 
 	/**
