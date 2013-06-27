@@ -40,7 +40,12 @@ class Zkernel_Db_Model_Twitter {
 		$res = array();
 		if (isset($this->_twitter[$this->_name]['status_list'])) $statuses = $this->_twitter[$this->_name]['status_list'];
 		else {
-			$statuses = $this->_service->status->userTimeline();
+			try {
+				$statuses = $this->_service->statuses->userTimeline();
+			}
+			catch (Exception $e) {
+				$statuses = $this->_service->status->userTimeline();
+			}
 			$this->_twitter[$this->_name]['status_list'] = $statuses;
 			Zend_Registry::set('Zkernel_Twitter', $this->_twitter);
 		}
@@ -59,7 +64,12 @@ class Zkernel_Db_Model_Twitter {
 		$res = array();
 		if (isset($this->_twitter[$this->_name]['status_list'])) $statuses = $this->_twitter[$this->_name]['status_list'];
 		else {
-			$statuses = $this->_service->status->friendsTimeline();
+			try {
+				$statuses = $this->_service->statuses->friendsTimeline();
+			}
+			catch (Exception $e) {
+				$statuses = $this->_service->status->friendsTimeline();
+			}
 			$this->_twitter[$this->_name]['status_list'] = $statuses;
 			Zend_Registry::set('Zkernel_Twitter', $this->_twitter);
 		}
@@ -79,7 +89,12 @@ class Zkernel_Db_Model_Twitter {
 		$k = 'status_search_'.md5($q);
 		if (isset($this->_twitter[$this->_name][$k])) $statuses = $this->_twitter[$this->_name][$k];
 		else {
-			$statuses = $this->_service->status->statusSearchTimeline($q, $_param);
+			try {
+				$statuses = $this->_service->statuses->statusSearchTimeline($q, $_param);
+			}
+			catch (Exception $e) {
+				$statuses = $this->_service->status->statusSearchTimeline($q, $_param);
+			}
 			$this->_twitter[$this->_name][$k] = $statuses;
 			Zend_Registry::set('Zkernel_Twitter', $this->_twitter);
 		}
@@ -111,6 +126,11 @@ class Zkernel_Db_Model_Twitter {
 	}
 
 	function _update($msg) {
-		$this->_service->status->update($msg);
+		try {
+			$this->_service->statuses->update($msg);
+		}
+		catch (Exception $e) {
+			$this->_service->status->update($msg);
+		}
 	}
 }

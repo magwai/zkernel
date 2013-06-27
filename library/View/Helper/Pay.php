@@ -367,6 +367,93 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 		return $this->payYandexSuccess($order, $param, $callback_success);
 	}
 
+	
+	function payChronopayForm($order, $param = array()) {
+		$config = @$this->_config['chronopay'] ? $this->_config['chronopay'] : array();
+		if ($param) $config = array_merge($config, $param);
+
+		$card = $this->view->basket()->payCard($order);
+		if (@!$card) return false;
+
+		$config['price'] = number_format(isset($config['price']) ? $config['price'] : $card['total'], 2, '.', '');
+		if (@$config['price']) $config['product_price'] = $config['price'];
+
+		if (@!$config['sign']) $config['sign'] = @md5($config['product'].'-'.$config['price'].'-'.$config['key']);
+
+		if (@!$config['country']) $config['country'] = 'RUS';
+		if (@!$config['language']) $config['language'] = 'ru';
+
+		if (@!$config['email']) $config['email'] = @$card['mail'];
+		
+		if (@!$config['url']) $config['url'] = 'https://payments.chronopay.com/';
+		if (@!$config['cb_url']) $config['cb_url'] = 'http://'.$_SERVER['HTTP_HOST'].'/pay/chronoresult';
+		if (@!$config['success_url']) $config['success_url'] = 'http://'.$_SERVER['HTTP_HOST'].'/pay/chronook';
+		if (@!$config['decline_url']) $config['decline_url'] = 'http://'.$_SERVER['HTTP_HOST'].'/pay/chronofail';
+		
+		$res = $this->genForm($config['url'], array(
+			'product_id' => $config['product'],
+			'product_price' => $config['product_price'],
+			'sign' => $config['sign'],
+			'order_id' => $order,
+			'cs1' => $order,
+			'cb_type' => 'P',
+			'country' => $config['country'],
+			'language' => $config['language'],
+			'email' => $config['email'],
+			'cb_url' => $config['cb_url'],
+			'success_url' => $config['success_url'],
+			'decline_url' => $config['decline_url']
+		));
+		if ($res) echo $res;
+		else return false;
+
+		exit();
+	}
+	
+	
+	function payChronopayResult($order, $param = array(), $callback_success = null) {
+		$config = @$this->_config['chronopay'] ? $this->_config['chronopay'] : array();
+		if ($param) $config = array_merge($config, $param);
+		if ($order === null) $order = @(int)$config['cs1'];
+		$card = $this->view->basket()->payCard($order);
+		if (@!$card) {
+			throw new Zend_Controller_Action_Exception('Forbidden', 403);
+			exit();
+		}
+		if (number_format(@(float)$card['total'], 2, '.', '') == number_format(@(float)$config['total'], 2, '.', '')) {
+			$md5 = md5(
+				@$config['key'].
+				@$config['customer_id'].
+				@$config['transaction_id'].
+				@$config['transaction_type'].
+				@$config['total']
+			);
+			if ($md5 == strtolower($config['sign'])) {
+				if ($callback_success !== null) $callback_success($card, $config);
+			}
+			else throw new Zend_Controller_Action_Exception('Forbidden', 403);
+		}
+		else throw new Zend_Controller_Action_Exception('Forbidden', 403);
+		exit();
+	}
+
+	function payChronopaySuccess($order, $param = array(), $callback_success = null) {
+		$config = @$this->_config['chronopay'] ? $this->_config['chronopay'] : array();
+		if ($param) $config = array_merge($config, $param);
+		if ($order === null) $order = @(int)$config['cs1'];
+		if (!$order) $order = @(int)$config['order'];
+
+		$card = $this->view->basket()->payCard($order);
+		if (@!$card) return false;
+
+		if ($card && $callback_success !== null) $callback_success($card, $config);
+		return false;
+	}
+
+	function payChronopayFail($order, $param = array(), $callback_success = null) {
+		return $this->payIntellectSuccess($order, $param, $callback_success);
+	}
+
 	function payIntellectForm($order, $param = array()) {
 		$config = @$this->_config['intellect'] ? $this->_config['intellect'] : array();
 		if ($param) $config = array_merge($config, $param);
