@@ -9,7 +9,7 @@
 
 class Zkernel_Service_Twitter extends Zend_Service_Twitter {
     protected $_methodTypes = array(
-        'status',
+        'statuses',
         'user',
         'directMessage',
         'friendship',

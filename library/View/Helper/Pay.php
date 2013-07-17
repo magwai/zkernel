@@ -279,7 +279,7 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 		}
 
 		if (@$config['shopid']) $config['ShopId'] = $config['shopid'];
-		
+
 		$config['price'] = isset($config['price']) ? $config['price'] : $card['total'];
 		if (@$config['price']) $config['orderSumAmount'] = $config['price'];
 
@@ -293,7 +293,7 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 			echo '<checkOrderResponse performedDatetime="'.date('Y-m-d\TH:i:s').'" code="100" invoiceId="'.$config['invoiceId'].'" shopId="'.$config['ShopId'].'" message="Заказ был оплачен ранее" />';
 		}
 		else echo '<checkOrderResponse performedDatetime="'.date('Y-m-d\TH:i:s').'" code="0" invoiceId="'.$config['invoiceId'].'" shopId="'.$config['ShopId'].'" />';
-		
+
 		exit();
 	}
 
@@ -367,7 +367,7 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 		return $this->payYandexSuccess($order, $param, $callback_success);
 	}
 
-	
+
 	function payChronopayForm($order, $param = array()) {
 		$config = @$this->_config['chronopay'] ? $this->_config['chronopay'] : array();
 		if ($param) $config = array_merge($config, $param);
@@ -384,12 +384,14 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 		if (@!$config['language']) $config['language'] = 'ru';
 
 		if (@!$config['email']) $config['email'] = @$card['mail'];
-		
+		if (@!$config['phone']) $config['phone'] = @$card['phone'];
+
+		if (@!$config['payment_type_group_id']) $config['payment_type_group_id'] = '1';
 		if (@!$config['url']) $config['url'] = 'https://payments.chronopay.com/';
 		if (@!$config['cb_url']) $config['cb_url'] = 'http://'.$_SERVER['HTTP_HOST'].'/pay/chronoresult';
 		if (@!$config['success_url']) $config['success_url'] = 'http://'.$_SERVER['HTTP_HOST'].'/pay/chronook';
 		if (@!$config['decline_url']) $config['decline_url'] = 'http://'.$_SERVER['HTTP_HOST'].'/pay/chronofail';
-		
+
 		$res = $this->genForm($config['url'], array(
 			'product_id' => $config['product'],
 			'product_price' => $config['product_price'],
@@ -400,17 +402,19 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 			'country' => $config['country'],
 			'language' => $config['language'],
 			'email' => $config['email'],
+			'phone' => trim(str_replace(array('(', ')', ' ', '+7'), array('', '', '', ''), $config['phone'])),
 			'cb_url' => $config['cb_url'],
 			'success_url' => $config['success_url'],
-			'decline_url' => $config['decline_url']
+			'decline_url' => $config['decline_url'],
+			'payment_type_group_id' => $config['payment_type_group_id']
 		));
 		if ($res) echo $res;
 		else return false;
 
 		exit();
 	}
-	
-	
+
+
 	function payChronopayResult($order, $param = array(), $callback_success = null) {
 		$config = @$this->_config['chronopay'] ? $this->_config['chronopay'] : array();
 		if ($param) $config = array_merge($config, $param);
@@ -653,4 +657,95 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 	function payRbkFail($order, $param = array(), $callback_success = null) {
 		return $this->payRbkSuccess($order, $param, $callback_success);
 	}
+
+	function payQwForm($order, $param = array()) {
+		$config = @$this->_config['qw'] ? $this->_config['qw'] : array();
+		if ($param) $config = array_merge($config, $param);
+
+		$card = $this->view->basket()->payCard($order);
+		if (@!$card) return false;
+
+		$config['price'] = isset($config['price']) ? $config['price'] : $card['total'];
+		if (@$config['price']) $config['summ'] = $config['price'];
+		if (@$config['id']) $config['from'] = $config['id'];
+		if (@!$config['lifetime']) $config['lifetime'] = 30 * 24;
+		if (@!$config['to']) $config['to'] = $card['phone'];
+
+		$config['to'] = preg_replace(array(
+			'/[^\d]/i'
+		), array(
+			''
+		), $config['to']);
+		if (strlen($config['to']) == 10) $config['to'] = '7'.$config['to'];
+		if (substr($config['to'], 0, 1) == '8') $config['to'] = '7'.substr($config['to'], 1);
+		$config['to'] = substr($config['to'], 1);
+
+		if (@!$config['url']) $config['url'] = 'http://w.qiwi.ru/setInetBill_utf.do';
+
+		$res = $this->genForm($config['url'], array(
+			'from' => $config['from'],
+			'to' => $config['to'],
+			'summ' => $config['summ'],
+			'lifetime' => $config['lifetime'],
+			'check_agt' => 'false',
+			'com' => $_SERVER['HTTP_HOST'].', #'.$order,
+			'txn_id' => $order
+		));
+
+		if ($res) echo $res;
+		else return false;
+
+		exit();
+	}
+
+	function payQwResult($order, $param = array(), $callback_success = null) {
+		$config = @$this->_config['qw'] ? $this->_config['qw'] : array();
+		if ($param) $config = array_merge($config, $param);
+
+		$i = @file_get_contents('php://input');
+
+		$l = array('/<login>(.*)?<\/login>/', '/<password>(.*)?<\/password>/');
+		$s = array('/<txn>(.*)?<\/txn>/', '/<status>(.*)?<\/status>/');
+		$m2 = '';
+		$m3 = '';
+		$m4 = '';
+		preg_match($l[1], $i, $m2);
+		preg_match($s[0], $i, $m3);
+		preg_match($s[1], $i, $m4);
+		$hash = strtoupper(md5($m3[1].strtoupper(md5($config['password']))));
+
+		if ($order === null) $order = (int)$m3[1];
+		$card = $this->view->basket()->payCard($order);
+		if (@!$card || $hash !== $m2[1]) {
+			$resultCode = 150;
+		}
+		else {
+			$resultCode = 0;
+			if ($m4[1] == 60) {
+				if ($callback_success !== null) $callback_success($card, $config);
+			}
+		}
+		$text = '<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="http://client.ishop.mw.ru/"><SOAP-ENV:Body><ns1:updateBillResponse><updateBillResult>'.$resultCode.'</updateBillResult></ns1:updateBillResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>';
+		header('content-type: text/xml; charset=UTF-8');
+		echo $text;
+		exit();
+	}
+
+	function payQwSuccess($order = 0, $param = array(), $callback_success = null) {
+		$config = @$this->_config['qw'] ? $this->_config['qw'] : array();
+		if ($param) $config = array_merge($config, $param);
+
+		if ($order === null) $order = @(int)$config['order'];
+
+		$card = $this->view->basket()->payCard($order);
+		if (@!$card) return false;
+
+		if ($callback_success !== null) $callback_success($card, $config);
+		return false;
+	}
+
+	function payQwFail($order, $param = array(), $callback_success = null) {
+		return $this->payQwSuccess($order, $param, $callback_success);
+	}
+
 }

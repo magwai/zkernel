@@ -196,6 +196,7 @@ c.go = function(controller, action, param, post) {
 				if (d.navpane) c.build_navpane(d.navpane);
 				if (d.content) {
 					if (typeof CKEDITOR != 'undefined') CKEDITOR.instances = {};
+					if (typeof tinymce != 'undefined') tinymce.editors = [];
 					$('.mceListBoxMenu').remove();
 					$('#c_content').html(d.content);
 					$('dt[id$=\_crop-label],dd[id$=\_crop-element]').hide();

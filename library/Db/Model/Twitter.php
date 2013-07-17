@@ -30,6 +30,10 @@ class Zkernel_Db_Model_Twitter {
 			if ($consumer_key) $opt['consumerKey'] = $consumer_key;
 			if ($consumer_secret) $opt['consumerSecret'] = $consumer_secret;
 			if ($callback_url) $opt['callbackUrl'] = $callback_url;
+			$opt['oauthOptions'] = array(
+				'consumerKey' => $opt['consumerKey'],
+				'consumerSecret' => $opt['consumerSecret']
+			);
 			$this->_service = new Zkernel_Service_Twitter($opt);
 			$this->_twitter[$this->_name]['service'] = $this->_service;
 			Zend_Registry::set('Zkernel_Twitter', $this->_twitter);
@@ -41,7 +45,7 @@ class Zkernel_Db_Model_Twitter {
 		if (isset($this->_twitter[$this->_name]['status_list'])) $statuses = $this->_twitter[$this->_name]['status_list'];
 		else {
 			try {
-				$statuses = $this->_service->statuses->userTimeline();
+				$statuses = $this->_service->statuses->userTimeline()->toValue();
 			}
 			catch (Exception $e) {
 				$statuses = $this->_service->status->userTimeline();
@@ -65,7 +69,7 @@ class Zkernel_Db_Model_Twitter {
 		if (isset($this->_twitter[$this->_name]['status_list'])) $statuses = $this->_twitter[$this->_name]['status_list'];
 		else {
 			try {
-				$statuses = $this->_service->statuses->friendsTimeline();
+				$statuses = $this->_service->statuses->homeTimeline()->toValue();
 			}
 			catch (Exception $e) {
 				$statuses = $this->_service->status->friendsTimeline();

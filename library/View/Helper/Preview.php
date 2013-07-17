@@ -7,7 +7,7 @@
  * http://www.opensource.org/licenses/mit-license.php
  */
 
-class Zkernel_View_Helper_Preview extends Zend_View_Helper_Abstract  { 
+class Zkernel_View_Helper_Preview extends Zend_View_Helper_Abstract  {
 	public function preview($dir = null, $name, $param = array()) {
 		if (!$dir || !$name) return @$param['default'];
 		$prefix = $param['prefix'] = @$param['prefix'] ? $param['prefix'].'_' : '';
@@ -43,6 +43,8 @@ class Zkernel_View_Helper_Preview extends Zend_View_Helper_Abstract  {
 				$preview->create($name, $param);
 			}
 			@chmod(PUBLIC_PATH.'/'.$cp.'/'.$dir_dest.'/'.$prefix.@$param['crop'].$name, 0777);
+			@clearstatcache();
+			$modified = @filemtime(PUBLIC_PATH.'/'.$cp.'/'.$dir_dest.'/'.$prefix.@$param['crop'].$name);
 	    }
 		$static_hosts = array();
 		$bt = Zend_Controller_Front::getInstance()->getParam('bootstrap');
@@ -53,7 +55,7 @@ class Zkernel_View_Helper_Preview extends Zend_View_Helper_Abstract  {
 		$ret = $modified || @file_exists(PUBLIC_PATH.'/'.$cp.'/'.$dir_dest.'/'.$prefix.@$param['crop'].(($png_name)?$png_name:$name))
 	    	? '/'.$cp.'/'.$dir_dest.'/'.$prefix.@$param['crop'].(($png_name)?$png_name:$name).'?'.$modified
 	    	: @$param['default'];
-		
+
 	    return ($static_hosts && $ret ? 'http://'.$static_hosts[substr((string)hexdec(substr(sha1($ret), 0, 15)), 0, 1)] : '').$ret;
     }
 }

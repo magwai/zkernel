@@ -115,7 +115,7 @@ class Zkernel_View_Helper_Mail extends Zkernel_View_Helper_Override  {
 					}
 				}
 			}
-			/*if ($tr) */$mail->send($tr);
+			if (!$ok) $mail->send($tr);
 		}
 		catch (Zend_Mail_Transport_Exception $e) {
 			$ok = false;
