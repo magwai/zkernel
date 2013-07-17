@@ -15,7 +15,7 @@ class Zkernel_Form extends Zend_Form {
 		);
 	}
 
-	function translateError($e, $v = null) {
+	static function translateError($e, $v = null) {
 		$d = array(
 			'notLessThan' => 'слишком большое значение',
 			'notGreaterThan' => 'слишком маленькое значение',
@@ -38,7 +38,7 @@ class Zkernel_Form extends Zend_Form {
 		return is_numeric($e) ? $v : (isset($d[$e]) ? $d[$e] : $e);
 	}
 
-	function translateErrors($e) {
+	static function translateErrors($e) { 
 		if ($e) foreach ($e as &$el) $el = self::translateError($el);
 		return $e;
 	}
