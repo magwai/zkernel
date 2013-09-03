@@ -13,6 +13,9 @@ class Zkernel_View_Helper_User extends Zend_View_Helper_Abstract  {
 		'full' => 'name',
 		'mail' => 'mail'
 	);
+	private $_ulogin_match = array(
+		'full' => 'name'
+	);
 
 	public function init() {
 		$this->_user = Zend_Registry::isRegistered('Zkernel_User') ? Zend_Registry::get('Zkernel_User') : null;
@@ -24,6 +27,10 @@ class Zkernel_View_Helper_User extends Zend_View_Helper_Abstract  {
 
 	public function loginza($token) {
 		return $this->_user->loginza($token, $this->_loginza_match);
+	}
+
+	public function ulogin($token) {
+		return $this->_user->ulogin($token, $this->_ulogin_match);
 	}
 
 	public function login($login, $password = null, $remember = false) {
@@ -48,6 +55,10 @@ class Zkernel_View_Helper_User extends Zend_View_Helper_Abstract  {
 
 	function set_loginza_match($data) {
 		$this->_loginza_match = $data;
+	}
+
+	function set_ulogin_match($data) {
+		$this->_ulogin_match = $data;
 	}
 
 	public function user($p = null) {

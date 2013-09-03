@@ -182,9 +182,7 @@ class Zkernel_User {
 		return false;
 	}
 
-	function loginza($token, $match = array()) {
-		$res = @file_get_contents('http://loginza.ru/api/authinfo?token='.$token);
-		$res_decoded = $this->loginzaParse($res);
+	function soc_login($token, $match, $res, $res_decoded, $type) {
 		if ($res_decoded && isset($res_decoded['mail'])) {
 			$ex = (int)$this->_models['user']->fetchOne('id', array(
 				'`login` = ?' => $res_decoded['login']
@@ -192,10 +190,11 @@ class Zkernel_User {
 			$data = array(
 				'token' => $token,
 				'token_last' => date('Y-m-d H:i:s'),
-				'loginza' => $res
+				$type => $res
 			);
 			if ($ex) {
-				$ok = $this->update($data, $ex);
+				$ok = 'login';
+				$this->update($data, $ex);
 			}
 			else {
 				$data['login'] = $res_decoded['login'];
@@ -209,6 +208,7 @@ class Zkernel_User {
 					}
 				}
 				$ok = $this->register($data);
+				if ($ok) $ok = 'register';
 			}
 			if ($ok) {
 				$this->login($res_decoded['login']);
@@ -216,6 +216,18 @@ class Zkernel_User {
 		}
 		else $ok = false;
 		return $ok;
+	}
+
+	function ulogin($token, $match = array()) {
+		$res = @file_get_contents('http://ulogin.ru/token.php?token='.$token.'&host='.$_SERVER['HTTP_HOST']);
+		$res_decoded = $this->uloginParse($res);
+		return $this->soc_login($token, $match, $res, $res_decoded, 'ulogin');
+	}
+
+	function loginza($token, $match = array()) {
+		$res = @file_get_contents('http://loginza.ru/api/authinfo?token='.$token);
+		$res_decoded = $this->loginzaParse($res);
+		return $this->soc_login($token, $match, $res, $res_decoded, 'loginza');
 	}
 
 	function loginzaParse($data) {
@@ -233,6 +245,26 @@ class Zkernel_User {
 			if (!$ret['full']) $ret['full'] = ($ret['name'] || $ret['family']
 				? $ret['name'].($ret['name'] && $ret['family'] ? ' ' : '').$ret['family']
 				: ($ret['nick'] ? $ret['nick'] : ($ret['mail'] ? $ret['mail'] : preg_replace('/(http\:\/\/openid\.yandex\.ru\/|\/)/i', '', $ret['login'])))
+			);
+		}
+		return $ret;
+	}
+
+	function uloginParse($data) {
+		$ret = array();
+		$res = @json_decode($data);
+		if ($res) {
+			$ret = array(
+				'nick' => isset($res->nickname) ? $res->nickname : '',
+				'name' => isset($res->first_name) ? $res->first_name : '',
+				'family' => isset($res->last_name) ? $res->last_name : '',
+				'login' =>	isset($res->identity) ? $res->identity : '',
+				'full' => @$res->first_name.(@$res->last_name ? ' '.$res->last_name : ''),
+				'mail' => isset($res->email) ? $res->email : '',
+				'city' => isset($res->city) ? $res->city : '',
+				'photo' => isset($res->photo) ? $res->photo : '',
+				'photo_big' => isset($res->photo_big) ? $res->photo_big : '',
+				'phone' => isset($res->phone) ? $res->phone : ''
 			);
 		}
 		return $ret;

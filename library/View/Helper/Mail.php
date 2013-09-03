@@ -10,7 +10,7 @@
 class Zkernel_View_Helper_Mail extends Zkernel_View_Helper_Override  {
 	function mail($data) {
 		$mail = new Zend_Mail('utf-8');
-		$mail->setType(Zend_Mime::MULTIPART_RELATED);
+		$mail->setType(Zend_Mime::MULTIPART_ALTERNATIVE);
 		$mail->setHeaderEncoding(Zend_Mime::ENCODING_BASE64);
 		$body = $this->view->partial('mail/frame.phtml', array(
 			'message' => @$data['body'] ? $data['body'] : $this->view->partial('mail/'.$data['view'].'.phtml', $data)
@@ -31,6 +31,28 @@ class Zkernel_View_Helper_Mail extends Zkernel_View_Helper_Override  {
 					);
 					$at->id = $cid;
 					$r[] = 'src="cid:'.$cid.'"';
+				}
+				else $r[] = $res[0][$k];
+			}
+			$body = str_ireplace($res[0], $r, $body);
+		}
+		preg_match_all('/href\=\"\/upload\/mce\/file\/([^\"]+)\"/si', $body, $res);
+		if (@$res[1]) {
+			$r = array();
+			foreach ($res[1] as $k => $v) {
+				$fn = PUBLIC_PATH.'/upload/mce/file/'.$res[1][$k];
+				$s = file_exists($fn);
+				if ($s) {
+					$cid = md5('upload/mce/file/'.$res[1][$k]);
+					$at = $mail->createAttachment(
+						file_get_contents($fn),
+						Zend_Mime::TYPE_OCTETSTREAM,
+						Zend_Mime::DISPOSITION_ATTACHMENT,
+                        Zend_Mime::ENCODING_BASE64,
+						basename($fn)
+					);
+					$at->id = $cid;
+					$r[] = 'href="cid:'.$cid.'"';
 				}
 				else $r[] = $res[0][$k];
 			}
