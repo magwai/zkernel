@@ -100,18 +100,19 @@ if (!isset($param) || $param[0] == '') {
     // check also foreigners even if relwork is FALSE (to get
     // foreign keys from innodb)
     $foreigners = PMA_getForeigners($db, $table);
-    ?>
-<script type="text/javascript">
+
+	$js = '<script type="text/javascript">
 // <![CDATA[
 function PMA_tbl_select_operator(f, index, multiple) {
-    switch (f.elements["func[" + index + "]"].options[f.elements["func[" + index + "]"].selectedIndex].value) {
-<?php
-reset($GLOBALS['cfg']['UnaryOperators']);
+    switch (f.elements["func[" + index + "]"].options[f.elements["func[" + index + "]"].selectedIndex].value) {';
+	
+	reset($GLOBALS['cfg']['UnaryOperators']);
 while (list($operator) = each($GLOBALS['cfg']['UnaryOperators'])) {
-    echo '        case "' . $operator . "\":\r\n";
+    $js .= '        case "' . $operator . "\":\r\n";
 }
-?>
-            bDisabled = true;
+	
+	
+	$js .= 'bDisabled = true;
             break;
 
         default:
@@ -120,7 +121,10 @@ while (list($operator) = each($GLOBALS['cfg']['UnaryOperators'])) {
     f.elements["fields[" + index + "]" + ((multiple) ? "[]": "")].disabled = bDisabled;
 }
 // ]]>
-</script>
+</script>';
+	
+	echo $js;
+    ?>
 <form method="post" action="tbl_select.php" name="insertForm">
 <?php echo PMA_generate_common_hidden_inputs($db, $table); ?>
 <input type="hidden" name="goto" value="<?php echo $goto; ?>" />

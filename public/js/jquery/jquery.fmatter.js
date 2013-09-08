@@ -155,8 +155,8 @@
 					timestamp.setTime(Number(Number(timestamp) + (offset * 60 * 1000)));
 				}
 			} else {
-				date = date.split(/[\\\/:_;.,\t\T\s-]/);
-				format = format.split(/[\\\/:_;.,\t\T\s-]/);
+				date = date.split(new RegExp('[\\\/:_;.,\t\T\s-]'));
+				format = format.split(new RegExp('[\\\/:_;.,\t\T\s-]'));
 				// parsing for month names
 				for(k=0,hl=format.length;k<hl;k++){
 					if(format[k] == 'M') {

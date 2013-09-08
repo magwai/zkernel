@@ -717,7 +717,7 @@ class Zkernel_View_Helper_Pay extends Zend_View_Helper_Abstract  {
 		if ($order === null) $order = (int)$m3[1];
 		$card = $this->view->basket()->payCard($order);
 		if (@!$card || $hash !== $m2[1]) {
-			$resultCode = 150;
+			$resultCode = $m4[1] > 100 ? 0 : 150;
 		}
 		else {
 			$resultCode = 0;
