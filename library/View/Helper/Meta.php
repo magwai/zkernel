@@ -15,9 +15,16 @@ class Zkernel_View_Helper_Meta extends Zend_View_Helper_Abstract  {
 		$words = preg_replace('/(\,|\-|\;|\_|\.)/si', '', $data['keywords']);
 		do $words = str_replace('  ', ' ', $words, $count);
 		while($count);
-		$this->_set_meta('title', $data['title']);
-		$this->_set_meta('keywords', str_replace(' ', ', ', $words));
-		$this->_set_meta('description', $data['description']);
+		if($data['title']) {
+			$this->_set_meta('title', $data['title']);
+		}
+		$words = str_replace(' ', ', ', $words);
+		if($words) {
+			$this->_set_meta('keywords', $words);
+		}
+		if($data['description']) {
+			$this->_set_meta('description', $data['description']);
+		}
 	}
 
 	public function _set_meta($key, $str) {
