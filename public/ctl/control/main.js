@@ -215,6 +215,7 @@ c.go = function(controller, action, param, post) {
 		complete: function() {
 		}
 	});
+	
 	//$.php((c.cfg.lang && !c.cfg.lang_session ? '/' + c.cfg.lang : '') + c.url_assemble(controller, action, param), post);
 	return false;
 };

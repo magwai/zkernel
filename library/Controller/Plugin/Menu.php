@@ -31,7 +31,6 @@ class Zkernel_Controller_Plugin_Menu extends Zend_Controller_Plugin_Abstract {
 		$reg = Zend_Registry::isRegistered('Zkernel_Multilang') ? Zend_Registry::get('Zkernel_Multilang') : '';
 		$view = Zend_Controller_Action_HelperBroker::getStaticHelper('viewRenderer')->view;
 		if ($m) foreach ($m as $el) {
-			//print_r($el->route);
 			if ($this->funcElCheck($el)) {
 				$el = $view->override()->overrideSingle($el, 'menu');
 				$p = $reg && !$reg->session && !@$reg->_default->domain ? array('lang' => $reg->stitle) : array();

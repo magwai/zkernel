@@ -4,7 +4,7 @@
  *
  * @package SessionAuthenticator
  * @author Moxiecode
- * @copyright Copyright © 2007, Moxiecode Systems AB, All rights reserved.
+ * @copyright Copyright ï¿½ 2007, Moxiecode Systems AB, All rights reserved.
  */
 
 @session_start();
@@ -76,4 +76,3 @@ class Moxiecode_SessionAuthenticator extends Moxiecode_ManagerPlugin {
 
 // Add plugin to MCManager
 $man->registerPlugin("SessionAuthenticator", new Moxiecode_SessionAuthenticator());
-?>
