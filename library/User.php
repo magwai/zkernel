@@ -112,17 +112,18 @@ class Zkernel_User {
 		if ($this->_auth === null) $this->initAuth();
 		$key = 'user_'.$this->_models['user']->info('name');
 		if ($password === null) {
-			$data = method_exists($this->_models['user'], 'fetchUserDataByLogin')
-				? $this->_models['user']->fetchUserDataByLogin($login)
-				: $this->_models['user']->fetchRow(array(
-					'`login` = ?' => $login
-				));
+			$data = $this->getUserData($login);
 			if ($data) {
-				$result = $this->_auth->getStorage()->write($login);
+				//перезаписываем идентичность с идентификатора на хеш, включающий в себя много 
+				//параметров, чтобы если один в базе изменился, а человек по сессии аутентифицировался ранее,
+				//то он уже не мог зайти.
+				$newIden = $this->genParamsIdentity($data);
+				$result = $this->_auth->getStorage()->write($newIden); 
+				
 				$this->_data = $data;
 				if ($remember) setcookie(
 					$key,
-					sha1($this->_data->login.$this->_data->password),
+					$newIden,
 					time() + 86400 * 30,
 					'/'
 				);
@@ -136,26 +137,60 @@ class Zkernel_User {
 			if ($result->isValid()) return $this->login($login, null, $remember);
 		}
 		return false;
+	}	
+	
+	protected function genParamsIdentity($user) {
+		if(is_numeric($user)) {
+			$userData = $this->getUserData($user);
+		} else if(is_object($user)) {
+			$userData = $user;
+		}
+		else{
+			$userData = $this->_data;
+		}
+		if(!$userData) throw new Zkernel_Exception('user data not set', 404);
+		return sha1($userData->login.$userData->password.$userData->active);
 	}
+	
+	protected function getUserFromParamsIdentity($identity) {
+		$row = $this->_models['user']->fetchRow(array(
+			'SHA1(CONCAT(`login`, `password`, `active`)) = ?' => $identity
+		));
+		return $row;
+	}
+	
+	protected function getUserData($login) {
+		$data = method_exists($this->_models['user'], 'fetchUserDataByLogin')
+			? $this->_models['user']->fetchUserDataByLogin($login)
+			: $this->_models['user']->fetchRow(array(
+				'`login` = ?' => $login
+			));		
+		return $data;
+	}	
 
 	function loginAuto() {
 		if ($this->_auth === null) $this->initAuth();
-		if ($this->_auth->hasIdentity()) $this->login($this->_auth->getIdentity());
+		$key = '';
+		if ($this->_auth->hasIdentity()) {
+			$identity = $this->_auth->getIdentity();
+		}
 		else {
 			$key = 'user_'.$this->_models['user']->info('name');
-			$secret = @$_COOKIE[$key] ? $_COOKIE[$key] : '';
-			$data = $this->_models['user']->fetchRow(array(
-				'SHA1(CONCAT(`login`, `password`)) = ?' => $secret
-			));
-			if ($data) $this->login($data->login);
-			else setcookie(
-				$key,
-				'',
-				0,
-				'/'
-			);
+			$identity = @$_COOKIE[$key] ? $_COOKIE[$key] : '';
 		}
-	}
+		
+		$isLogged = false;
+		if($identity) {
+			$user = $this->getUserFromParamsIdentity($identity);
+			if($user) {
+				$isLogged = $this->login($user->login);
+			}
+		}
+		
+		if(!$isLogged && $key) {
+			setcookie($key, '', 0, '/');			
+		}
+	}	
 
 	function register($data) {
 		$meta = $this->_models['user']->info('metadata');
