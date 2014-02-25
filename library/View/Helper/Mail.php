@@ -92,7 +92,7 @@ class Zkernel_View_Helper_Mail extends Zkernel_View_Helper_Override  {
 		else $mail->setSubject(
 			$this->view->txt('site_title').($data['subject'] ? ' — '.$data['subject'] : '')
 		);
-		$ok = true;
+		$ok = false;
 		try {
 			$tr = null;
 			$bt = Zend_Controller_Front::getInstance()->getParam('bootstrap');
@@ -111,12 +111,12 @@ class Zkernel_View_Helper_Mail extends Zkernel_View_Helper_Override  {
 								'ssl' => $config['mail']['transports'][$v]['ssl'][$k]
 							));
 							try {
-								$ok = true;
 								$mail->send($tr);
+								$ok = true;
 								break;
 							}
 							catch (Exception $e) {
-								$ok = false;
+								//$ok = false;
 								//@file_put_contents(DATA_PATH.'/mail-'.time().microtime(true).'.txt', var_export($e, 1));
 							}
 						}
@@ -131,13 +131,15 @@ class Zkernel_View_Helper_Mail extends Zkernel_View_Helper_Override  {
 							}
 							catch (Exception $e) {
 								$tr = null;
-								$ok = false;
+								//$ok = false;
 							}
 						}
 					}
 				}
 			}
-			if (!$ok) $mail->send($tr);
+			if (!$ok) {
+				$ok = $mail->send($tr);
+			}
 		}
 		catch (Zend_Mail_Transport_Exception $e) {
 			$ok = false;
