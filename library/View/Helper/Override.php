@@ -60,7 +60,18 @@ class Zkernel_View_Helper_Override extends Zend_View_Helper_Abstract  {
 		if (isset($r->title)) $r->title_valid = htmlspecialchars($r->title);
 		if (isset($r->date)) $r->date_valid = Zkernel_Common::getDate($r->date);
 		//if (isset($options['num'])) $r->_num = $options['num'];
-		if ($type !== null && method_exists($this, 'override'.ucfirst($type))) $this->{'override'.ucfirst((string)$type)}($r, $options);
+		
+		//исключение в пользовательском оверрайде в админке приводит к труднонаходимой ошибке,
+		//поэтому добавил эту отладочную печать.
+		try{
+			if ($type !== null && method_exists($this, 'override'.ucfirst($type))) $this->{'override'.ucfirst((string)$type)}($r, $options);
+		} catch(Zend_Exception $e) {
+			if(APPLICATION_ENV == 'development') {
+				echo $e->getMessage(); 
+				echo $e->getTraceAsString();
+				exit;
+			}
+		}
 		return $r;
 	}
 
