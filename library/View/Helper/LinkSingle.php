@@ -42,12 +42,6 @@ class Zkernel_View_Helper_LinkSingle extends Zend_View_Helper_HeadLink  {
 		        }
 		        else $mod = true;
 				if ($mod) {
-					$static_hosts = array();
-					$bt = Zend_Controller_Front::getInstance()->getParam('bootstrap');
-					if ($bt) {
-						$config = $bt->getOptions();
-						$static_hosts = @$config['statichost'];
-					}
 					foreach ($items as $k => $el) {
 						$dir_full = dirname($el);
 						$dir = str_ireplace(PUBLIC_PATH, '', $dir_full);
@@ -73,7 +67,7 @@ class Zkernel_View_Helper_LinkSingle extends Zend_View_Helper_HeadLink  {
 									'/'.$zp,
 									'/'
 								), $su);
-								$str = str_ireplace($matches[$k_1], 'url('.($static_hosts ? 'http://'.$static_hosts[substr((string)hexdec(substr(sha1($su), 0, 15)), 0, 1)] : '').$su.($mtime ? '?'.filemtime($dir_full.'/'.$el_1) : '').')', $str);
+								$str = str_ireplace($matches[$k_1], 'url('.Zkernel_Common::gen_static_url($su).($mtime ? '?'.filemtime($dir_full.'/'.$el_1) : '').')', $str);
 							}
 						}
 
@@ -98,7 +92,7 @@ class Zkernel_View_Helper_LinkSingle extends Zend_View_Helper_HeadLink  {
 									'/zkernel',
 									'/'
 								), $su);
-								$str = str_ireplace($matches[$k_1], 'src="'.($static_hosts ? 'http://'.$static_hosts[substr((string)hexdec(substr(sha1($su), 0, 15)), 0, 1)] : '').$su.($mtime ? '?'.filemtime($dir_full.'/'.$el_1) : '').'"', $str);
+								$str = str_ireplace($matches[$k_1], 'src="'.Zkernel_Common::gen_static_url($su).($mtime ? '?'.filemtime($dir_full.'/'.$el_1) : '').'"', $str);
 							}
 						}
 
@@ -114,9 +108,9 @@ class Zkernel_View_Helper_LinkSingle extends Zend_View_Helper_HeadLink  {
 					@chmod(PUBLIC_PATH.$nm, 0777);
 
 					if (function_exists('gzopen')) {
-						$zp = gzopen(PUBLIC_PATH.$nm.'.gz', 'wb9');
-						gzwrite($zp, $c);
-						gzclose($zp);
+						$zp1 = gzopen(PUBLIC_PATH.$nm.'.gz', 'wb9');
+						gzwrite($zp1, $c);
+						gzclose($zp1);
 						@chmod(PUBLIC_PATH.$nm.'.gz', 0777);
 					}
 				}

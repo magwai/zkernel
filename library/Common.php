@@ -323,16 +323,29 @@ class Zkernel_Common {
 		else return $dbs;
 	}
 
-	function recursive_delete($dir) { 
-		if (!@file_exists($dir)) return true; 
-		if (!@is_dir($dir) || @is_link($dir)) return @unlink($dir); 
-        foreach (scandir($dir) as $item) { 
-            if ($item == '.' || $item == '..') continue; 
-            if (!self::recursive_delete($dir . "/" . $item)) { 
-                chmod($dir . "/" . $item, 0777); 
-                if (!self::recursive_delete($dir . "/" . $item)) return false; 
-            }; 
-        } 
-        return rmdir($dir); 
-    } 
+	static function recursive_delete($dir) {
+		if (!@file_exists($dir)) return true;
+		if (!@is_dir($dir) || @is_link($dir)) return @unlink($dir);
+		foreach (scandir($dir) as $item) {
+			if ($item == '.' || $item == '..') continue;
+			if (!self::recursive_delete($dir . "/" . $item)) {
+				chmod($dir . "/" . $item, 0777);
+				if (!self::recursive_delete($dir . "/" . $item)) return false;
+			};
+		}
+		return rmdir($dir);
+	}
+	
+	static function gen_static_url($url) {
+		$static_hosts = array();
+		$bt = Zend_Controller_Front::getInstance()->getParam('bootstrap');
+		if ($bt) {
+			$config = $bt->getOptions();
+			$static_hosts = @$config['statichost'];
+		}
+		return ($static_hosts && $url
+			? 'http://'.$static_hosts[substr((string)hexdec(substr(sha1($url), 0, 15)), 0, 1)]
+			: '').$url;
+	}
+
 }

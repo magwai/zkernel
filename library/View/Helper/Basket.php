@@ -374,6 +374,11 @@ class Zkernel_View_Helper_Basket extends Zend_View_Helper_Abstract  {
 		$ok = $this->_model_order_item->delete(array(
 			'`parentid` = ?' => $oid
 		));
+		if (!$this->basketQuant() && $this->_model_cash) {
+			$this->basketSave(array(
+				'cash' => 0
+			));
+		}
 		return $ok;
 	}
 

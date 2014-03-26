@@ -46,16 +46,10 @@ class Zkernel_View_Helper_Preview extends Zend_View_Helper_Abstract  {
 			@clearstatcache();
 			$modified = @filemtime(PUBLIC_PATH.'/'.$cp.'/'.$dir_dest.'/'.$prefix.@$param['crop'].$name);
 	    }
-		$static_hosts = array();
-		$bt = Zend_Controller_Front::getInstance()->getParam('bootstrap');
-		if ($bt) {
-			$config = $bt->getOptions();
-			$static_hosts = @$config['statichost'];
-		}
 		$ret = $modified || @file_exists(PUBLIC_PATH.'/'.$cp.'/'.$dir_dest.'/'.$prefix.@$param['crop'].(($png_name)?$png_name:$name))
 	    	? '/'.$cp.'/'.$dir_dest.'/'.$prefix.@$param['crop'].(($png_name)?$png_name:$name).'?'.$modified
 	    	: @$param['default'];
 
-	    return ($static_hosts && $ret ? 'http://'.$static_hosts[substr((string)hexdec(substr(sha1($ret), 0, 15)), 0, 1)] : '').$ret;
+	    return Zkernel_Common::gen_static_url($ret);
     }
 }

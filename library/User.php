@@ -211,7 +211,7 @@ class Zkernel_User {
 				if ($ok) $ok = 'register';
 			}
 			if ($ok) {
-				$this->login($res_decoded['login']);
+				$this->login($res_decoded['login'], null, true);
 			}
 		}
 		else $ok = false;
