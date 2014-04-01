@@ -34,18 +34,6 @@ class Zkernel_Db_Model_Cconf extends Zkernel_Db_Table {
     	if ($where !== null) $select->where($where);
 		return $this->getAdapter()->fetchPairs($select);
     }
-    
-    public function fetchAllPairs($where = null, $action = null, $controller = null, $trash = null) {
-		if ($controller === null) $controller = Zend_Controller_Front::getInstance()->getRequest()->getControllerName();
-		if ($action === null) $action = Zend_Controller_Front::getInstance()->getRequest()->getActionName();
-		$select = $this->select()
-    		//->from($this, array('CONCAT(`type`, ":", `key`)', 'value'))
-    		->from($this, array('key', 'IF (`type` != "text", CONCAT(`type`, ":", `value`), `value`)'))
-    		->where('`controller` = ?', $controller)
-    		->where('`action` = ?', $action);
-    	if ($where !== null) $select->where($where);
-		return $this->getAdapter()->fetchPairs($select);
-    }
 
 	function getTypes() {
 		return array(
