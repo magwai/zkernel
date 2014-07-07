@@ -32,7 +32,8 @@ class Zkernel_View_Helper_InlineSingle extends Zend_View_Helper_InlineScript  {
 					file_put_contents(PUBLIC_PATH.$nm, $c);
 					@chmod(PUBLIC_PATH.$nm, 0777);
 
-					if (function_exists('gzopen')) {
+					$config = Zend_Controller_Front::getInstance()->getParam('bootstrap')->getOptions();
+					if (@$config['js']['static'] && function_exists('gzopen')) {
 						$zp = gzopen(PUBLIC_PATH.$nm.'.gz', 'wb9');
 						gzwrite($zp, $c);
 						gzclose($zp);

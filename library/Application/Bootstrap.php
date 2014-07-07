@@ -52,6 +52,7 @@ class Zkernel_Application_Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 			}
 		}
 		$config->merge(new Zend_Config($this->getOptions()));
+
 		$this->setOptions($config->toArray());
 	}
 

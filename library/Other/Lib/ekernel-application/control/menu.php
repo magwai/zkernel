@@ -1,6 +1,6 @@
 <?php
 
-$tt = array('' => '[ '.$this->control()->config->control_lang_current['not_specified'].' ]');
+$tt = array('' => '[ не указан ]');
 $data = Zkernel_Common::getControllerDocblock();
 if ($data) {
 	foreach ($data as $n => $db) {
@@ -59,45 +59,54 @@ if ($data) {
 	}
 }
 
-$this->control(array(
-	'tree' => 1,
-	'field' => array(
-		'title' => array(
-			'title' => $this->control()->config->control_lang_current['title'],
-			'required' => true,
-			'order' => 1
-		),
-		'key' => array(
-			'title' => $this->control()->config->control_lang_current['key'],
-			'order' => 2,
-			'active' => $this->user()->isAllowed(
-				$this->user('role'),
-				Zkernel_Common::getById(array(
-					'model' => new Default_Model_Cresource(),
-					'field' => 'id',
-					'key' => 'key',
-					'id' => 'admin'
-				))
-			)
-		),
-		'cap' => array(
-			'title' => $this->control()->config->control_lang_current['partition'],
-			'description' => $this->control()->config->control_lang_current['partition_desc'],
-			'type' => 'select',
-			'param' => array(
-				'multioptions' => $tt,
-				'value' =>
-'php_function:
-$item = $control->config->model->fetchRow(array("`id` = ?" => (int)$control->config->param["id"]));
-return	$item ? @$item->controller.
+function cb_before(&$control) {
+	if (@$control->config->data->cap && !@$control->config->data->url) {
+		$p = explode('|', $control->config->data->cap);
+		$control->config->data->controller = @$p[0];
+		$control->config->data->action = @$p[1];
+		$control->config->data->param = @$p[2];
+		$control->config->data->route = @$p[3];
+	}
+	else {
+		$control->config->data->controller = '';
+		$control->config->data->action = '';
+		$control->config->data->param = '';
+		$control->config->data->route = '';
+	}
+}
+
+$cap_value = '';
+if ($this->config->action == 'edit') {
+	$item = $this->config->model->fetchRow(array("`id` = ?" => (int)$this->config->param["id"]));
+	$cap_value = $item ? @$item->controller.
 		(@$item->action ? "|".$item->action : "").
 		(@$item->param ? "|".$item->param : "").
-		(@$item->route ? "|".$item->route : "") : "";'
-			),
+		(@$item->route ? "|".$item->route : "") : "";
+}
+
+$this->control(array(
+	'tree' => true,
+	'field' => array(
+		'title' => array(
+			'title' => 'Название',
+			'order' => 1,
+			'required' => true
+		),
+		'key' => array(
+			'title' => 'Ключ',
+			'order' => 2,
+			'active' => $this->view->user()->is_allowed_by_key('admin')
+		),
+		'cap' => array(
+			'title' => 'Раздел сайта',
+			'type' => 'select',
+			'item' => $tt,
+			'value' => $cap_value,
 			'order' => 3
 		),
 		'url' => array(
 			'title' => 'URL',
+			'description' => 'Если указан URL, то он будет использован вместо указанного выше раздела сайта',
 			'order' => 4
 		),
 		'controller' => array(
@@ -112,42 +121,41 @@ return	$item ? @$item->controller.
 		'route' => array(
 			'active' => false
 		),
-		'orderid' => array(
-			'active' => false
-		),
-		'parentid' => array(
+		'map' => array(
 			'active' => false
 		)
 	),
-	'func_override' =>
-'php_function:
-if (@$control->config->data->cap && !@$control->config->data->url) {
-	$p = explode("|", $control->config->data->cap);
-	$control->config->data->controller = @$p[0];
-	$control->config->data->action = @$p[1];
-	$control->config->data->param = @$p[2];
-	$control->config->data->route = @$p[3];
-}
-else {
-	$control->config->data->controller = "";
-	$control->config->data->action = "";
-	$control->config->data->param = "";
-	$control->config->data->route = "";
-	//if (!$control->config->data->url) $control->config->info[] = "Заполните поле \"Раздел\" или \"URL\"";
-}
-',
-	'action_config' => array(
-		'ctlshow' => array(
+	'callback' => array(
+		'before' => function($control) {
+			$control->view->navigation()->control_encode($control);
+		},
+		'preset' => function($control) {
+			$control->view->navigation()->control_decode($control);
+		}
+	),
+	'config_action' => array(
+		'index' => array(
 			'field' => array(
-				'key' => array(
+				'url' => array(
 					'active' => false
 				),
 				'cap' => array(
 					'active' => false
-				),
-				'url' => array(
-					'active' => false
 				)
+			)
+		),
+		'add' => array(
+			'callback' => array(
+				'before' => function(&$control) {
+					cb_before($control);
+				}
+			)
+		),
+		'edit' => array(
+			'callback' => array(
+				'before' => function(&$control) {
+					cb_before($control);
+				}
 			)
 		)
 	)

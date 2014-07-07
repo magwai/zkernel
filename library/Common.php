@@ -149,7 +149,7 @@ class Zkernel_Common {
     		: false;
     	if ($pk) {
     		$inner = self::getDocblock($pk->name);
-    		if ($inner) $ret = array_merge($inner, $ret);
+			if ($inner) $ret = array_merge($inner, $ret);
     	}
 		return $ret;
 	}
@@ -335,7 +335,7 @@ class Zkernel_Common {
 		}
 		return rmdir($dir);
 	}
-	
+
 	static function gen_static_url($url) {
 		$static_hosts = array();
 		$bt = Zend_Controller_Front::getInstance()->getParam('bootstrap');

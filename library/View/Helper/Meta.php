@@ -53,6 +53,7 @@ class Zkernel_View_Helper_Meta extends Zend_View_Helper_Abstract  {
 			$meta = $model->fetchMatch(@$_SERVER['REQUEST_URI']);
 		}
 		if ($meta) {
+			if (@$meta['data']) $meta = @json_decode($meta);
 			$meta = $this->view->override()->overrideSingle($meta, 'meta');
 			if (@$meta['description']) $this->_set_meta('description', $meta['description']);
 			if (@$meta['keywords']) $this->_set_meta('keywords', $meta['keywords']);
